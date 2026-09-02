@@ -34,7 +34,7 @@ This is an advanced module: it assumes, rather than teaches, the foundations. Be
 
 - **HTTP in practice** — methods, status codes, headers, cookies, caching headers, and how proxies terminate and forward traffic.
 - **The common vulnerability classes** described in the OWASP Top 10 and the Web Security Testing Guide (SQL injection, XSS, CSRF, IDOR, broken authentication) — enough to exploit each on a basic lab without looking things up.
-- **Everyday Burp Suite** — proxy interception, Repeater, Intruder basics, Decoder. The advanced Burp guide builds on these, it does not re-teach them.
+- **Everyday Burp Suite** — proxy interception, Repeater, Intruder basics, Decoder. The advanced Burp guide builds on these and does not re-teach them.
 - **Reading and writing small scripts** — you will extend the Python scanner example and script request builders, so basic Python (functions, dataclasses, `requests`-style HTTP) is expected.
 - **Reading application code** — modern labs and real assessments require understanding the JavaScript/Python/Java snippets behind a feature, not just fuzzing its inputs.
 
@@ -107,27 +107,27 @@ Tip: keep a personal notes file with **one worked chain per technique family**. 
 - Prefer authorized lab platforms: PortSwigger Web Security Academy, OWASP Juice Shop, local DVWA/WebGoat-style apps, or INE's own lab environment if you are enrolled.
 - Never paste NDA-covered material into this repository. Keep all content generic, public, and in English.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Skipping methodology.** Starting labs before you have a workflow produces scattered, unverifiable results. Learn the phases first; they are the reusable asset.
 - **Chasing payloads instead of mechanisms.** If you cannot explain why a payload works, you will not be able to bypass the next filter. Study the parser and the flaw, not just the string.
 - **Not recording evidence.** A lab "win" without saved request/response pairs is worthless for report drills and for revision. Record as you go.
-- **Practising on one platform only.** Different platforms use different stacks and show different real-world variation. Rotate between sources.
+- **Practicing on one platform only.** Different platforms use different stacks and show different real-world variation. Rotate between sources.
 - **Blaming the payload first.** A "failed" exploit is often a proxy misconfiguration, an expired session, or the wrong `Host` header. Verify your environment before changing the payload.
 - **Adding NDA content.** The moment an item describes exam specifics it cannot live in this module. Keep it public and generic.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain, in my own words, what eWPTXv2-level testing adds over basic web testing (chains, bypasses, auth internals).
 - [ ] I have read `methodology/` files 01–05 in order and can summarize each phase without looking.
-- [ ] I have practised the Burp advanced features in `tools/burp-advanced.md` (a macro + session rule, one Turbo Intruder script, one extension).
+- [ ] I have practiced the Burp advanced features in `tools/burp-advanced.md` (a macro + session rule, one Turbo Intruder script, one extension).
 - [ ] I have run `tools/custom-scripts/advanced-scanner.py` against an authorized target and extended it with one new check.
 - [ ] I have completed the drills in `labs/challenge-solutions.md` and recorded at least one full chain with evidence.
 - [ ] I can reproduce the core entries of `cheatsheets/advanced-techniques.md` with the file closed.
 - [ ] I have written at least one end-to-end pentest-style report using the reporting methodology.
 - [ ] Everything I added to this module is English, public, and free of NDA content.
 
-## Further resources
+## Further Resources
 
 - OWASP Web Security Testing Guide — https://owasp.org/www-project-web-security-testing-guide/
 - OWASP Cheat Sheet Series — https://cheatsheetseries.owasp.org/

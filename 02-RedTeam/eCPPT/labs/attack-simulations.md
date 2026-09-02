@@ -210,7 +210,7 @@ Blue-team takeaway: rotate `krbtgt` twice after a suspected compromise.
 
 ---
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Skipping the snapshot** — scenarios change passwords and krbtgt state;
   without a revert point the lab degrades after one run.
@@ -230,7 +230,7 @@ Blue-team takeaway: rotate `krbtgt` twice after a suspected compromise.
   user, host, technique, evidence, impact. That discipline is what the report
   phase (and real work) demands.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can obtain a foothold with a password spray and explain the lockout risk
 - [ ] I can Kerberoast a service account and crack the TGS offline
@@ -239,7 +239,7 @@ Blue-team takeaway: rotate `krbtgt` twice after a suspected compromise.
 - [ ] I can forge a golden ticket and validate domain-wide access
 - [ ] I revert to the clean snapshot between scenarios and document each run
 
-## Further resources
+## Further Resources
 
 - [HackTricks — Active Directory methodology](https://book.hacktricks.wiki/en/windows-hardening/active-directory-methodology.html)
 - [MITRE ATT&CK — T1110.003 Password Spraying](https://attack.mitre.org/techniques/T1110/003/)

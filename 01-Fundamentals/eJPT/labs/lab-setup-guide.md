@@ -161,7 +161,7 @@ Before moving to `practice-scenarios.md`, verify your environment works end to e
 - [ ] From Kali: `ssh msfadmin@<metasploitable-ip>` logs in with `msfadmin`.
 - [ ] Snapshots "clean-base" exist for every VM.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Hypervisor networking wrong.** If Kali sees the internet but not the targets (or
   vice versa), check the adapter types — NAT cannot reach host-only guests.
@@ -180,7 +180,7 @@ Before moving to `practice-scenarios.md`, verify your environment works end to e
 - **Not recording IPs.** Write down each VM's name and IP; static addressing removes
   most confusion.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can name the two hypervisor choices and one reason to prefer each.
 - [ ] I can boot Kali, change the default password, and update the system.
@@ -191,7 +191,7 @@ Before moving to `practice-scenarios.md`, verify your environment works end to e
 - [ ] I can SSH from Kali into Metasploitable 2 with its documented credentials.
 - [ ] I have a clean "base" snapshot of every VM to restore after each drill.
 
-## Further resources
+## Further Resources
 
 - Kali Linux documentation and downloads: <https://www.kali.org/docs/> · <https://www.kali.org/get-kali/>
 - VirtualBox manual: <https://www.virtualbox.org/manual/>

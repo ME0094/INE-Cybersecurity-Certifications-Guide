@@ -105,7 +105,7 @@ BloodHound answers: "Shortest path to Domain Admins," "users with `GenericAll`/`
 - **Document everything as you go:** the same commands become your report evidence (see Phase 05).
 - **Stay in scope:** LDAP/BloodHound collection touches a lot of objects — throttle, use authenticated queries, and avoid destructive changes to objects.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain domain vs. forest, and name the default high-privilege groups and their scope.
 - [ ] I can describe the Kerberos AS/TGS exchange and where TGT and service tickets get encrypted.

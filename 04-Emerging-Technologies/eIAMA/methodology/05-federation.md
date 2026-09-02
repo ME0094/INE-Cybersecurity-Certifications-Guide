@@ -168,7 +168,7 @@ Strategic considerations: protocol support (SAML for legacy/B2B, OIDC for modern
 - **Mistake:** accepting SAML metadata from arbitrary URLs or untrusted sources. **Tip:** pin metadata sources; validate entities and certificates.
 - **Mistake:** no monitoring of failed assertions/validation. **Tip:** log rejections; alert on spikes — attacks show up there first.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can distinguish local SSO from federated SSO and describe the trust model.
 - [ ] I can draw the SAML SP-initiated flow and explain the ACS endpoint's role.
@@ -178,7 +178,7 @@ Strategic considerations: protocol support (SAML for legacy/B2B, OIDC for modern
 - [ ] I can explain at least five federation failure modes and their fixes.
 - [ ] I can recommend an IdP topology (single, broker, B2B, CIAM) for a given scenario.
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-63C, *Digital Identity Guidelines: Federation and Assertions*: https://doi.org/10.6028/NIST.SP.800-63c
 - OASIS SAML V2.0 core specification: https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.html

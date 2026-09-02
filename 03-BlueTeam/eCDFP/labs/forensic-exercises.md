@@ -177,7 +177,7 @@ sha256sum ~/lab/case3/dumps/*.dmp
 
 **Expected outcome:** you can name the OS/build, produce a process tree, and — if you planted the renamed `notepad.exe` — point to the anomaly: an `svchost.exe` whose **parent is `explorer.exe`** (real services are children of `services.exe`) or whose image path points to `Temp`. With a public sample, expect at least: OS identification, a process inventory, and a flagged process with a network connection or injected region. You do not need a "gotcha" finding on every sample — a clean baseline, documented, is a valid result.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Writing to the image after deletion** — any new write can overwrite the deleted file's clusters; unmount and stop touching it before recovering.
 - **Recovering before you hashed** — save the original file hash at creation time; without it you cannot *prove* a clean recovery.
@@ -187,7 +187,7 @@ sha256sum ~/lab/case3/dumps/*.dmp
 - **Analyzing a memory dump on the box it came from** — move the sample to a clean machine first.
 - **Skipping Drill 0 cleanly** — most drill failures trace back to a sloppy exercise image; redo it rather than debugging downstream.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I built a FAT32 exercise image and recorded its SHA-256 before touching it further.
 - [ ] I deleted a file on purpose and recovered it with `fls -d` + `icat -r`, hash-verified byte-for-byte.
@@ -198,7 +198,7 @@ sha256sum ~/lab/case3/dumps/*.dmp
 - [ ] Every drill artifact (image, recovered file, CSV, dump) sits in a folder with its hash recorded.
 - [ ] I can explain, for each drill, one thing that would invalidate the result (write-after-delete, wrong timezone, etc.).
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-86 — *Guide to Integrating Forensic Techniques into Incident Response* (csrc.nist.gov/publications).
 - The Sleuth Kit wiki (body file and `mactime` format) — sleuthkit.org.

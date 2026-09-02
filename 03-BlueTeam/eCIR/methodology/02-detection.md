@@ -218,7 +218,7 @@ a new host, account, or data store enters the picture.
 - **Mistake:** Not recording the triage decision. **Tip:** If it is not
   written down, it did not happen — log time, source, decision, and reason.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the difference between an event and an incident with an
       example of each.
@@ -236,7 +236,7 @@ a new host, account, or data store enters the picture.
       and can name safer alternatives.
 - [ ] I can define dwell time and explain why it matters for scoping.
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final

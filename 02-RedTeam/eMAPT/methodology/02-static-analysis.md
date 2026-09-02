@@ -166,7 +166,7 @@ to the cipher logic, and credentials in `assets/` or iOS bundled plists.
 - **Not recording evidence paths** — note class/method names and file:line so
   findings survive into the report.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I decoded the APK (apktool) and generated Java sources (jadx), or
       unpacked the IPA and obtained a decrypted binary for analysis.

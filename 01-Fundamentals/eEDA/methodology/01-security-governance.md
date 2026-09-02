@@ -148,7 +148,7 @@ The same data serves different audiences: technical detail for the security team
 - **Tip**: publish policies in a central, version-controlled location with effective dates and an owner named on each document.
 - **Tip**: rehearse one board-quality metric pack per quarter so that when an incident happens, the reporting muscle already exists.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the difference between governance and management with a concrete example.
 - [ ] I can name who is accountable (board, CISO) versus responsible (security team) for the program.

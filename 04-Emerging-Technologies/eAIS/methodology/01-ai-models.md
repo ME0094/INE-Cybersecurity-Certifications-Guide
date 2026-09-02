@@ -112,7 +112,7 @@ def run_assistant(user_message, retrieved_docs, tool_registry):
 
 Every arrow between these layers is a place a security control (Phase 05) must live: filter inputs, constrain tools, and log everything.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Mistake:** treating "the model refused" as proof the application is safe. Refusals are model behavior, not an access-control mechanism.
 - **Mistake:** trusting retrieved documents at the same level as your own system prompt. Any web page, email, or uploaded file inside context can steer the model.
@@ -121,7 +121,7 @@ Every arrow between these layers is a place a security control (Phase 05) must l
 - **Tip:** draw the data flow (user → app → model → tools → data stores) before testing; each hop is an injection or disclosure candidate.
 - **Tip:** write down which content classes are *instructions* (your system prompt, tool schemas) versus *data* (documents, emails, web pages). Every architecture decision should keep those classes separable.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can name at least five ML/LLM component stages and one attack family relevant to each.
 - [ ] I can explain the difference between pre-training, SFT/RLHF alignment, and fine-tuning.
@@ -131,7 +131,7 @@ Every arrow between these layers is a place a security control (Phase 05) must l
 - [ ] I can sketch a trust-boundary diagram for a simple RAG + tools application.
 - [ ] I can describe where memorization, backdoors, and privacy leakage arise in the ML lifecycle.
 
-## Further resources
+## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/
 - MITRE ATLAS (Adversarial Threat Landscape for Artificial-Intelligence Systems) — https://atlas.mitre.org/

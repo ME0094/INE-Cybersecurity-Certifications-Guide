@@ -112,7 +112,7 @@ suite = [
 - **Incident response.** Prepare playbooks for prompt-injection abuse, data leakage, and poisoned-artifact discovery: contain (disable tools), preserve (logs, artifacts), analyze, notify, and remediate (revert model/prompt, rotate credentials).
 - **Model cards and documentation.** Document intended use, limitations, training data, and tested attack surface so operators know what was validated — and what was not.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Mistake:** using an "input filter" or "ignore previous instructions" as the only control. Filters are evadable; pair them with least-privilege tools and output contracts.
 - **Mistake:** granting the agent broad credentials "to make it work." Scope it down and put high-impact actions behind human approval — the confused-deputy attack disappears when there is no deputy authority.
@@ -121,7 +121,7 @@ suite = [
 - **Tip:** measure defenses with the same rigor as attacks: define ASR baselines, budget, and regression gates before each release.
 - **Tip:** design for the worst case: ask "if the model is 100% compromised, what can the attacker reach?" and shrink that answer with tool scoping, not with better prompts.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can name at least five defense layers and give one concrete control for each.
 - [ ] I can explain why input filtering alone is insufficient and what layered controls replace it.
@@ -132,7 +132,7 @@ suite = [
 - [ ] I can explain governance artifacts: NIST AI RMF alignment, AIBOM, model cards, and incident playbooks.
 - [ ] I can apply the "fully compromised model" test to scope the real blast radius.
 
-## Further resources
+## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/
 - MITRE ATLAS (Adversarial Threat Landscape for AI Systems) — https://atlas.mitre.org/

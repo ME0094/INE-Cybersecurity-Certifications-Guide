@@ -150,7 +150,7 @@ AAL is about the **whole protocol**, not just the factor count: replay resistanc
 - **Mistake:** no absolute session timeout; stolen tokens live forever. **Tip:** enforce idle + absolute limits and re-auth on privilege change.
 - **Mistake:** passkeys rolled out without a recovery/backup story, then users locked out. **Tip:** plan device-bound vs. synced per population and test recovery.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can classify factors (knowledge/possession/inherence) and name realistic attacks on each.
 - [ ] I can explain why two factors from the same category do not make MFA.
@@ -160,7 +160,7 @@ AAL is about the **whole protocol**, not just the factor count: replay resistanc
 - [ ] I can choose idle/absolute timeouts and session revocation for a given threat model.
 - [ ] I can map controls to AAL1/AAL2/AAL3 and justify a privileged-access posture.
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-63B, *Digital Identity Guidelines: Authentication and Lifecycle Management*: https://doi.org/10.6028/NIST.SP.800-63b
 - FIDO Alliance — passkeys: https://fidoalliance.org/passkeys/

@@ -175,7 +175,7 @@ Know the difference between **monitor-and-continue** (true positive, contained, 
 - **Mistake:** undocumented reasoning, then a colleague re-does the whole investigation. *Tip:* fill the case notes as you go, not at the end.
 - **Mistake:** closing a true positive as "monitored" with no owner and no deadline. *Tip:* every open verdict needs a next action and a time to re-check.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I ACK alerts within the SLA and work from a written triage checklist.
 - [ ] I validate every alert against raw events before forming a verdict.

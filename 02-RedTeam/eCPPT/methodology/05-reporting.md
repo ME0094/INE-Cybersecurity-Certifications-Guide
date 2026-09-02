@@ -112,7 +112,7 @@ Never write the executive summary *after* the findings as an afterthought: draft
 - **Writing for yourself, not the reader:** the report's job is to transfer *your* understanding; if a section only you can follow, cut or rewrite it.
 - **Forgetting the appendix:** put long outputs, tool versions, and IOCs there; keep the body readable.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] My report follows a standard structure (exec summary → methodology → findings → roadmap → appendix).
 - [ ] Every finding has a severity with an explicit CVSS vector and a consistent qualitative band.

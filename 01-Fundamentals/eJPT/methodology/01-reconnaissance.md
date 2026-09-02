@@ -207,7 +207,7 @@ Notes:     Hostnames via crt.sh: dc01.lab.local, www.lab.local
 Next step: full TCP port scan + version detection (enumeration phase)
 ```
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Scanning out of scope.** The #1 professional mistake. Re-read the scope
   before every new subnet.
@@ -224,7 +224,7 @@ Next step: full TCP port scan + version detection (enumeration phase)
 - **Confusing discovery with enumeration.** Discovery only answers "is it
   up?" — do not report open ports until you actually scan them.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the difference between passive and active reconnaissance
       and why passive comes first.
@@ -238,7 +238,7 @@ Next step: full TCP port scan + version detection (enumeration phase)
 - [ ] I can explain when to use `-sn`, `-PS`, `-PA`, `-PU`, `-PR`, and `-Pn`.
 - [ ] I produce a written scope and a host list (`-oG`) before any scan.
 
-## Further resources
+## Further Resources
 
 - Nmap reference guide (official): https://nmap.org/book/toc.html
 - Nmap host-discovery options: https://nmap.org/book/man-host-discovery.html

@@ -106,7 +106,7 @@ third-party summaries:
 - OWASP projects (Top 10, WSTG, MSTG, LLM Top 10) are freely available from the OWASP
   homepage: **https://owasp.org** (stable landing page — search each project by name).
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Reading books instead of the syllabus.** Use the official syllabus as the map and
   books as the deep dives; an excellent book can still cover the wrong 20% for your exam.

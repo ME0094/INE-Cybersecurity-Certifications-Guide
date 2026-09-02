@@ -28,7 +28,7 @@ name="csrf" value="([a-zA-Z0-9]{32})"
 
 3. In the **Session Handling Rules** editor, add a rule whose action is *Run a macro*, choose your macro, and enable substitution.
 4. Back in the request editor, use the context menu to **insert a macro substitution point** at the exact position the value must go (header, cookie, or body parameter).
-5. Scope the rule to the relevant tool and URL prefix, then test with *Session handling rule tester* style manual sends (replay the request twice and confirm the token changes each time).
+5. Scope the rule to the relevant tool and URL prefix, then test with manual sends in the *session handling rule tester* (replay the request twice and confirm the token changes each time).
 
 Macros are stateful: they replay real requests, so they consume server-side state and can trip rate limits. Keep the macro as short as possible (only the requests needed to produce the value).
 
@@ -144,7 +144,7 @@ Other integration patterns:
 - **REST API / headless automation** — recent Professional releases ship an automation API; check your version's release notes before scripting around it.
 - **Project state files** — save/load `.burp` project state to keep an assessment reproducible across sessions.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Unscoped session rules and match/replace** rewrite traffic to unrelated hosts. Scope everything to the target prefix.
 - **Macro loops**: a macro that itself triggers a session rule can recurse. Test the macro standalone first.
@@ -154,7 +154,7 @@ Other integration patterns:
 - **Forgetting to disable convenience rules** when you switch from lab work to real engagements; a leftover rewrite rule is a classic way to corrupt production testing.
 - **Not exporting evidence**: interactive tool wins that are never saved as request/response pairs vanish when the project closes.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can create a macro that extracts a dynamic token and substitutes it into a request via a session handling rule.
 - [ ] I can scope a session handling rule to one tool and one URL prefix and verify it does not fire elsewhere.
@@ -164,7 +164,7 @@ Other integration patterns:
 - [ ] I can configure a scoped match/replace rule and explain why static replaces are wrong for dynamic values.
 - [ ] I can route `curl` and a Python script through Burp's proxy and locate their traffic in HTTP history.
 
-## Further resources
+## Further Resources
 
 - PortSwigger Web Security Academy (proxy, macros, session handling, Turbo Intruder topics) — https://portswigger.net/web-security
 - BApp Store (official extension catalog) — https://portswigger.net/bappstore

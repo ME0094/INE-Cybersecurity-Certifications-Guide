@@ -96,7 +96,7 @@ Detection is hard because poisoned models are designed to look normal; combine m
 - **Runtime guardrails.** Since a backdoor may slip through, keep inference-time controls (Phase 05): input/output filters, tool allow-lists, anomaly monitoring of unusual tool-call sequences.
 - **Incident readiness.** Treat a poisoned-model suspicion like a code-supply-chain incident: isolate the artifact, preserve evidence, revert to a known-good snapshot, and notify affected downstream consumers (this is where an AI Bill of Materials pays off).
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Mistake:** trusting a fine-tune because its benchmarks look good. Backdoors are designed to survive benchmarks.
 - **Mistake:** loading checkpoints with pickle from untrusted sources. One `torch.load()` of a malicious file can execute code on the training or serving host.
@@ -105,7 +105,7 @@ Detection is hard because poisoned models are designed to look normal; combine m
 - **Tip:** treat fine-tuning as code review: require the same rigor for a fine-tuning dataset as for a third-party library.
 - **Tip:** freeze and sign the weights you deploy, and re-verify hashes at deployment time — drift between "reviewed" and "deployed" is a supply-chain symptom.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can distinguish availability poisoning, backdoor poisoning, and label flipping with one example each.
 - [ ] I can explain why corpus injection is feasible for web-crawled pre-training data.
@@ -115,7 +115,7 @@ Detection is hard because poisoned models are designed to look normal; combine m
 - [ ] I can explain the role of an AI Bill of Materials and artifact checksums in incident response.
 - [ ] I can map model poisoning to the relevant OWASP LLM Top 10 and MITRE ATLAS categories.
 
-## Further resources
+## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/
 - MITRE ATLAS (Poisoning techniques) — https://atlas.mitre.org/

@@ -207,7 +207,7 @@ read them before writing your own.
 - **Never import production data into a shared instance** — lab/authorized
   environments only; BloodHound data is sensitive.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Importing legacy JSON into CE (or CE JSONL into 4.x)** — collection and
   ingestion versions must match. Check the zip contents before importing.
@@ -221,7 +221,7 @@ read them before writing your own.
   collector and taint your "starting position" analysis. Use a normal
   domain-read account.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can start Neo4j and the BloodHound app (or CE Docker stack) and log in
 - [ ] I can run SharpHound (Windows) and `bloodhound-python` (Linux) and import the zip
@@ -231,7 +231,7 @@ read them before writing your own.
 - [ ] I can explain what each edge on that path means and how to abuse it
 - [ ] I know which collection methods need admin rights and which are LDAP-only
 
-## Further resources
+## Further Resources
 
 - [BloodHound (SpecterOps) — official repository](https://github.com/SpecterOps/BloodHound)
 - [SharpHound — data collector repository](https://github.com/SpecterOps/SharpHound)

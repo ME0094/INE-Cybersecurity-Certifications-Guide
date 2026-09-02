@@ -131,7 +131,7 @@ The goal: the annual audit becomes a sample of a process that is already proven 
 - **Tip**: maintain a single **obligations register** mapping each requirement to its owner control and evidence — it is the backbone of any compliance program.
 - **Tip**: when a control fails in production, ask "what would the auditor say?" — that framing forces both remediation *and* documentation.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the difference between compliance and security, with an example of compliant-but-insecure.
 - [ ] I can state GDPR's applicability trigger, the 72-hour breach rule, and controller vs processor.

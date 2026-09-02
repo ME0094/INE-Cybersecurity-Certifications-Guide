@@ -199,7 +199,7 @@ msf6 auxiliary(...) > run -j
 | Meterpreter foothold, no SSH | `route add` / `autoroute` (+ `portfwd`) |
 | GUI tools (Burp, browser) through pivot | `ssh -D`, point the app at SOCKS |
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Scanning from Kali instead of pivoting.** If Kali cannot reach the
   subnet, scan *through* the pivot.
@@ -218,7 +218,7 @@ msf6 auxiliary(...) > run -j
 - **Leaving the proxy up.** Kill `ssh -D`, config changes, and Metasploit
   routes as part of cleanup.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the difference between local, remote, and dynamic SSH
       forwarding with a concrete `-L`/`-R`/`-D` example.
@@ -235,7 +235,7 @@ msf6 auxiliary(...) > run -j
       internal subnet, and use `portfwd add` for a single service.
 - [ ] I clean up SSH tunnels, proxies, and routes when the objective is done.
 
-## Further resources
+## Further Resources
 
 - OpenSSH manual (`ssh`: `-L`, `-R`, `-D`, `-J`) — your distribution's man pages
 - proxychains-ng (GitHub): https://github.com/rofl0r/proxychains-ng

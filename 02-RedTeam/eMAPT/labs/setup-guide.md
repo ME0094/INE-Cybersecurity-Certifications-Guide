@@ -163,7 +163,7 @@ confirm with `frida-ps -U`.
 - Tip: keep an `env.md` per project with the package ids, bundle ids, hosts,
   and versions you test; it becomes the header of your report.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I created a google_apis AVD and can `adb root` it
 - [ ] I installed at least one public vulnerable app and confirmed its package id

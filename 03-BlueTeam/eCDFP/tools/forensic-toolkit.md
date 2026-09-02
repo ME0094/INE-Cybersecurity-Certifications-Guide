@@ -38,7 +38,7 @@ sudo dd if=/dev/sdb1 of=/mnt/evidence/case01/part1.dd bs=4M conv=noerror,sync st
 
 > Do **not** pipe `dd` through compression tools unless you plan for it; forensic workflows usually keep a raw image plus a compressed copy for analysis.
 
-`dc3dd` (a DoD-cyber-crime fork of `dd`) hashes while copying and logs the result — convenient one-pass integrity.
+`dc3dd` (a fork of `dd` from the DoD Cyber Crime Center) hashes while copying and logs the result — convenient one-pass integrity.
 
 ```bash
 sudo dc3dd if=/dev/sdb of=/mnt/evidence/case01/disk.dd hash=sha256 hashlog=/mnt/evidence/case01/hash.log log=/mnt/evidence/case01/acquisition.log
@@ -186,7 +186,7 @@ bulk_extractor -o /mnt/evidence/case01/bulk /mnt/evidence/case01/disk.dd
 
 Photorec (TestDisk family) is another carving option best for photo recovery. Remember: carved files lose their original names and timestamps, so document how you carved them.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Mounting the evidence** — mounting a suspect image, even read-only, is a red flag on a real case; use TSK tools on the image instead.
 - **Imaging the wrong device node** — always confirm with `lsblk`/`blkid` before `dd`; a single typo can destroy the wrong disk.
@@ -195,7 +195,7 @@ Photorec (TestDisk family) is another carving option best for photo recovery. Re
 - **Carving when you should recover metadata-first** — deleted-file recovery through `fls -d`/`icat -r` preserves names and metadata; carve only what metadata cannot reach.
 - **Using `dd` on a mounted live system** — acquire from a forensic boot environment or write-blocked hardware, never from the running OS you are imaging.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain why write blockers and hash verification are non-negotiable in acquisition.
 - [ ] I imaged a practice device with `dd` and `dc3dd` and compared the resulting hashes.
@@ -206,7 +206,7 @@ Photorec (TestDisk family) is another carving option best for photo recovery. Re
 - [ ] I carved files from an image with `foremost` and could name what carving does *not* preserve.
 - [ ] I can list the two rules that apply to every acquisition (write-protect, hash-verify).
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-86 — *Guide to Integrating Forensic Techniques into Incident Response* (csrc.nist.gov/publications).
 - The Sleuth Kit documentation and wiki — sleuthkit.org.

@@ -139,7 +139,7 @@ psort -o l2tcsv /evidence/case/plaso.dump > timeline_full.csv
 pinfo /evidence/case/plaso.dump               # storage stats/sanity
 ```
 
-## 8. Common mistakes & tips
+## 8. Common Mistakes & Tips
 
 - **Wrong device node** — confirm with `lsblk` before `dd`; imaging the wrong disk is irreversible.
 - **No partition offset** — TSK says "file system not found" on whole-disk images when you skip `-o`; read it from `mmls`.
@@ -148,7 +148,7 @@ pinfo /evidence/case/plaso.dump               # storage stats/sanity
 - **Mixing timezones** — pin timelines to UTC (`-z UTC`) and note the convention in your report.
 - **Trusting one artifact** — confirm a finding with a second tool (e.g., `fls -d` then Autopsy, `pslist` then `psscan`).
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can write a `dd` command that survives read errors and shows progress, and explain each flag.
 - [ ] I can produce and verify a `hashdeep` manifest for an evidence tree.
@@ -159,7 +159,7 @@ pinfo /evidence/case/plaso.dump               # storage stats/sanity
 - [ ] I can dump a process with `memdump --dump` and extract files with `dumpfiles --dump`.
 - [ ] I can generate a body file with `fls -m` and turn it into a UTC CSV with `mactime`.
 
-## Further resources
+## Further Resources
 
 - The Sleuth Kit documentation and wiki — sleuthkit.org.
 - Autopsy user documentation — sleuthkit.org/autopsy.

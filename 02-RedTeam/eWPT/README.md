@@ -104,7 +104,7 @@ alone will not make it stick.
   certification NDA seriously, just as you would in any professional
   engagement.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Jumping into labs before the methodology** → you collect exploits without a
   process. Read the five phase files first; the labs assume that order.
@@ -124,7 +124,7 @@ alone will not make it stick.
 - Tip: revisit earlier files after finishing later ones; you will catch gaps
   now that you have context.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain what eWPT validates in one sentence, without exam specifics.
 - [ ] I can name the five methodology phases in working order.
@@ -138,7 +138,7 @@ alone will not make it stick.
 
 ---
 
-## Further resources
+## Further Resources
 
 - OWASP Top 10 — <https://owasp.org/www-project-top-ten/>
 - OWASP Testing Guide — <https://owasp.org/www-project-web-security-testing-guide/>

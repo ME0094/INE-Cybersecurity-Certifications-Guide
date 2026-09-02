@@ -202,7 +202,7 @@ offline for forensics while BC wants them restored — the decision framework
 - **Mistake:** Preparing only for technical incidents, ignoring legal, PR,
   and regulatory aspects. **Tip:** Include legal and communications in
   exercises so notification timing is realistic.
-## Checklist / Self-test
+## Checklist / Self-Test
 - [ ] I can explain the difference between an IR policy and an IR plan and
       name the six questions every IR plan must answer.
 - [ ] I can list the core IR roles and the incident commander's
@@ -219,7 +219,7 @@ offline for forensics while BC wants them restored — the decision framework
       interact with containment decisions.
 - [ ] I know where the offline copy of the IR plan and the out-of-band
       contact list are stored at my organization.
-## Further resources
+## Further Resources
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
 - NIST SP 800-184, *Guide for Cybersecurity Event Recovery* —

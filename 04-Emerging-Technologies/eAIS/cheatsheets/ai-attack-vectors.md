@@ -150,7 +150,7 @@ for prompt data.
 | Supply chain | Model/deps/datasets | Signing, pinning, SBOM, vetting |
 | Privacy leakage | Any layer | Data minimization, redaction, logging control |
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Conflating categories.** A jailbreak is *not* the same as direct prompt injection, and
   adversarial evasion is not a conversation-level trick. Name the vector precisely before
@@ -166,7 +166,7 @@ for prompt data.
 - **Skipping the frameworks.** OWASP LLM Top 10 and MITRE ATLAS give you shared vocabulary;
   use their IDs in findings so reports mean the same thing to everyone.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain direct vs. indirect prompt injection and give one defense for each.
 - [ ] I can describe a jailbreak and why it differs from prompt injection.
@@ -177,7 +177,7 @@ for prompt data.
 - [ ] I can map each vector above to a primary defense from the quick map.
 - [ ] I understand that these examples are for authorized, sandboxed testing only.
 
-## Further resources
+## Further Resources
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/)

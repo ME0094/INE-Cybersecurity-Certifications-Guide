@@ -107,7 +107,7 @@ Blue-team reading: protect LSASS with Credential Guard + LSA Protection,
 disable WDigest, rotate `krbtgt` and DA passwords after suspected compromise,
 and alert on LSASS handle access and on `sekurlsa`/`lsadump` command lines.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Running it without admin** — `privilege::debug` fails with
   "ERROR kuhl_m_privilege_simple; RtlAdjustPrivilege" when not elevated; most
@@ -126,7 +126,7 @@ and alert on LSASS handle access and on `sekurlsa`/`lsadump` command lines.
 - **Forgetting the log** — run `log` first so you keep evidence of what was
   extracted (needed for reports).
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain, in one sentence each, what `sekurlsa::logonpasswords`, `lsadump::sam`, and `kerberos::golden` do
 - [ ] I can state the minimum privilege required before most Mimikatz commands work
@@ -136,7 +136,7 @@ and alert on LSASS handle access and on `sekurlsa`/`lsadump` command lines.
 - [ ] I understand why plaintext output is rare on modern Windows (WDigest off)
 - [ ] I have only ever run Mimikatz in my own authorized lab environment
 
-## Further resources
+## Further Resources
 
 - [Mimikatz — official repository (gentilkiwi)](https://github.com/gentilkiwi/mimikatz)
 - [Microsoft Learn — Credential Guard overview](https://learn.microsoft.com/en-us/windows/security/identity-protection/credential-guard/)

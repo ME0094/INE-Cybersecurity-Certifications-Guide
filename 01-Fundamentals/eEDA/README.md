@@ -77,7 +77,7 @@ Suggested workflow:
 2. **Study the two tool guides** — [security-frameworks](tools/security-frameworks.md) and [compliance-tools](tools/compliance-tools.md) — and run the commands yourself on a Linux VM.
 3. **Do the lab** — [security-policy-exercises](labs/security-policy-exercises.md) — where you draft a policy, build a risk register, map CIS Controls, and interpret real scan output.
 4. **Keep the cheatsheet open** — [terminology-reference](cheatsheets/terminology-reference.md) — and use it while writing any summary, report, or self-test answer.
-5. Finish each file with its **Checklist / Self-test**; only move on when every box is honest to check.
+5. Finish each file with its **Checklist / Self-Test**; only move on when every box is honest to check.
 
 ### Suggested Study Plan
 
@@ -86,7 +86,7 @@ Suggested workflow:
 | 1 | Governance + risk methodology notes | One-page summary of each note |
 | 2 | Compliance + engineering methodology notes; read both tool guides | Terminology quiz using the cheatsheet |
 | 3 | Run the lab exercises (policy, risk register, CIS mapping, scans) | AUP draft, 6-row risk register, CIS mapping table, saved scan reports |
-| 4 | Re-run every file's Checklist / Self-test; fill your gaps | All checkboxes checked with evidence |
+| 4 | Re-run every file's Checklist / Self-Test; fill your gaps | All checkboxes checked with evidence |
 
 Spacing matters more than cramming: this material is vocabulary-and-frameworks heavy, and it sticks when you *apply* each concept in the lab within a day or two of reading it.
 
@@ -98,7 +98,7 @@ Spacing matters more than cramming: this material is vocabulary-and-frameworks h
 - **Writing policies that cannot be enforced or measured.** A good policy names the audience, the requirement, and who owns enforcement. Avoid vague sentences like "systems must be secure".
 - **Forgetting residual risk.** After you implement a control, the risk that remains is still yours to document and accept.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain, in one paragraph each, what the eEDA certifies and who it is for.
 - [ ] I can list the four methodology pillars and give one concrete task per pillar.
@@ -106,7 +106,7 @@ Spacing matters more than cramming: this material is vocabulary-and-frameworks h
 - [ ] I have run at least one scan with Lynis or OpenSCAP on a Linux VM and written down what the output means.
 - [ ] I have drafted one security policy and one risk register entry using the lab guide.
 - [ ] I can look up any GRC term in the terminology cheatsheet without opening a browser.
-- [ ] I have completed the Checklist / Self-test section of every file in this module.
+- [ ] I have completed the Checklist / Self-Test section of every file in this module.
 
 ## Further Resources
 

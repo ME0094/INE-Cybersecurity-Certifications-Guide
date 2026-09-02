@@ -136,7 +136,7 @@ Duplicate or crafted parameter names exploit **parser disagreement about the sam
 
 Detect it: send duplicates, reflect both, and observe *which* value drives the decision; then test whether validation and use read different positions.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Testing encoding bypasses without an oracle.** You need a visible difference (response, timing, out-of-band) to know a bypass worked; build the oracle first.
 - **Stopping at the first primitive.** A JWT with `alg:none` or a reflected header is a start — chain it to the goal (see `labs/challenge-solutions.md`).
@@ -145,7 +145,7 @@ Detect it: send duplicates, reflect both, and observe *which* value drives the d
 - **Testing SSRF against real cloud metadata** of systems you do not own. Authorized labs only.
 - **Ignoring `state`/`iss`/single-use** when reading OAuth flows — the crypto is rarely the bug; the state machine is.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can enumerate six JWT vectors and explain the verification step each one attacks.
 - [ ] I can list the OAuth `redirect_uri`/`state`/`client_secret` checks and the flaw each prevents.
@@ -155,7 +155,7 @@ Detect it: send duplicates, reflect both, and observe *which* value drives the d
 - [ ] I can explain last-wins vs first-wins parameter pollution with one example per parser behavior.
 - [ ] I can reproduce this entire sheet's structure from memory (topic → vectors → detection → bypass).
 
-## Further resources
+## Further Resources
 
 - OWASP Cheat Sheet Series — https://cheatsheetseries.owasp.org/
 - PortSwigger Web Security Academy (JWT, OAuth, SSRF, smuggling topics with labs) — https://portswigger.net/web-security

@@ -77,7 +77,7 @@ Suggested path for a new learner (roughly 2–4 weeks at a few hours per week):
 
 1. **Foundations (methodology 01–02).** Learn identity lifecycle and authentication first; every other pillar builds on them.
 2. **Authorization (methodology 03).** Roles, attributes, policies; revisit least privilege constantly.
-3. **Zero trust (methodology 04).** Frame everything so far in the "never trust, always verify" model; read the NIST definition (see Further resources).
+3. **Zero trust (methodology 04).** Frame everything so far in the "never trust, always verify" model; read the NIST definition (see Further Resources).
 4. **Federation (methodology 05).** Learn SAML and OIDC conceptually before touching a lab.
 5. **Platforms (tools/iam-platforms.md).** Understand the families and when each fits.
 6. **Hands-on (labs/iam-scenarios.md).** Build the Keycloak lab and run every guided scenario. Seeing real protocol messages makes the theory stick.
@@ -133,4 +133,4 @@ Use this to track your overall preparation:
 
 ---
 
-> ⚠️ Personal study notes. No exam content protected by NDA is included; when in doubt about a source, rely on the public standards listed under "Further resources" in each file.
+> ⚠️ Personal study notes. No exam content protected by NDA is included; when in doubt about a source, rely on the public standards listed under "Further Resources" in each file.

@@ -159,7 +159,7 @@ TIME (UTC)   ACTION                             OWNER      STATUS
 - **Mistake:** unapproved or undocumented actions. *Tip:* every containment step needs approval, a timestamp, and a note in the case.
 - **Mistake:** solo heroics and silence. *Tip:* notify early, escalate early, and let the playbook and the team carry the response.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I know my role as first responder and what is outside my authority.
 - [ ] I follow the order: notify → protect → capture → contain → preserve → escalate.

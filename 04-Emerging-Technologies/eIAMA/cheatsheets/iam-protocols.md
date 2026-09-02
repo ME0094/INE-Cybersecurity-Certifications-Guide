@@ -212,7 +212,7 @@ Provisioning pattern: IdP detects a new user → `POST /Users` on the target →
 - **Mistake:** mixing up the roles: LDAP *stores* and *binds*; Kerberos *authenticates* in the domain; OIDC/SAML *federate to web apps*; SCIM *provisions*. Choose per problem, not by fashion.
 - **Mistake:** in Kerberos deployments, forgetting clock sync. **Tip:** keep hosts within the tolerated skew or tickets silently fail.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can name the four OAuth 2.0 roles and the main grant types with a use case each.
 - [ ] I can explain why PKCE is required for public clients.

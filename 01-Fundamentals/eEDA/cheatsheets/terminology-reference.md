@@ -150,7 +150,7 @@ VPN    Virtual Private Network
 - **SOC the report vs. SOC the team.** "SOC 2" is an AICPA attestation report; "the SOC" is the Security Operations Center. Context disambiguates — use the full phrase when writing.
 - **Don't memorize definitions cold.** Practice by classifying real examples: "failed login alerts" → detective technical control; "MFA" → preventive technical; "AUP" → administrative preventive.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can define asset, threat, vulnerability, and risk with a real example of each.
 - [ ] I can distinguish inherent risk, residual risk, risk appetite, and risk tolerance.

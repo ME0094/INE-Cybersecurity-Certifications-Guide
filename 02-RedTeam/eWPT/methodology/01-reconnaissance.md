@@ -188,7 +188,7 @@ Reconnaissance produces hundreds of small facts; the difference between a good a
 - **Skipping the API layer.** If the site is a SPA, the API is the application. Always enumerate API endpoints before exploitation.
 - **Poor evidence hygiene.** Store requests, not just conclusions; a finding without a reproducible request is hard to report and hard to retest.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can state the exact in-scope URLs, out-of-scope items, and rules of engagement from memory.
 - [ ] I crawled both the public and (where authorized) the authenticated parts of the application.

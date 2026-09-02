@@ -135,13 +135,13 @@ nxc smb 10.0.0.11 -u bob -p 'P@ss'            # valid creds?
 nxc smb 10.0.0.11 -u bob -H '<NTLM>'          # valid hash? (Pwn3d! = admin)
 ```
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - `/domain` vs local — `net localgroup` is THIS host; `net group /domain` is
   the domain. Mixing them up produces confusing "no such group" errors.
 - RSAT missing — AD cmdlets fail with "module not found"; install
   `RSAT-AD-PowerShell` or run from the DC.
-- **Case-insensitive filters are not always** — LDAP filters are
+- **Filters are not always case-insensitive** — LDAP filters are
   case-sensitive for attribute names; PowerShell `-Filter` strings use
   PowerShell syntax (`"Name -like '*x*'"`), not LDAP.
 - BloodHound queries need the *imported* data — a fresh collector zip only
@@ -151,7 +151,7 @@ nxc smb 10.0.0.11 -u bob -H '<NTLM>'          # valid hash? (Pwn3d! = admin)
   membership drive the next command choice.
 - Log your commands: you will need exact evidence when writing the report.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can list domain users, a user's groups, and Domain Admin members with both `net` and AD cmdlets
 - [ ] I can find SPN users (Kerberoast targets) with the AD module from memory
@@ -161,7 +161,7 @@ nxc smb 10.0.0.11 -u bob -H '<NTLM>'          # valid hash? (Pwn3d! = admin)
 - [ ] I can validate credentials/hashes with `nxc` before attempting access
 - [ ] I can identify the ports each remote-execution channel uses
 
-## Further resources
+## Further Resources
 
 - [Microsoft Learn — Active Directory module cmdlets](https://learn.microsoft.com/en-us/powershell/module/activedirectory/)
 - [Microsoft Learn — Active Directory Domain Services overview](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview)

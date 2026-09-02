@@ -123,7 +123,7 @@ a lab IdP/SP pair — use one you control.)
   (via URL, cookie pre-set, or `session` parameter) and does not rotate it on
   login, an attacker can fixate then wait for the victim to authenticate.
 - **Missing rotation on privilege change**: logging in, changing roles, or
-  2FA completion must issue a *new* session id; check that the pre-login
+  completing 2FA must issue a *new* session id; check that the pre-login
   cookie value dies after login.
 - **Invalidation gaps**: logout must invalidate server-side; the *old*
   session and any parallel sessions (other devices) must not keep working.
@@ -173,7 +173,7 @@ Cookie: session=abc; step=otp-pending
 6. Record evidence per issue: before/after tokens, full requests, and the
    exact logic that failed (missing check vs. wrong check).
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Treating JWT as opaque.** Decode every token before testing; most bugs
   are visible in the header (`alg`, `kid`, `jku`).
@@ -190,7 +190,7 @@ Cookie: session=abc; step=otp-pending
 - **Not checking multi-device sessions.** Logout that only kills one session
   is a real invalidation flaw — test from two sessions.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can decode a JWT and test `alg:none`, algorithm confusion, weak-HMAC
       secret, and missing `exp`/audience validation.
@@ -209,7 +209,7 @@ Cookie: session=abc; step=otp-pending
 - [ ] I keep an auth entry-point map with the tokens/cookies issued at each
       step.
 
-## Further resources
+## Further Resources
 
 - IETF RFC 7519 (JWT) summary and ecosystem: https://jwt.io/introduction
 - IETF RFC 6749 (OAuth 2.0) and RFC 7519/7517 (JOSE) at the RFC editor:

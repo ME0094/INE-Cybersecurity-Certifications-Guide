@@ -163,7 +163,7 @@ frida-ps -Uai | grep -i bank                      # find app's process name
 - Tip: keep `-c "android sslpinning disable"` handy for first traffic checks,
   then re-enable and hook pinning properly to learn the bypass.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can enumerate, install, launch, and kill an app with adb from memory
 - [ ] I can set and clear the device proxy without looking at this file

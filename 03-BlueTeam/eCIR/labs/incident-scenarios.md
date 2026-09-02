@@ -36,7 +36,7 @@ practicing containment, so the lab must be built to be destroyed.
 - **Velociraptor agents** on targets so collection during a drill matches real workflow.
 - **Snapshot discipline**: after each drill, revert every VM to its baseline.
 
-### Making a Drill "Injects"
+### Making Drill Injects
 
 You can play attacker yourself or, better, have a partner feed you **injects** — timed
 events or files that appear without your prior knowledge:
@@ -167,7 +167,7 @@ is a complete detection → containment → eradication → lessons-learned cycl
 - **Rushing containment.** Practicing the wrong order (eradicate before preserve, isolate
   before memory capture) teaches bad habits; use the checklists to enforce the order.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] My lab runs on an isolated network and every VM has a clean baseline snapshot.
 - [ ] I have completed Drill A (ransomware-like host) end to end with a written case file.

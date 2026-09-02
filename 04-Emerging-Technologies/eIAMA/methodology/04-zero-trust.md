@@ -121,7 +121,7 @@ Architecture implications: comprehensive **activity logging** (authn, authz, dat
 - **Mistake:** treating identities as only human. **Tip:** give workloads/service identities the same lifecycle (Phase 01) and least privilege.
 - **Mistake:** assume-breach but no blast-radius reduction. **Tip:** least privilege + segmentation + short sessions make a compromised credential cheap to contain.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can state the zero-trust principles and explain why location-based trust fails.
 - [ ] I can describe PE, PA, and PEP and draw how a request flows through them.
@@ -131,7 +131,7 @@ Architecture implications: comprehensive **activity logging** (authn, authz, dat
 - [ ] I can argue why identity-centric architecture implements zero trust in practice.
 - [ ] I can map eIAMA Phases 01–03 (lifecycle, AuthN, AuthZ) into a zero-trust design.
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-207, *Zero Trust Architecture*: https://doi.org/10.6028/NIST.SP.800-207
 - NIST Computer Security Resource Center (CSRC): https://csrc.nist.gov/

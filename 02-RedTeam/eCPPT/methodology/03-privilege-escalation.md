@@ -143,7 +143,7 @@ Also re-check: world-writable scripts executed by cron/root, writable `PATH` dir
 - **Linux rabbit holes:** re-running kernel exploits instead of checking `sudo -l`, cron scripts, and capabilities first.
 - **Ignoring the service restart problem:** modifying a service requires start/stop rights or a reboot — if you can't restart it, look for another vector.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I enumerate services with `wmic`/`Get-CimInstance` and spot unquoted paths and weak DACLs.
 - [ ] I can confirm a service-object DACL weakness with `accesschk` and exploit it via `sc config`.

@@ -149,7 +149,7 @@ Frameworks overlap heavily, so defenders map between them (auditors love this). 
 - **Memorizing control IDs without meaning.** You will be asked "what does this *do*?" more often than "what number is it?". Learn each control's outcome first.
 - **Forgetting the mapping artifact.** In real engagements, the mapping table *is* the deliverable that ties policy to framework to evidence. Start one early.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can name the six CSF 2.0 functions and give one outcome example for each.
 - [ ] I can list the seven RMF steps in order and say what an ATO is.

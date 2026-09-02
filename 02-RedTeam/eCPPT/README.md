@@ -116,7 +116,7 @@ A suggested order of attack for this module:
 6. **Report writing practice** — write up one scenario as a mini report
    (findings, evidence screenshots, risk, remediation).
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] Read all five methodology phases and summarize each in my own words
 - [ ] Practice PowerShell essentials until I can enumerate without a browser
@@ -127,7 +127,7 @@ A suggested order of attack for this module:
 - [ ] Write one practice penetration test report from a lab run
 - [ ] Review the official exam objectives and confirm current version/policies on inecp.com
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Skipping methodology for tooling** — knowing `mimikatz` flags without
   knowing *when* to use them fails engagements. Always tie a tool to the phase
@@ -142,7 +142,7 @@ A suggested order of attack for this module:
   Guard, and EDR react to your tooling makes you a better (and more careful)
   operator.
 
-## Further resources
+## Further Resources
 
 - [INE Security — official site and certification catalog](https://ine.com)
 - [eJPT module of this repository](../../01-Fundamentals/eJPT/README.md) — fundamentals prerequisite

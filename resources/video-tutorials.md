@@ -103,7 +103,7 @@
 - If a creator sells a course that mirrors an INE exam topic, remember that only INE's
   material is authoritative for the exam itself.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Binge-watching without a lab.** Video feels productive but is passive; pair every
   video with a hands-on reproduction in your own environment.

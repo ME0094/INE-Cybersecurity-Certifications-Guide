@@ -188,7 +188,7 @@ details live in the communication-analysis phase.
 - **Test-environment hygiene** — use dedicated test accounts and a sandboxed
   device profile; never point a personal device at the target network.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can acquire the exact APK/IPA build under test and have hashes recorded.
 - [ ] I extracted package/bundle id, versions, SDK levels, and signing info.

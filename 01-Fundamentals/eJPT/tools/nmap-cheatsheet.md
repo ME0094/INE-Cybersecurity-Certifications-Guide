@@ -196,7 +196,7 @@ The classic flow is: **ping sweep → top-ports sweep → full TCP on interestin
 version/scripts on open ports → OS/extra checks**. Do not jump straight to `-A -p-`
 against a whole subnet.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Forgetting `sudo`.** As a normal user `-sS` and `-O` silently degrade (SYN scan
   becomes connect scan) or fail. Run privileged scans with `sudo`.
@@ -213,7 +213,7 @@ against a whole subnet.
 - **Not re-checking states.** Run an open-port scan without `--open` once so you can see
   `filtered` ports and understand the full picture.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain `open`, `closed`, and `filtered` port states.
 - [ ] I can run a ping sweep (`-sn`) on a /24 and list live IPs.
@@ -224,7 +224,7 @@ against a whole subnet.
 - [ ] I know when to use `-Pn`, `-n`, `-T4`, and `--min-rate`.
 - [ ] I can run `-sU` against a short list of top UDP ports.
 
-## Further resources
+## Further Resources
 
 - Nmap reference guide (the official book, free online): <https://nmap.org/book/toc.html>
 - Nmap man page: <https://nmap.org/book/man.html>

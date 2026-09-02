@@ -144,7 +144,7 @@ Ask yourself these questions first:
 | "Study adversarial examples on a local NLP model" | TextAttack | Current model/dataset/recipe support |
 | "Block bad inputs/outputs at runtime" | NeMo Guardrails or similar | Current config language and integration path |
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Copy-pasting CLI examples from blog posts.** These tools change flags, model names,
   and plugin IDs between releases. Run `--help`, read the README, and verify against the
@@ -163,7 +163,7 @@ Ask yourself these questions first:
 - **Running payloads from memory.** Public jailbreak templates are training data for the
   models they target. Generate variants programmatically instead of pasting stale ones.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can name the four tool categories and give one project for each.
 - [ ] I can explain the difference between garak and PyRIT (scan vs. orchestrated campaign).
@@ -173,7 +173,7 @@ Ask yourself these questions first:
 - [ ] I know how to verify that a tool's current CLI matches its documentation before running it.
 - [ ] I can explain which tool I would pick for a CI regression test vs. a one-off scan, and why.
 
-## Further resources
+## Further Resources
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/)

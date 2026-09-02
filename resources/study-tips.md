@@ -108,7 +108,7 @@
 - Treat this whole repository as **your own study material**: it is fine to document your
   methodology and lab results, not fine to reproduce protected courseware or exam content.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Starting advanced certs without fundamentals.** The red-team and blue-team tracks
   assume baseline knowledge; skipping the foundations makes every later module slower.

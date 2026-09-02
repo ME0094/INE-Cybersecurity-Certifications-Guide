@@ -56,7 +56,7 @@ What a jailbreak unlocks for testing:
 Do not leave a jailbroken device with default SSH credentials on a network;
 this is both a personal risk and bad lab hygiene.
 
-## Dumping and Dumping Metadata
+## Dumps and Metadata
 
 ### frida-ios-dump (decrypt the App Store binary)
 
@@ -184,7 +184,7 @@ host, or an authorized remote lab.
 - Tip: when a class name or method looks interesting, confirm it exists at
   runtime with `frida -U -f <bundle> -l probe.js` printing `ObjC.classes`.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain why App Store binaries are encrypted and how that changes static analysis
 - [ ] I can list which iOS testing options my hardware supports (simulator / jailbroken device / remote lab)

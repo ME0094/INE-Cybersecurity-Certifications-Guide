@@ -132,7 +132,7 @@ Drills to map the application before touching any input.
   Expected outcome: a careful, load-conscious note on whether a TOCTOU-style
   condition is present.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Skipping recon** → you test endpoints blind and mislabel findings. Map the
   app first; drills get faster, not slower.
@@ -154,7 +154,7 @@ Drills to map the application before touching any input.
 - Tip: repeat each drill at the next DVWA security level once you finish the
   current one; the methodology stays identical, the defenses change.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I mapped my lab's endpoints and parameters before exploiting anything.
 - [ ] I proved one SQL injection manually and only then used sqlmap.
@@ -167,7 +167,7 @@ Drills to map the application before touching any input.
 
 ---
 
-## Further resources
+## Further Resources
 
 - PortSwigger Web Security Academy — free labs for every phase — <https://portswigger.net/web-security>
 - OWASP Juice Shop (another authorized practice target) — <https://owasp.org/www-project-juice-shop/>

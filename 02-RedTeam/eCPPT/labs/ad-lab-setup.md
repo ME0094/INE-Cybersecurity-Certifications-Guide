@@ -214,7 +214,7 @@ nmap -Pn -p 53,88,135,139,389,445,5985 10.0.0.10   # DC ports open?
 - **Memory snapshots** capture active sessions — take them *after* logging
   users in if you want session data on restore.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] DC01 promotes cleanly; `dcdiag` reports no errors
 - [ ] Clients get IP/DNS from DHCP and resolve `corp.local`
@@ -225,7 +225,7 @@ nmap -Pn -p 53,88,135,139,389,445,5985 10.0.0.10   # DC ports open?
 - [ ] Snapshot `02-Lab-Clean` exists and restoring it works
 - [ ] I can reproduce the whole build from these notes alone in under a day
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Real TLD or public DNS name** — always use `.local`/fake domains to avoid
   DNS conflicts and legal-looking traffic.
@@ -241,7 +241,7 @@ nmap -Pn -p 53,88,135,139,389,445,5985 10.0.0.10   # DC ports open?
 - **Joining clients with DNS pointing at the router** — the #1 "can't find the
   domain" cause; DNS must point at the DC.
 
-## Further resources
+## Further Resources
 
 - [Microsoft Learn — Install Active Directory Domain Services](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-)
 - [Microsoft Learn — Active Directory administrative center / ADUC](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/active-directory-administrative-center)

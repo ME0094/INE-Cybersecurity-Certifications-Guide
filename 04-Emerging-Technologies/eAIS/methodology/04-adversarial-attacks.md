@@ -102,7 +102,7 @@ Robustness claims need metrics and test suites:
 [ ] Report limitations: which families were NOT tested and why.
 ```
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Mistake:** claiming "the model is safe" from clean-input tests only. Robustness must be measured *under attack*, with defined budgets.
 - **Mistake:** testing only image-style perturbations against an LLM. For LLMs, text-level evasion, injection, and extraction are the dominant paths.
@@ -111,7 +111,7 @@ Robustness claims need metrics and test suites:
 - **Tip:** when you find filter evasion, retest the payload against the *next* version of the filter — evasions are version-specific.
 - **Tip:** keep adversarial test artifacts in a private, versioned corpus so regressions are detectable after updates.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain an adversarial example and the role of the perturbation budget (ε).
 - [ ] I can name FGSM/PGD as gradient-based perturbation methods and their purpose.
@@ -122,7 +122,7 @@ Robustness claims need metrics and test suites:
 - [ ] I can design a small robustness evaluation plan covering at least two attack families.
 - [ ] I can map these attacks to relevant OWASP LLM Top 10 and MITRE ATLAS categories.
 
-## Further resources
+## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/
 - MITRE ATLAS (Adversarial Threat Landscape for AI Systems) — https://atlas.mitre.org/

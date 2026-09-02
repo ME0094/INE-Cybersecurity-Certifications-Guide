@@ -104,7 +104,7 @@ Work through these questions:
 - **Mistake:** assuming "the cloud IdP syncs from AD" makes the two stores identical. **Tip:** expect attribute conflicts and soft/hard match issues; define the sync direction and conflict rules.
 - **Mistake:** over-centralizing — every user in one giant realm, every app trusting everything. **Tip:** separate workforce, customer, and machine identity into realms/tenants with distinct policies.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can list the six core capabilities every IAM platform provides.
 - [ ] I can explain the difference between an identity *store* (LDAP/AD) and an *IdP* (Keycloak, Entra ID, Okta).

@@ -185,7 +185,7 @@ security decision that should be enforced server-side is fair game.
 - **Testing in the wrong network** — confirm the device is on the same network
   as Burp (or use the emulator's `10.0.2.2` alias) before debugging for hours.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] Burp listener is reachable from the device and the proxy is configured.
 - [ ] Burp's CA is installed and fully trusted on the test device.

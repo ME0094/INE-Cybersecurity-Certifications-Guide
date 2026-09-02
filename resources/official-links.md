@@ -142,14 +142,14 @@
    page, syllabus page, and exam-information source of truth.
 4. Record the date you verified it next to your notes, and re-check before exam day.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Treating directory links as deep links.** Only eAIS, eIAMA, and eSOC product pages are
   published here; for every other certification the directory is the safe URL. Do not
   guess slug variants such as `ejpt-certification` — they may point to stale or wrong pages.
 - **Bookmarking login-gated course pages.** Course URLs inside the platform are not stable
   public links and frequently change; bookmark the certification directory instead.
-- **Trusting third-party "official" reseller pages.** Only ine.com and certs.ine.com domains
+- **Trusting third-party "official" reseller pages.** Only the ine.com and certs.ine.com domains
   are authoritative. Be skeptical of look-alike domains selling "official" bundles or dumps.
 - **Ignoring the newsroom.** Syllabus and exam changes are announced there; check it before
   committing weeks of study to an outline that may have just changed.

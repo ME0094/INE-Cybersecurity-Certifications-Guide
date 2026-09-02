@@ -183,7 +183,7 @@ Rules of thumb: keep fewer than a dozen well-curated panels per board; every pan
 - **Mistake:** fixed thresholds that never change. *Tip:* review baseline windows regularly and document why a threshold is what it is.
 - **Mistake:** no test of the pipeline. *Tip:* periodically generate known events (failed logon, `whoami` execution) and confirm they arrive parsed and searchable — a "canary log" test.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can name the five log classes above and state one high-value question each answers.
 - [ ] I can trace one endpoint event from host to SIEM index and identify where parsing happens.

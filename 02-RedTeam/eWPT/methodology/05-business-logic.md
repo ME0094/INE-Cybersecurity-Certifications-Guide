@@ -146,7 +146,7 @@ Direct state manipulation overlaps with access control (Phase 03) — the differ
 - **Missing multi-step replay.** Single-step tests miss flaws that only appear when you replay step 1 after completing step 3, or jump 1→4.
 - **Not reading the product.** You cannot find business logic flaws you do not understand. Read the help docs, FAQ, and terms — they describe the intended rules you will violate.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I documented the intended workflow and its invariants for each critical business function.
 - [ ] I attempted forced browsing to late workflow steps (e.g. confirm without paying).

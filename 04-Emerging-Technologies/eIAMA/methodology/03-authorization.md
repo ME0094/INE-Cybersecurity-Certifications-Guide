@@ -160,7 +160,7 @@ Access reviews are the same engine as the lifecycle reviews in Phase 01 — cert
 - **Mistake:** standing admin for everyone "just in case." **Tip:** JIT elevation, approvals, break-glass with monitoring.
 - **Mistake:** reviews that produce reports but no remediation. **Tip:** wire revocation outcomes into the lifecycle engine automatically.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can define subject, resource, action, permission, role, and policy.
 - [ ] I can compare RBAC/ABAC/ReBAC across a scenario and justify the choice.
@@ -170,7 +170,7 @@ Access reviews are the same engine as the lifecycle reviews in Phase 01 — cert
 - [ ] I can design least-privilege/JIT controls and a break-glass exception path.
 - [ ] I can design an access certification campaign with remediation hooks.
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-162, *Guide to Attribute Based Access Control (ABAC)*: https://doi.org/10.6028/NIST.SP.800-162
 - OAuth 2.0 Authorization Framework, RFC 6749: https://datatracker.ietf.org/doc/html/rfc6749

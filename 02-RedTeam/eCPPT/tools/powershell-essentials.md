@@ -194,7 +194,7 @@ Practical consequences: your lab is the only safe place to practice in-memory
 loading; on real engagements defenders will likely see your commands, so
 minimize noise and coordinate with the blue team.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Confusing `$_` scope inside nested blocks** — when in doubt, assign to a
   named variable (`$proc = $_`) instead of stacking `$_` in nested pipelines.
@@ -209,7 +209,7 @@ minimize noise and coordinate with the blue team.
 - **Testing bypasses outside your lab** — execution-policy and AMSI bypass
   techniques are offensive content: use them only with authorization.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the four scopes of execution policy and set a per-process Bypass
 - [ ] I can discover an unknown cmdlet with `Get-Command` and read its help
@@ -219,7 +219,7 @@ minimize noise and coordinate with the blue team.
 - [ ] I can load a remote `.ps1` into memory and call one of its functions
 - [ ] I can name the main PowerShell defensive logs (4104/4103) and what AMSI/CLM do
 
-## Further resources
+## Further Resources
 
 - [Microsoft Learn — PowerShell documentation](https://learn.microsoft.com/en-us/powershell/)
 - [Microsoft Learn — about_Execution_Policies](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies)

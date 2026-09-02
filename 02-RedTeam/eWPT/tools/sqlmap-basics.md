@@ -31,7 +31,7 @@ cd sqlmap && python sqlmap.py --version
 ## 1. Basic detection
 
 Point sqlmap at a URL that contains a parameter. Use `--batch` to accept
-default answers to prompts (non-interactive), and always add `--flush-session`
+default answers to prompts (non-interactive), and use `--flush-session`
 rarely — by default sqlmap caches results per target in its output folder.
 
 ```bash
@@ -43,7 +43,7 @@ What happens under the hood:
 
 - sqlmap tests the parameter for **boolean-based blind**, **error-based**,
   **union-based**, **time-based blind**, and **stacked-query** injection.
-- It fingerprint the **DBMS** (MySQL, PostgreSQL, MSSQL, Oracle, SQLite…)
+- It fingerprints the **DBMS** (MySQL, PostgreSQL, MSSQL, Oracle, SQLite…)
   and the exact version when possible.
 - Findings are saved under
   `~/.local/share/sqlmap/output/<host>/` as log and data files.
@@ -207,7 +207,7 @@ Tips:
   cookie, different parameter), stale cached results can mask a re-test. When
   in doubt, point sqlmap at a fresh output folder with `--output-dir`.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Skipping manual confirmation** → sqlmap runs blind and you learn nothing.
   Prove the injection in Repeater first; sqlmap then confirms and extracts.
@@ -225,7 +225,7 @@ Tips:
 - Tip: use `--string`/`--code` hints when the default truth criteria misfire
   on a page that never fully changes (customize what "true" looks like).
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain what `--level` and `--risk` change and their defaults.
 - [ ] I detected injection on a local lab parameter with `-u` + `--batch`.
@@ -238,7 +238,7 @@ Tips:
 
 ---
 
-## Further resources
+## Further Resources
 
 - sqlmap official site — <https://sqlmap.org/>
 - sqlmap user's manual (wiki) — <https://github.com/sqlmapproject/sqlmap/wiki>

@@ -200,7 +200,7 @@ FAIR's value is discipline: it forces you to separate *frequency of attack* from
 - **Tip**: pick one risk scenario and run it through all three styles (qualitative heat map, ALE arithmetic, and a FAIR-style range) to see how conclusions differ and converge.
 - **Tip**: tie every security project in your roadmap back to a register entry — this is how security budgets get defended.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can define risk, threat, vulnerability, exposure, and residual risk precisely.
 - [ ] I can run a qualitative assessment with a defined 5x5 matrix and written cell criteria.

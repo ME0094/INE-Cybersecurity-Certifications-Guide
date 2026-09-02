@@ -195,7 +195,7 @@ Remove the container when finished so no throwaway credentials linger.
 - **Mistake:** expecting a realm role to appear in a client's token automatically in every configuration. **Tip:** check the client's role mappers/scopes; token content is configurable, so verify, don't assume.
 - **Mistake:** reusing the master realm for real users. **Tip:** the master realm exists to administer the server; create dedicated realms for actual identities.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I started Keycloak in Docker and reached the admin console without errors.
 - [ ] I created a realm and a user and authenticated at the account console.

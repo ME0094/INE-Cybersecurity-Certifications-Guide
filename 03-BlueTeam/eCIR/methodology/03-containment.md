@@ -209,7 +209,7 @@ and verified:
 - **Mistake:** Containing without telling business owners, who then "fix" the
   outage by re-enabling the host. **Tip:** Communicate the plan and expected
   duration through the defined escalation channel.
-## Checklist / Self-test
+## Checklist / Self-Test
 - [ ] I can explain the difference between short-term and long-term
       containment and give one example of each.
 - [ ] I can list the four decision criteria for choosing a containment action
@@ -225,7 +225,7 @@ and verified:
 - [ ] I can fill in a chain-of-custody log entry and explain why it matters.
 - [ ] I can describe why checking for attacker-created backdoor accounts is
       part of account containment.
-## Further resources
+## Further Resources
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
 - NIST SP 800-86, *Guide to Integrating Forensic Techniques into Incident

@@ -208,7 +208,7 @@ Users found: admin, backup_svc (SMB enum)
 Next steps: test Apache 2.4.49 exploit, dig into /backup/, brute force login
 ```
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Scanning only the top 1000 ports.** High ports (8080, 8443, 2222, 3000)
   hide lab services. Always do `-p-` once per host.
@@ -226,7 +226,7 @@ Next steps: test Apache 2.4.49 exploit, dig into /backup/, brute force login
 - **Skipping verification.** One banner can be wrong; confirm suspicious
   versions with a second tool.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I ran a full `-p-` TCP scan and a `-sV -sC` scan on every live host.
 - [ ] I can explain what `-sV`, `-sC`, `-p-`, and `-A` each do.
@@ -240,7 +240,7 @@ Next steps: test Apache 2.4.49 exploit, dig into /backup/, brute force login
       next steps.
 - [ ] I record exact service versions — not just names — for every open port.
 
-## Further resources
+## Further Resources
 
 - Nmap service/version detection: https://nmap.org/book/man-version-detection.html
 - Nmap NSE script index (smb-, ftp-, http- scripts): https://nmap.org/nsedoc/

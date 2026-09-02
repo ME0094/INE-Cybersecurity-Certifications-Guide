@@ -219,7 +219,7 @@ If any gate fails -> stay in eradication/recovery; do not resume normal ops.
 - **Mistake:** Restoring from backups that are themselves infected.
   **Tip:** Test-restore into quarantine, scan, and verify before production
   release.
-## Checklist / Self-test
+## Checklist / Self-Test
 - [ ] I can list the conditions that must all be true for eradication to be
       complete.
 - [ ] I can apply the reimage-vs-clean decision factors to a scenario (e.g.,
@@ -236,7 +236,7 @@ If any gate fails -> stay in eradication/recovery; do not resume normal ops.
       operations.
 - [ ] I understand when and why `krbtgt` password rotation is required after
       a suspected domain compromise.
-## Further resources
+## Further Resources
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
 - NIST SP 800-83 Rev. 1, *Guide to Malware Incident Prevention and Handling* —

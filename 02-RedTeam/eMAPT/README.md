@@ -132,7 +132,7 @@ adb shell pm list packages -3   # test apps present?
 - Tip: keep a personal "lessons log" per module folder and add one entry per
   session; it becomes your fastest revision material.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] Read `methodology/01-reconnaissance.md` through `05-exploitation.md` in order
 - [ ] Reproduce every command from `tools/android-tools.md` on an emulator

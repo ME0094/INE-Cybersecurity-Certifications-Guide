@@ -94,8 +94,8 @@ Low       info leak with little impact; defense-in-depth gaps
 
 ## Describing chained impact
 
-Chains are where advanced reports live or die. Treat the chain as a first
-class object:
+Chains are where advanced reports live or die. Treat the chain as a
+first-class object:
 
 ```text
 §3.4 Chain: export SSRF -> internal debug API -> cloud keys -> config read
@@ -169,7 +169,7 @@ executive summary must be readable by someone who will never open the
 appendix: top 3-5 risks, what they mean for the business, and what to fix
 first.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Vague reproductions.** "Send a request to the endpoint" is not
   reproducible; paste the exact request.
@@ -188,7 +188,7 @@ first.
 - **Defensiveness in review.** Walk the vector, share evidence, and update
   the report when a point is valid.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] Every finding has a numbered, copy-paste reproduction with the exact
       request, expected result, and response evidence.
@@ -207,7 +207,7 @@ first.
 - [ ] I can defend each rating by walking through the CVSS vector and scope
       lines without resorting to assertion.
 
-## Further resources
+## Further Resources
 
 - OWASP Web Security Testing Guide — reporting and risk-rating guidance:
   https://owasp.org/www-project-web-security-testing-guide/

@@ -179,7 +179,7 @@ Examples relevant to web testing:
 Install only extensions you understand and need; extensions run with your
 permissions and can send traffic.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Forgetting the CA certificate** → HTTPS sites fail or show warnings. Install
   the Burp CA into the browser's trusted store once per browser profile.
@@ -198,7 +198,7 @@ permissions and can send traffic.
 - Tip: use the **Search** box in HTTP history to find requests containing a
   parameter or payload string across the whole session.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] Browser traffic flows through Burp and HTTPS is decrypted without
       certificate warnings.
@@ -212,7 +212,7 @@ permissions and can send traffic.
 
 ---
 
-## Further resources
+## Further Resources
 
 - PortSwigger Burp Suite documentation — <https://portswigger.net/burp/documentation>
 - PortSwigger BApp Store — <https://portswigger.net/bappstore>

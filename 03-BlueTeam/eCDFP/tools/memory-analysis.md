@@ -171,7 +171,7 @@ python3 vol.py -f /evidence/mem.raw windows.dumpfiles --pid 3456 --dump
 sha256sum /evidence/dumps/3456.dmp
 ```
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Forgetting `--profile` in Volatility 2** — every command needs it; define `PROFILE=...` in your shell to reduce typos.
 - **Trusting `pslist` alone** — hidden processes need `psscan`; run both and diff the PIDs.
@@ -181,7 +181,7 @@ sha256sum /evidence/dumps/3456.dmp
 - **Reading only one artifact** — a process name tells you little; combine `pstree` + `cmdline` + `netscan` + `malfind` before concluding anything.
 - **Forgetting anti-forensics** — memory can be tampered with by rootkits; correlate memory findings with disk artifacts and logs.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain three classes of evidence that exist *only* in memory.
 - [ ] I can state the difference between a Volatility 2 profile and a Volatility 3 symbol table.
@@ -192,7 +192,7 @@ sha256sum /evidence/dumps/3456.dmp
 - [ ] I dumped a process (`memdump`) and a file (`dumpfiles`) and inspected the result with `strings`.
 - [ ] I can name one limitation of `pslist` and the plugin that covers it.
 
-## Further resources
+## Further Resources
 
 - Volatility 3 official documentation — volatility3.readthedocs.io (plugin list, quickstart, symbol server notes).
 - Volatility Foundation site and GitHub — volatilityfoundation.org, github.com/volatilityfoundation.

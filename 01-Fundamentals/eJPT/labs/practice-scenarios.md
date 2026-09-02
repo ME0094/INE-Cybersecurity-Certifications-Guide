@@ -185,7 +185,7 @@ Chain the scenarios into one full run: recon (S1) → exploit (S2 or S4) → pos
 "pivot" VM and reach it through `route add` / `autoroute` in Metasploit or a
 `proxychains` SOCKS tunnel — see `methodology/05-pivoting.md`.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Skipping Scenario 1 evidence.** Every later choice (module, wordlist, payload)
   should be justified by what you enumerated.
@@ -201,7 +201,7 @@ Chain the scenarios into one full run: recon (S1) → exploit (S2 or S4) → pos
 - **Stopping after the shell.** The drill is complete when you have evidence and notes,
   not when you see `root@`.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] Scenario 1: I produced a saved, version-annotated port inventory.
 - [ ] Scenario 2: I obtained a root shell via a Metasploit exploit matched to the service.
@@ -212,7 +212,7 @@ Chain the scenarios into one full run: recon (S1) → exploit (S2 or S4) → pos
 - [ ] I keep per-scenario notes with commands, outputs, and credentials.
 - [ ] I never attacked anything outside my own lab network.
 
-## Further resources
+## Further Resources
 
 - Metasploitable 2 project page: <https://sourceforge.net/projects/metasploitable/>
 - DVWA project and setup: <https://github.com/digininja/DVWA>

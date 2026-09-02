@@ -204,7 +204,7 @@ All privileged sign-ins                ->  MFA + sent to SIEM as high-value even
 - **Tip**: segment and harden with the "blast radius" question in mind: if this one host is compromised, what is the maximum damage? Design so the answer shrinks every quarter.
 - **Tip**: document every deviation from baseline with an owner and an expiry date — undated exceptions become permanent holes.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can name at least six secure design principles and give a concrete control for each.
 - [ ] I can draw a layered zone model (DMZ, internal, backend, admin plane) and justify each flow rule.

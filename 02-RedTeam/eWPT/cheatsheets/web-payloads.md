@@ -209,7 +209,7 @@ normalize, and what does the filter fail to normalize?" Test each one against a
 known-good request and diff the response; if nothing changes, the app does not
 trust that input — move on.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Blindly pasting payload lists** → you never learn why one works. Start
   with the minimal probe for the family, then extend.
@@ -230,7 +230,7 @@ trust that input — move on.
 - Tip: validate every payload family in DVWA at Low first, then watch it fail
   at High — the *why* of the failure teaches the defense.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can name the three SQLi sub-families and when to use each.
 - [ ] I can distinguish reflected, stored, and DOM XSS by delivery, not syntax.
@@ -243,7 +243,7 @@ trust that input — move on.
 
 ---
 
-## Further resources
+## Further Resources
 
 - OWASP Cheat Sheet Series (payload/defense context) — <https://cheatsheetseries.owasp.org/>
 - PortSwigger Web Security Academy (each class has free labs) — <https://portswigger.net/web-security>

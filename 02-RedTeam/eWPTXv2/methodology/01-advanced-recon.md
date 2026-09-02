@@ -14,7 +14,7 @@ to dig first.
 
 - Enumerate **subdomains and virtual hosts** to expand the attack surface.
 - Map the **SPA** and its **API** (routes, parameters, auth requirements).
-- Analyse **client-side JavaScript** for endpoints, secrets, and logic clues.
+- Analyze **client-side JavaScript** for endpoints, secrets, and logic clues.
 - Fingerprint **WAF/CDN** layers so you know what you will have to bypass.
 - Hunt **exposed files**: source maps, `.git`, backups, Swagger/OpenAPI docs.
 - Produce an **attack-surface document** that drives the remaining phases.
@@ -137,7 +137,7 @@ dig +short example.com CNAME
 # Look for direct IPs: subdomain A-records, MX/SPF records, old DNS history
 ```
 
-Test WAF behaviour safely with a single benign-but-suspicious request, e.g.
+Test WAF behavior safely with a single benign-but-suspicious request, e.g.
 `curl 'https://example.com/?q=<script>'` and observe status/body differences
 versus a clean request. Record: blocked patterns, response codes used for
 blocks (403 vs 406 vs 200-with-captcha), and whether blocks are IP-based or
@@ -201,7 +201,7 @@ response excerpts, request IDs) next to every claim; mark hosts **in scope /
 out of scope**; and update the surface map whenever a new endpoint or vhost
 appears — exploitation phases are only as good as this map.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Trusting a single DNS source.** Cross crt.sh, brute force, and search
   engines; each misses different subdomains. Also check IPv6 (`AAAA`) — many
@@ -213,13 +213,13 @@ appears — exploitation phases are only as good as this map.
 - **Reading minified JS raw.** Beautify first; and remember dynamic
   `import()` loads more modules only after user actions.
 - **Treating CDN/WAF fingerprints as facts.** Headers can be spoofed; confirm
-  behaviour (blocking) before planning bypasses.
+  behavior (blocking) before planning bypasses.
 - **Ignoring low-hanging exposed files.** `.git` and Swagger often unlock
   more than any 0-day; check them before deep exploitation.
 - **Polluting notes.** One host per block, evidence attached, scope marked.
   Recon without notes does not feed the report.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I enumerated subdomains (passive + brute force) and virtual hosts on
       every discovered IP.
@@ -228,7 +228,7 @@ appears — exploitation phases are only as good as this map.
 - [ ] I downloaded and beautified the app's JS bundles and searched them for
       endpoints, secrets, and auth logic.
 - [ ] I checked for source maps and attempted original-source recovery.
-- [ ] I fingerprinted the WAF/CDN (headers, TLS, block behaviour) and noted it
+- [ ] I fingerprinted the WAF/CDN (headers, TLS, block behavior) and noted it
       in the surface document.
 - [ ] I probed exposed files: `.git`, backups, `.env`, Swagger/OpenAPI, and
       GraphQL introspection.
@@ -237,7 +237,7 @@ appears — exploitation phases are only as good as this map.
 - [ ] I maintain one up-to-date attack-surface document per host with
       evidence, scope markings, and candidate next steps.
 
-## Further resources
+## Further Resources
 
 - OWASP Web Security Testing Guide — information gathering and configuration
   testing: https://owasp.org/www-project-web-security-testing-guide/

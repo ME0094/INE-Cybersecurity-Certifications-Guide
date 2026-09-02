@@ -101,7 +101,7 @@ build the lab with `labs/lab-setup-guide.md` → work through
 6. Chain drills once they feel easy: scan → exploit → post-exploit → pivot.
 7. Keep a notes template per engagement (IPs, open ports, versions, creds, commands).
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Testing without authorization.** Only attack your own VMs or platforms that grant
   permission (VulnHub, TryHackMe, Hack The Box). Never scan your real LAN.
@@ -116,7 +116,7 @@ build the lab with `labs/lab-setup-guide.md` → work through
 - **Memorizing specific machines.** Learn the *process*; machines in an exam are new.
 - **Skipping the "clean snapshot" habit.** Break your lab, restore it, and move on.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain what the eJPT covers and who it is aimed at.
 - [ ] I can describe the exam format in general public terms (practical, VPN labs,
@@ -128,7 +128,7 @@ build the lab with `labs/lab-setup-guide.md` → work through
 - [ ] I keep organized engagement notes with evidence (commands + output).
 - [ ] I verified current exam logistics on the official INE Security page.
 
-## Further resources
+## Further Resources
 
 - INE Security — official certifications page (public marketing & syllabus):
   <https://security.ine.com/certifications/>

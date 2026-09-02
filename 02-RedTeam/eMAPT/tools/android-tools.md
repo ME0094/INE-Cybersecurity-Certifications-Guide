@@ -71,7 +71,7 @@ adb exec-out screencap -p > screen.png         # screenshot without saving on de
 ```
 
 `run-as` only works on **debuggable** apps or with root; otherwise read private
-storage via a rooted device (`adb root`) or a backup extract.
+storage via a rooted device (`adb root`) or a backup extraction.
 
 ## Emulator Setup
 
@@ -229,7 +229,7 @@ adb shell run-as com.example.app cat shared_prefs/example.xml
 - Tip: keep one AVD per Android version you must support; test on the oldest
   targetSdk you care about, since security defaults changed across releases.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] `adb devices` lists my emulator/device and I can open a shell
 - [ ] I can install, launch, and force-stop a test app with adb commands

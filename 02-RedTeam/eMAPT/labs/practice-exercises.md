@@ -186,7 +186,7 @@ least the static-analysis pass on the iOS app.
   second runs misleading.
 - Tip: write the report the same day; findings lose their edge overnight.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] Drill 1: I listed exported components and three evidence-backed static findings
 - [ ] Drill 2: my Frida hook changed an app behavior and I saved the output

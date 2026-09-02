@@ -190,7 +190,7 @@ High volume, never confirms      -> likely bad threshold or broken parse
 - **Mistake:** detecting only the endpoint layer. *Tip:* the same technique (e.g., credential dumping) should produce detections from multiple layers: endpoint, network, and auth.
 - **Mistake:** never retiring rules. *Tip:* schedule a quarterly detection review — coverage grows by pruning, not only by adding.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain signature vs anomaly detection and give one strength and one weakness of each.
 - [ ] I can read a Sigma rule and state its log source, selection fields, condition, and level.

@@ -123,7 +123,7 @@ Each drill names an objective, the techniques it exercises, and the evidence tha
 - **Steps you should be able to do:** show the sequential behavior (one success), then the concurrent behavior (more than one success), and quantify it in the evidence.
 - **Expected outcome:** response pairs demonstrating N successes where the business rule allows 1, plus a note on where the check and the act diverged.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Solving forward, recording never.** The chain you reconstruct from memory an hour later is missing links. Record after every successful step.
 - **Confusing "the payload ran" with "the impact happened".** A reflected string or an out-of-band ping is a primitive; the brief's success condition is the goal. Chase the latter.
@@ -132,7 +132,7 @@ Each drill names an objective, the techniques it exercises, and the evidence tha
 - **Copying published answers.** You train recall, not judgment. Struggle, then compare with a write-up, then redo it from scratch.
 - **Skipping the "so what" question** on every finding — that question is what builds chains.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I have a repeatable loop (orient → map → primitive → bypass → chain → record) and used it on the last three labs I solved.
 - [ ] My notes for one full chain include a saved request/response pair for every link.
@@ -141,7 +141,7 @@ Each drill names an objective, the techniques it exercises, and the evidence tha
 - [ ] I completed Drill 4–6 and can explain the detection signal before the impact for each.
 - [ ] My chain ledger format (table + evidence ids) is ready to reuse in a report's attack narrative.
 
-## Further resources
+## Further Resources
 
 - PortSwigger Web Security Academy (authorized multi-stage labs) — https://portswigger.net/web-security
 - PortSwigger Research (smuggling/desync and chain write-ups) — https://portswigger.net/research

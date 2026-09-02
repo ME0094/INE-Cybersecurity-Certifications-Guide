@@ -180,7 +180,7 @@ privileged flows.
 - **Ignoring app self-defense** — if the app crashes or resets on attach,
   look for tamper/root detection and bypass it first (Step 1 hooks).
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] frida-server runs on the device and `frida-ps -U` lists processes.
 - [ ] I spawned the target with `frida -U -f` and confirmed hooks fire.

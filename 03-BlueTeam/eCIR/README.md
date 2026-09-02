@@ -107,7 +107,7 @@ A suggested 4–6 week plan (adjust to your pace):
 - **Trusting one source.** Cross-check public claims about the cert domain against
   INE's official syllabus page and NIST/MITRE references listed below.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the six IR lifecycle phases and what each one produces.
 - [ ] I can name the ordering rule of evidence work: preserve first, analyze copies.

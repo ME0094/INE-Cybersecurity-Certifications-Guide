@@ -210,7 +210,7 @@ returns a different record).
 - Tip: use Burp's **HTTP history filter** per host — mobile apps generate a lot
   of noise (analytics, crash reporting).
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] Burp's listener binds to an interface the device/emulator can reach
 - [ ] The device proxy points at Burp and `http://burp` loads from the device browser

@@ -200,7 +200,7 @@ locations like `C:\Users\Public\` or `%TEMP%`), confirm with `cmdline`, then use
 - **Imaging over the network without integrity controls.** If you must use network
   acquisition, wrap it in a tool that hashes and verifies (e.g., EWF over a secure channel).
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can image a USB drive with `dd` and independently hash source and image.
 - [ ] I can create and verify an E01 image with `ewfacquire`/`ewfverify`.

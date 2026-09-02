@@ -162,7 +162,7 @@ VALUES ('3', 'alice', 'alice.jpg', MD5('Password123'), NOW(), 0);
   keep DVWA bound to `127.0.0.1` or the VM's NAT interface; route your browser
   through Burp Suite from day one so every exercise doubles as proxy practice.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Running DVWA on a public IP** → within hours it is scanned and abused.
   Keep it on localhost/NAT and stop the container when idle.
@@ -182,7 +182,7 @@ VALUES ('3', 'alice', 'alice.jpg', MD5('Password123'), NOW(), 0);
 - Tip: pair each level with the matching methodology note so the exercise maps
   to a phase of the testing process.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] DVWA runs locally (Docker or LAMP) and opens in my browser.
 - [ ] I created/reset the database and logged in with the default account.
@@ -195,7 +195,7 @@ VALUES ('3', 'alice', 'alice.jpg', MD5('Password123'), NOW(), 0);
 
 ---
 
-## Further resources
+## Further Resources
 
 - DVWA official repository (README has full install notes) — <https://github.com/digininja/DVWA>
 - OWASP Broken Web Applications Project (alternative lab VM) — <https://owasp.org/www-project-broken-web-applications/>

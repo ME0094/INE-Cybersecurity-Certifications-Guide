@@ -90,7 +90,7 @@ security is about *doing*, so the labs are the heart of this module.
 Suggested cadence: 6–8 weeks at a few hours per week, or a compressed 2-week sprint if you
 already know web/application security and only need the AI-specific material.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Skipping fundamentals.** Jumping straight to jailbreak payloads without understanding
   how system prompts, RAG, and tool calls work produces shallow, non-transferable skills.
@@ -107,7 +107,7 @@ already know web/application security and only need the AI-specific material.
 - **Using production keys.** Never point lab tools at real API keys or company data. Use a
   local model or a throwaway, spend-limited key.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain tokens, context windows, fine-tuning, embeddings, and RAG in my own words.
 - [ ] I can name the main AI attack categories and map each to OWASP LLM Top 10 entries.
@@ -118,7 +118,7 @@ already know web/application security and only need the AI-specific material.
 - [ ] For every attack I practice, I can name a concrete defense or control.
 - [ ] I understand the NDA boundary and know what public material is safe to rely on.
 
-## Further resources
+## Further Resources
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/)

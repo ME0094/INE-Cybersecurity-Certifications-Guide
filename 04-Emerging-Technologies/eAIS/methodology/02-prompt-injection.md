@@ -107,7 +107,7 @@ Delimiters like `--- USER DATA BELOW ---` are *instructions to a model that has 
 - **Phishing amplification.** A compromised or attacker-controlled web page becomes a weapon: any assistant that summarizes it for a user can be instructed to deliver a believable phishing pitch.
 - **Trusted-tool abuse.** Assistants with email/slack write access can be coerced to send messages or approvals from a "trusted" account — the confused-deputy pattern.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Mistake:** assuming safety-trained models "know" not to follow injected instructions. Modern models are more robust, but injection is still an open research problem; never rely on the model alone.
 - **Mistake:** testing only direct injection. Indirect injection (documents, web content, emails) is where enterprise assistants actually get compromised.
@@ -115,7 +115,7 @@ Delimiters like `--- USER DATA BELOW ---` are *instructions to a model that has 
 - **Tip:** in reports, separate *mechanism* (how the instruction got into context) from *impact* (what the agent could actually do). Impact depends on tool privileges — a no-tools chatbot that leaks its system prompt is low severity; a mail-sending agent that leaks one is critical.
 - **Tip:** test payloads against a *copy* of the system in an isolated environment with dummy data — never against a live assistant holding real customer data.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the difference between direct and indirect prompt injection and give one example of each.
 - [ ] I can describe goal hijacking and why "ignore previous instructions" works even with a strong system prompt.
@@ -126,7 +126,7 @@ Delimiters like `--- USER DATA BELOW ---` are *instructions to a model that has 
 - [ ] I can explain why delimiters and "ignore instructions" filters are weak controls.
 - [ ] I can map prompt injection to OWASP LLM01 and locate it in MITRE ATLAS.
 
-## Further resources
+## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications (LLM01 Prompt Injection) — https://owasp.org/www-project-top-10-for-large-language-model-applications/
 - MITRE ATLAS (adversarial techniques, incl. indirect prompt injection) — https://atlas.mitre.org/

@@ -184,7 +184,7 @@ Contact: <name/role/phone/email>.
 - **Improvising comms.** Use the templates; the comms lead sends external messages —
   improvisation leaks scope and confidence.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can recite the universal triage flow (verify → classify → preserve → contain → eradicate → recover → learn) from memory.
 - [ ] I can state the first three actions for each of: malware, phishing, account compromise, exfiltration.

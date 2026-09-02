@@ -228,7 +228,7 @@ The right fix is to treat templates as code, never interpolating user input into
 - **Forgetting stored impact.** Stored XSS and stored HTML uploads are higher severity than reflected because they hit every visitor, not just the tester.
 - **Overstepping in labs.** Confirming RCE via SSTI/command injection is enough for a lab finding — stop there unless the scenario explicitly asks for a full shell. Never run these families outside authorization.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I inventoried every input surface (parameters, body fields, JSON, headers, cookies, uploads).
 - [ ] I confirmed each injectable context with a unique marker before exploiting.

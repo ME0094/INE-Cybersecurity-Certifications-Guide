@@ -146,7 +146,7 @@ These are the commercial/enterprise layers you will see in job ads and larger or
 - **Editing audit rules at runtime only.** `auditctl` rules vanish on reboot. Write them under `/etc/audit/rules.d/` and run `augenrules --load`.
 - **Reporting a hardening index without context.** Always pair the Lynis score with the *warnings that remain* and a short explanation of accepted risk.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can run an OpenSCAP scan against a CIS profile and generate an HTML report.
 - [ ] I can create a tailoring file and exclude one inapplicable rule with a documented reason.

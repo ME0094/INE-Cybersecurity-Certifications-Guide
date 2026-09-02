@@ -200,7 +200,7 @@ Impact: filter can be bypassed for the SQLi family -> severity of SQLi +1
 Be careful about what you claim: a bypass that works on *your* payload
 family does not mean the WAF is useless — state the tested scope precisely.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Fuzzing blindly.** Understand which parser layer you are attacking and
   decode once more than the filter does; random payload spam teaches little.
@@ -217,7 +217,7 @@ family does not mean the WAF is useless — state the tested scope precisely.
 - **Over-claiming WAF bypass scope.** Report exactly which families and
   endpoints were tested.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the parser-mismatch principle behind most bypasses.
 - [ ] I can craft encoding, case, comment, and whitespace variants of a
@@ -235,7 +235,7 @@ family does not mean the WAF is useless — state the tested scope precisely.
 - [ ] I document each bypass as evidence tied to an underlying finding, with
       tested scope stated.
 
-## Further resources
+## Further Resources
 
 - OWASP Web Security Testing Guide — input validation and WAF testing:
   https://owasp.org/www-project-web-security-testing-guide/

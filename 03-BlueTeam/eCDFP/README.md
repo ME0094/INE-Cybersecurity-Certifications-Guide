@@ -88,7 +88,7 @@ Treat the folders as concentric practice rings — read, then do, then compress 
 2. **Learn one tool family at a time** using `tools/` (Sleuth Kit & carving first, then memory with Volatility — memory builds on file-system habits).
 3. **Do every lab drill** in `labs/forensic-exercises.md` at least twice: once following the steps, once from memory.
 4. **Drill with the cheatsheet** until the commands are reflex, then put it away and write the commands out by hand.
-5. **Self-check** with each file's "Checklist / Self-test" and the module checklist below before moving on.
+5. **Self-check** with each file's "Checklist / Self-Test" and the module checklist below before moving on.
 
 ## Study roadmap
 
@@ -127,7 +127,7 @@ Digital forensics is the after-the-fact sibling of detection and response: the S
 - Timeline work tells you *the order of events and the initial access point*.
 - Reporting closes the loop with management, legal, and the next incident's playbook.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 Run through this module checklist — each item maps to a concrete artifact you should be able to produce:
 
@@ -139,7 +139,7 @@ Run through this module checklist — each item maps to a concrete artifact you 
 - [ ] I wrote one complete short report: scope, method, findings, evidence paths, and conclusions.
 - [ ] I can reproduce the key commands from the cheatsheet from memory (no notes).
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-86 — *Guide to Integrating Forensic Techniques into Incident Response* (csrc.nist.gov/publications).
 - Sleuth Kit documentation and wiki — sleuthkit.org (also hosts Autopsy).

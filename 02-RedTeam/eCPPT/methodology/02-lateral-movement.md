@@ -140,7 +140,7 @@ Rule of thumb: keep tool traffic inside the tunnel; run port scans with `-sT` (S
 - **Leaving services behind:** PsExec-style tools create services/tasks; remove them (`sc delete`/`schtasks /delete`) in the lab and note cleanup in your report.
 - **Detection awareness:** note Windows Event IDs 4624 (logon), 4648 (explicit credentials), 4672 (admin), 4688/1 (process creation), and Sysmon 3 (network) — high-volume channel use is how defenders catch lateral movement.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can perform PtH against SMB, WMI, and WinRM with Impacket and explain when each fails.
 - [ ] I can export and inject Kerberos tickets (mimikatz/Rubeus) and use a ccache with `-k` from Linux.

@@ -171,7 +171,7 @@ oscap info /usr/share/xml/scap/ssg/content/ssg-debian12-ds.xml
 - **Scanning without root or without the right content** — both tools silently degrade; verify with `sudo` and confirm the data stream matches your OS release.
 - **Remediating everything blindly.** A scan is advisory: a rule that breaks a business app must be handled via tailoring + documented acceptance, not force-applied.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I wrote a complete AUP skeleton with version, owner, review date, and enforceable rules.
 - [ ] My risk register has at least 6 rows with L×I scores, treatments, and owners.

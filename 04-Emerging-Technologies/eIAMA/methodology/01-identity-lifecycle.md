@@ -178,7 +178,7 @@ Good hygiene is what makes a zero-trust architecture (Phase 04) believable: you 
 - **Mistake:** letting the app be the source of truth ("we create users in the app"). **Tip:** centralize provisioning; apps consume identities via SCIM/directory.
 - **Mistake:** annual reviews that everyone rubber-stamps. **Tip:** sample-verify certifications, use event-driven reviews, and enforce remediation.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can draw the JML lifecycle and state the required actions and ideal timings for each event.
 - [ ] I can explain the difference between system of record, authoritative attribute source, directory, and enforcement point.
@@ -188,7 +188,7 @@ Good hygiene is what makes a zero-trust architecture (Phase 04) believable: you 
 - [ ] I can list at least five identity-hygiene problems and a mitigation for each.
 - [ ] I can explain why session revocation matters for offboarding, not just account disabling.
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-162, *Guide to Attribute Based Access Control (ABAC)*: https://doi.org/10.6028/NIST.SP.800-162
 - NIST SP 800-63-3, *Digital Identity Guidelines* (IAL/AAL suite): https://doi.org/10.6028/NIST.SP.800-63-3

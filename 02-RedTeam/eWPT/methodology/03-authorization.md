@@ -151,7 +151,7 @@ A finding is only as good as its demonstrated impact. For every access-control i
 - **Ignoring the HTTP method.** `GET /admin` may be blocked while `POST /admin` passes; many frameworks map both to the same handler.
 - **Failing to baseline.** Compare every odd response against *your own* legitimate access — otherwise you will report public data as an access-control flaw.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I control at least two accounts (or two objects) that let me prove cross-identity access.
 - [ ] I enumerated the app's functions and marked which privilege level each one should require.

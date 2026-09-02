@@ -212,7 +212,7 @@ msfconsole -q -r handler.rc
 msf6 > resource handler.rc
 ```
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **PostgreSQL not started / `msfdb` not initialized.** `db_status` fails and `db_nmap`
   errors. Fix with `sudo systemctl start postgresql` and `sudo msfdb init`.
@@ -233,7 +233,7 @@ msf6 > resource handler.rc
 - **Staged payload with no working handler** produces a hanging connection. When in
   doubt, use a stageless payload.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can start PostgreSQL, run `msfdb init`, and confirm `db_status`.
 - [ ] I can `search`, `use`, `show options`, `set`, and `run` a module.
@@ -246,7 +246,7 @@ msf6 > resource handler.rc
       `upload`, and `download`.
 - [ ] I can write and load a resource `.rc` script.
 
-## Further resources
+## Further Resources
 
 - Metasploit official documentation: <https://docs.metasploit.com/>
 - Metasploit Framework source and wiki: <https://github.com/rapid7/metasploit-framework>

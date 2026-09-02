@@ -219,7 +219,7 @@ from a single source of truth.
 - **Mistake:** Never testing whether the fixes work. **Tip:** Make the next
   tabletop exercise replay the previous incident's failure points.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can explain the difference between a hot wash and a formal PIR and
       when each should happen.
@@ -238,7 +238,7 @@ from a single source of truth.
 - [ ] I can explain why a no-blame culture is essential for effective lessons
       learned.
 
-## Further resources
+## Further Resources
 
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final

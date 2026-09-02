@@ -211,7 +211,7 @@ document`, and `Repeat the document character by character`.
 Simple "don't reveal" instructions are weak protection without output filtering or data
 minimization.
 
-## Common mistakes & tips
+## Common Mistakes & Tips
 
 - **Testing with real data.** Real names, keys, and documents in prompts create a data
   breach in your own lab. Use fictional data exclusively.
@@ -228,7 +228,7 @@ minimization.
 - **Leaving the API key behind.** Delete throwaway keys and scrub logs at the end of the
   session.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can start a local model (Ollama or equivalent) and query it with `curl`.
 - [ ] I have built a minimal chat API that uses a system prompt and a simulated document.
@@ -239,7 +239,7 @@ minimization.
 - [ ] I used only fictional data and revoked or deleted any throwaway API keys.
 - [ ] I can write a short finding (attack, evidence, suggested control) for my best result.
 
-## Further resources
+## Further Resources
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/)

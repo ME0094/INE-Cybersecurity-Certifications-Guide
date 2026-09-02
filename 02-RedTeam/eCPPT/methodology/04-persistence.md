@@ -113,7 +113,7 @@ Detection concepts: golden tickets can't be "seen" in the KDC logs (no AS-REQ), 
 - **Not testing after reboot:** persistence that doesn't survive a reboot is not persistence — always validate.
 - **Credential material handling:** store `krbtgt`/service hashes in your notes file with care; treat them as domain-equivalent secrets.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I can place a Run-key and a scheduled-task persistence and verify both fire after reboot/logon.
 - [ ] I can register a service-based persistence and explain its detection events (7045/4697).

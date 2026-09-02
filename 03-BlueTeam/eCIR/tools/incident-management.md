@@ -191,7 +191,7 @@ review and update the playbook — the loop that makes the next incident cheaper
 - **Treating the template as the message.** Templates keep structure; the content must
   still be accurate, current, and specific to this incident.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I know which ticketing/IR platform our team uses and how to open a case with severity and assignment.
 - [ ] I can produce a complete case file: synopsis, timeline, evidence log, actions log, comms log.

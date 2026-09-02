@@ -201,7 +201,7 @@ curl -s -b 'JSESSIONID=OLDTOKEN' https://app.example.com/account
 - **Not checking session fixation.** Log in from a token you chose before authenticating (set `JSESSIONID=attacker-chosen` then authenticate); if the app keeps your value, an attacker who plants a token can hijack the session.
 - **Volume discipline.** Brute force is the noisiest test you will run. Confirm rate limits with a handful of requests first, then scale only as authorized.
 
-## Checklist / Self-test
+## Checklist / Self-Test
 
 - [ ] I tested documented default credentials for the fingerprinted products/panels.
 - [ ] I checked for username enumeration and confirmed it with at least two response differences.
