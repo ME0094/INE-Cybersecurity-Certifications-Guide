@@ -100,7 +100,7 @@ Review any script before running it in your own environment.
 
 ## Status
 
-The guides are **complete**: all eleven certification modules are finished study
+**Status: complete.** All eleven certification modules are finished study
 guides written entirely in English.
 
 - [x] Repository structure and shared conventions defined
