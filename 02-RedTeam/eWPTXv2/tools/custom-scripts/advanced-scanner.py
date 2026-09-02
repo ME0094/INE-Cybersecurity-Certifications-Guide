@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""
+advanced-scanner.py — Escaner web multi-capa (eWPTXv2).
+
+Recoge "fricciones" de bajo coste antes de atacar a mano: cabeceras de
+seguridad, cookies, robots/sitemap, rutas comunes, CORS y redirecciones.
+Disenado como base extensible: anade nuevos checks en CHECKS.
+
+Uso:
+    python3 advanced-scanner.py -u https://target.com
+    python3 advanced-scanner.py -u http://target:8080 --out report.json
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import ssl
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+from dataclasses import dataclass, field
+
+SECURITY_HEADERS = (
+    "Content-Security-Policy",
+    "Strict-Transport-Security",
+    "X-Content-Type-Options",
+    "X-Frame-Options",
+    "Referrer-Policy",
+    "Permissions-Policy",
+)
+
+COMMON_PATHS = (
+    "robots.txt", "sitemap.xml", ".well-known/security.txt",
+    "admin", "api", "login", "upload", ".git/config", "swagger",
+)
+
+WEAK_COOKIE_FLAGS = ("secure", "httponly", "samesite")
+
+
+@dataclass
+class Finding:
+    level: str
+    check: str
+    detail: str
+    extra: dict = field(default_factory=dict)
+
+
+class Scanner:
+    def __init__(self, base: str, insecure: bool = False, timeout: float = 10.0):
+        self.base = base.rstrip("/")
+        self.timeout = timeout
+        self.findings: list[Finding] = []
+        handlers: list = []
+        if insecure:
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+            handlers.append(urllib.request.HTTPSHandler(context=ctx))
+        self.opener = urllib.request.build_opener(*handlers)
+
+    def request(self, url: str, extra_headers: dict | None = None) -> tuple[int, dict, bytes]:
+        headers = {"User-Agent": "advanced-scanner/0.1"}
+        headers.update(extra_headers or {})
+        req = urllib.request.Request(url, headers=headers)
+        try:
+            with self.opener.open(req, timeout=self.timeout) as resp:
+                return resp.status, dict(resp.headers), resp.read()
+        except urllib.error.HTTPError as exc:
+            return exc.code, dict(exc.headers), exc.read()
+        except urllib.error.URLError as exc:
+            raise RuntimeError(f"Error de red hacia {url}: {exc}") from exc
+
+    # ── Checks ──────────────────────────────────────────────────────
+    def check_headers(self, status: int, headers: dict) -> None:
+        hdr = {k.lower(): v for k, v in headers.items()}
+        for name in SECURITY_HEADERS:
+            if name.lower() not in hdr:
+                self.findings.append(Finding("info", "security-headers",
+                                             f"Falta cabecera {name}"))
+        server = hdr.get("server") or hdr.get("x-powered-by")
+        if server:
+            self.findings.append(Finding("info", "banner", f"Banner expuesto: {server}"))
+
+    def check_cookies(self, headers: dict) -> None:
+        for set_cookie in headers.get("Set-Cookie", "").splitlines():
+            parts = [p.strip().lower() for p in set_cookie.split(";")]
+            name = parts[0].split("=")[0] if parts else "?"
+            missing = [f for f in WEAK_COOKIE_FLAGS if f not in parts]
+            if missing:
+                self.findings.append(Finding("low", "cookies",
+                                             f"Cookie '{name}' sin: {', '.join(missing)}"))
+
+    def check_cors(self) -> None:
+        try:
+            _, headers, _ = self.request(self.base + "/", {"Origin": "https://evil.example"})
+            acao = headers.get("Access-Control-Allow-Origin")
+            if acao and acao.strip() == "https://evil.example":
+                self.findings.append(Finding("high", "cors",
+                                             "ACAO refleja el Origin (CORS abierto)"))
+        except RuntimeError:
+            pass
+
+    def check_common_paths(self) -> None:
+        for path in COMMON_PATHS:
+            url = self.base + "/" + path
+            try:
+                status, _, body = self.request(url)
+            except RuntimeError:
+                continue
+            if status == 200 and path in ("robots.txt", "sitemap.xml"):
+                self.findings.append(Finding("low", "paths",
+                                             f"{path} accesible", {"bytes": len(body)}))
+            elif status in (200, 301, 302, 403):
+                self.findings.append(Finding("info", "paths",
+                                             f"{path} -> HTTP {status}"))
+
+    # ── Orquestacion ────────────────────────────────────────────────
+    def run(self) -> dict:
+        try:
+            status, headers, body = self.request(self.base + "/")
+        except RuntimeError as exc:
+            return {"error": str(exc), "findings": []}
+        self.check_headers(status, headers)
+        self.check_cookies(headers)
+        self.check_common_paths()
+        self.check_cors()
+        return {
+            "target": self.base,
+            "status": status,
+            "body_bytes": len(body),
+            "findings": [vars(f) for f in self.findings],
+        }
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("-u", "--url", required=True)
+    ap.add_argument("--insecure", action="store_true")
+    ap.add_argument("--out", default=None, help="Volcar JSON a un fichero.")
+    args = ap.parse_args()
+
+    scanner = Scanner(args.url, insecure=args.insecure)
+    report = scanner.run()
+    text = json.dumps(report, indent=2, ensure_ascii=False)
+    if args.out:
+        with open(args.out, "w", encoding="utf-8") as fh:
+            fh.write(text + "\n")
+        print(f"[+] Informe guardado en {args.out}")
+    else:
+        print(text)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

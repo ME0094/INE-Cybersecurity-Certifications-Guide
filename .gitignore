@@ -1,0 +1,38 @@
+# ── Sistema operativo ────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+*.swp
+*.tmp
+
+# ── Editores / IDE ───────────────────────────────────────────────────
+.vscode/
+.idea/
+*.code-workspace
+
+# ── Python ───────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.python-version
+
+# ── Entornos y secretos (nunca subir) ────────────────────────────────
+.env
+.env.*
+*.pem
+*.key
+*.token
+
+# ── Artefactos de laboratorio / salidas ──────────────────────────────
+*.log
+logs/
+out/
+artifacts/
+*.ovpn
+
+# ── Scripts (resultados intermedios) ─────────────────────────────────
+reports/
+*.html.tmp
