@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-advanced-scanner.py — Escaner web multi-capa (eWPTXv2).
+advanced-scanner.py — Multi-layer web scanner (eWPTXv2).
 
-Recoge "fricciones" de bajo coste antes de atacar a mano: cabeceras de
-seguridad, cookies, robots/sitemap, rutas comunes, CORS y redirecciones.
-Disenado como base extensible: anade nuevos checks en CHECKS.
+Collects low-cost "frictions" before attacking by hand: security headers,
+cookies, robots/sitemap, common paths, CORS and redirects.
+Designed as an extensible base: add new checks in CHECKS.
 
-Uso:
+Usage:
     python3 advanced-scanner.py -u https://target.com
     python3 advanced-scanner.py -u http://target:8080 --out report.json
 """
@@ -69,7 +69,7 @@ class Scanner:
         except urllib.error.HTTPError as exc:
             return exc.code, dict(exc.headers), exc.read()
         except urllib.error.URLError as exc:
-            raise RuntimeError(f"Error de red hacia {url}: {exc}") from exc
+            raise RuntimeError(f"Network error reaching {url}: {exc}") from exc
 
     # ── Checks ──────────────────────────────────────────────────────
     def check_headers(self, status: int, headers: dict) -> None:
@@ -77,10 +77,10 @@ class Scanner:
         for name in SECURITY_HEADERS:
             if name.lower() not in hdr:
                 self.findings.append(Finding("info", "security-headers",
-                                             f"Falta cabecera {name}"))
+                                             f"Missing header {name}"))
         server = hdr.get("server") or hdr.get("x-powered-by")
         if server:
-            self.findings.append(Finding("info", "banner", f"Banner expuesto: {server}"))
+            self.findings.append(Finding("info", "banner", f"Exposed banner: {server}"))
 
     def check_cookies(self, headers: dict) -> None:
         for set_cookie in headers.get("Set-Cookie", "").splitlines():
@@ -89,7 +89,7 @@ class Scanner:
             missing = [f for f in WEAK_COOKIE_FLAGS if f not in parts]
             if missing:
                 self.findings.append(Finding("low", "cookies",
-                                             f"Cookie '{name}' sin: {', '.join(missing)}"))
+                                             f"Cookie '{name}' missing: {', '.join(missing)}"))
 
     def check_cors(self) -> None:
         try:
@@ -97,7 +97,7 @@ class Scanner:
             acao = headers.get("Access-Control-Allow-Origin")
             if acao and acao.strip() == "https://evil.example":
                 self.findings.append(Finding("high", "cors",
-                                             "ACAO refleja el Origin (CORS abierto)"))
+                                             "ACAO reflects the Origin (open CORS)"))
         except RuntimeError:
             pass
 
@@ -110,12 +110,12 @@ class Scanner:
                 continue
             if status == 200 and path in ("robots.txt", "sitemap.xml"):
                 self.findings.append(Finding("low", "paths",
-                                             f"{path} accesible", {"bytes": len(body)}))
+                                             f"{path} is accessible", {"bytes": len(body)}))
             elif status in (200, 301, 302, 403):
                 self.findings.append(Finding("info", "paths",
                                              f"{path} -> HTTP {status}"))
 
-    # ── Orquestacion ────────────────────────────────────────────────
+    # ── Orchestration ──────────────────────────────────────────────
     def run(self) -> dict:
         try:
             status, headers, body = self.request(self.base + "/")
@@ -137,7 +137,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("-u", "--url", required=True)
     ap.add_argument("--insecure", action="store_true")
-    ap.add_argument("--out", default=None, help="Volcar JSON a un fichero.")
+    ap.add_argument("--out", default=None, help="Dump JSON to a file.")
     args = ap.parse_args()
 
     scanner = Scanner(args.url, insecure=args.insecure)
@@ -146,7 +146,7 @@ def main() -> int:
     if args.out:
         with open(args.out, "w", encoding="utf-8") as fh:
             fh.write(text + "\n")
-        print(f"[+] Informe guardado en {args.out}")
+        print(f"[+] Report saved to {args.out}")
     else:
         print(text)
     return 0

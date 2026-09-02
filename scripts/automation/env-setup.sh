@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # env-setup.sh
-# Preparacion basica del entorno de laboratorio (Kali/Parrot/Debian/Ubuntu/macOS).
-# Uso: ./env-setup.sh [--install]
-#   --install   instala las herramientas definidas en TOOLS (por defecto solo informa).
+# Basic lab environment setup (Kali/Parrot/Debian/Ubuntu/macOS).
+# Usage: ./env-setup.sh [--install]
+#   --install   installs the tools defined in TOOLS (by default it only reports).
 set -euo pipefail
 
 TOOLS=(nmap curl wget git jq python3 python3-pip)
@@ -22,31 +22,31 @@ install_pkg() { # pkg_mgr tool_name
     dnf)    sudo dnf install -y "$2" ;;
     pacman) sudo pacman -Sy --noconfirm "$2" ;;
     brew)   brew install "$2" ;;
-    *)      echo "No se como instalar '$2' con el gestor disponible." ;;
+    *)      echo "I don't know how to install '$2' with the available package manager." ;;
   esac
 }
 
 main() {
   local pkg_mgr
   pkg_mgr="$(detect_pkg)"
-  echo "[*] Gestor de paquetes detectado: $pkg_mgr"
-  echo "[*] Directorio de laboratorio: $LAB_DIR"
+  echo "[*] Detected package manager: $pkg_mgr"
+  echo "[*] Lab directory: $LAB_DIR"
   mkdir -p "$LAB_DIR"
-  echo "[*] Herramientas objetivo: ${TOOLS[*]}"
+  echo "[*] Target tools: ${TOOLS[*]}"
 
   if [[ "${1:-}" == "--install" ]]; then
     for tool in "${TOOLS[@]}"; do
       if command -v "$tool" >/dev/null 2>&1; then
-        echo "[+] $tool ya disponible"
+        echo "[+] $tool already available"
       else
-        echo "[*] Instalando $tool ..."
+        echo "[*] Installing $tool ..."
         install_pkg "$pkg_mgr" "$tool"
       fi
     done
   else
-    echo "[i] Ejecuta con --install para instalar las herramientas que falten."
+    echo "[i] Run with --install to install any missing tools."
   fi
-  echo "[*] Listo. Siguiente paso: descargar imagenes de maquinas victima y configurar redes."
+  echo "[*] Done. Next step: download victim machine images and configure networks."
 }
 
 main "$@"

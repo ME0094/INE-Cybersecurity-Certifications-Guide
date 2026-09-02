@@ -1,0 +1,90 @@
+# =============================================================================
+# EDUCATIONAL EXAMPLE SIGMA RULE (study only)
+# -----------------------------------------------------------------------------
+# Sigma is a vendor-neutral YAML format for describing log events to detect.
+# The Sigma CLI converts one rule into queries for many SIEM backends.
+#
+# DETECTS: powershell.exe / pwsh.exe launched with "-EncodedCommand", the
+# classic sign of obfuscated (base64) PowerShell used by attackers.
+#
+# STUDY ONLY: test it in your own lab against events you generate yourself
+# (see ../../../labs/soc-scenarios.md). Real rules need tuning per env.
+#   Validate syntax: sigma check sigma-example.yml
+#   Convert:         sigma convert -t es-qs sigma-example.yml
+# =============================================================================
+
+# --- Metadata: who, what, why ----------------------------------------------
+title: Suspicious PowerShell - Encoded Command Execution
+# Human-readable name shown in alert queues and reports.
+
+id: 5f4a9c2e-8b1d-4e6f-9a3c-1d2e4f6a8b0c
+# Globally unique identifier (UUID). Rules keep a stable id so analysts and
+# automation can reference "this rule" even if its title or logic changes.
+
+status: experimental
+# Lifecycle: experimental -> test -> stable -> deprecated. "experimental"
+# honestly signals the logic is not yet battle-tested in production.
+
+description: |
+  Detects powershell.exe or pwsh.exe launched with the -EncodedCommand
+  argument, commonly used to run obfuscated/base64-encoded PowerShell.
+  Legitimate admin tooling can also use it, so this rule produces leads
+  to triage, not confirmed compromise.
+# Free-text explanation of what the rule matches and why it matters.
+
+references:
+    - https://attack.mitre.org/techniques/T1059/001/
+# Optional links: MITRE ATT&CK technique page, vendor docs, write-ups.
+
+author: Your Name (example for study)
+date: 2024/06/01
+# Who wrote it and when (YYYY/MM/DD or ISO format).
+
+tags:
+    - attack.execution      # ATT&CK tactic: Execution
+    - attack.t1059.001      # ATT&CK technique: PowerShell
+# Tags make rules searchable and let analysts pivot by technique ID.
+
+# --- Log source: where the events come from --------------------------------
+logsource:
+    category: process_creation
+    # Class of log: "process_creation" fires every time a process starts
+    # (e.g., Windows Event 4688 with command-line auditing, or Sysmon ID 1).
+    product: windows
+    # OS family of the source; avoids matching macOS/Linux process logs.
+
+# --- Detection: what to look for -------------------------------------------
+detection:
+    selection_powershell:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        # 'Image' = full path of the launched executable. '|endswith' means
+        # "the field ends with one of these". Both Windows PowerShell and
+        # PowerShell 7 are listed so the rule covers hosts with either.
+    selection_encoded:
+        # Match the command line against the encoded-command switch. Sigma
+        # accepts the long spelling '-EncodedCommand' and the short '-enc'.
+        # Matching is case-insensitive and a plain list under a field is OR,
+        # so the long form is listed mainly for readability/documentation.
+        CommandLine|contains:
+            - '-EncodedCommand'
+            - '-enc'
+        # '|contains' = field value contains the string; without '|all', ANY
+        # listed string is enough to match this block.
+    condition: selection_powershell and selection_encoded
+    # Boolean that decides if the rule fires: BOTH blocks must match. Other
+    # common forms: "1 of them", "all of selection*", "selection and not
+    # filter_*" (filters remove known-benign cases).
+
+# --- False positives & severity ---------------------------------------------
+falsepositives:
+    - Legitimate administrative or automation scripts that use encoding
+      to pass complex commands (e.g., some deployment tooling)
+    - Scripts started by approved IT tooling during maintenance windows
+# List what can look like this rule so the next analyst knows why it may be
+# noise in YOUR environment.
+
+level: high
+# Alert severity (informational/low/medium/high/critical). Encoded PowerShell
+# is rarely run by a normal user by accident, so treat it as urgent.

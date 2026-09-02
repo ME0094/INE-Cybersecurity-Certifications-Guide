@@ -1,38 +1,140 @@
 # eJPT — Junior Penetration Tester
 
-> Área: 01-Fundamentals · INE-Cybersecurity-Certifications-Guide
+> `01-Fundamentals/eJPT` · INE-Cybersecurity-Certifications-Guide
+>
+> Status: study module. Methodology notes, tool references, lab guides, and command
+> cheatsheets for preparing the **eJPT (Junior Penetration Tester)**.
 
-## Descripción
+The eJPT is INE Security's **entry-level, hands-on penetration testing** certification. It
+measures whether you can perform a basic external/internal pentest against live lab
+targets: discover hosts, enumerate services, exploit known public vulnerabilities, and
+collect evidence. Everything in this module is public knowledge plus your own lab
+practice — **no exam content or NDA-protected material** is included.
 
-Introducción al pentesting: fundamentos de redes y protocolos, metodología ofensiva básica y laboratorios guiados.
+## What the eJPT certification covers
 
-Módulo en construcción: cada nota incluye su propósito y una lista de puntos
-pendientes (casillas - [ ]) para ir completando.
+- **Networking fundamentals** needed to understand addressing, subnets, and services.
+- The **penetration testing process**: reconnaissance → enumeration → exploitation →
+  post-exploitation, plus basic pivoting concepts.
+- **Information gathering** with tools such as Nmap, banner grabbing, and web enumeration.
+- **Vulnerability assessment**: mapping discovered services and versions to known,
+  public vulnerabilities (CVEs, Exploit-DB).
+- **Exploitation**: using Metasploit against intentionally vulnerable targets.
+- **Web application basics**: introductory issues such as weak authentication, file
+  uploads, and command injection.
+- **Host and network attacks** on a small internal network similar to a VPN lab.
 
-## Estructura del módulo
+## Target audience
 
-- [methodology/](methodology/) — Fases y procedimientos numerados en orden de trabajo
-  - [01-reconnaissance](methodology/01-reconnaissance.md)
-  - [02-enumeration](methodology/02-enumeration.md)
-  - [03-exploitation](methodology/03-exploitation.md)
-  - [04-post-exploitation](methodology/04-post-exploitation.md)
-  - [05-pivoting](methodology/05-pivoting.md)
-- [tools/](tools/) — Herramientas, guías de referencia y scripts propios
-  - [nmap-cheatsheet](tools/nmap-cheatsheet.md)
-  - [metasploit-basics](tools/metasploit-basics.md)
-  - [netcat-essentials](tools/netcat-essentials.md)
-- [labs/](labs/) — Montaje de laboratorios, escenarios y ejercicios prácticos
-  - [lab-setup-guide](labs/lab-setup-guide.md)
-  - [practice-scenarios](labs/practice-scenarios.md)
-- [cheatsheets/](cheatsheets/) — Chuletas de comandos y terminología de consulta rápida
-  - [commands-reference](cheatsheets/commands-reference.md)
+- Beginners who want a first, credible, practical pentesting credential.
+- IT/networking professionals moving toward offensive security.
+- Students who learn better **by doing** than by memorizing theory.
 
-## Progreso
+The eJPT is a common first step before mid-level practical courses such as the eCPPT.
 
-- [ ] Repasar metodología completa
-- [ ] Completar guías de laboratorio y verificar resultados
-- [ ] Consolidar chuletas de referencia
+## Recommended background
 
----
+- Comfort with the **Linux command line** (navigation, pipes, redirection, permissions).
+- Basic **TCP/IP knowledge**: IP addresses, subnets, well-known ports (21, 22, 80, 443,
+  445, 3306), TCP vs UDP.
+- A rough idea of what a **web server** and an **operating system** are.
+- No prior pentesting experience is required — the official course and this module build
+  from zero.
 
-> ⚠️ Apuntes propios de estudio. No incluir contenido de exámenes protegido por NDA.
+If the command line still feels foreign, spend a few days inside the lab described in
+`labs/lab-setup-guide.md` before starting the methodology notes.
+
+## Exam format (in general public terms)
+
+The eJPT is **practical and hands-on**. In broad public terms:
+
+- You connect **over VPN** to an exam network with live, intentionally vulnerable targets.
+- You answer a set of questions by **actually performing** the related tasks on those
+  targets (scanning, enumerating, exploiting, collecting evidence).
+- The exam is **time-boxed**: a fixed time window, so time management and note-taking
+  are part of the skill being tested.
+- Scoring is based on correct answers backed by the evidence you gather during the exam.
+
+The workflow matters more than any specific machine. If you can complete the drills in
+`labs/practice-scenarios.md` against your own lab, you are training exactly the right
+muscle. Do **not** look for "exam dumps" — they violate the NDA and defeat the purpose.
+Always confirm current public logistics (price, duration, rules) on the official INE
+Security page, since those details can change.
+
+## Skills you build
+
+- Planning and scoping a small, authorized pentest inside a lab.
+- Host discovery and service/version identification with **Nmap**.
+- Banner grabbing, web directory enumeration, and service-specific enumeration.
+- Matching services to known public vulnerabilities.
+- Exploiting with **Metasploit** and managing meterpreter sessions.
+- Manual shells and file transfers with **Netcat/Ncat**.
+- Basic post-exploitation: what to run, what to look for, what to record.
+- Basic routing/pivoting concepts to reach internal segments.
+- Organized note-taking and evidence collection.
+
+## Module layout — how to use this folder
+
+| Folder / file | What it is for |
+|---|---|
+| `methodology/` | Numbered phases in working order: 01-reconnaissance → 05-pivoting |
+| `tools/nmap-cheatsheet.md` | Nmap: host discovery, scans, NSE, output, timing |
+| `tools/metasploit-basics.md` | Metasploit: msfconsole, payloads, handlers, DB, sessions |
+| `tools/netcat-essentials.md` | Netcat/Ncat: shells, file transfer, ncat extras (SSL, keep-open) |
+| `labs/lab-setup-guide.md` | Build your practice lab (Kali + vulnerable VMs) |
+| `labs/practice-scenarios.md` | Guided scan-to-shell drills with expected outcomes |
+| `cheatsheets/commands-reference.md` | One-page command reference organized by phase |
+
+**Suggested order:** skim `methodology/01-reconnaissance.md` and `02-enumeration.md` →
+build the lab with `labs/lab-setup-guide.md` → work through
+`labs/practice-scenarios.md` with the `tools/*` pages open → consolidate everything with
+`cheatsheets/commands-reference.md`.
+
+## Suggested study path
+
+1. Build the lab: Kali attacker + Metasploitable 2 + DVWA
+   (`labs/lab-setup-guide.md`).
+2. Read methodology phases 01–05 and repeat each phase on a live target.
+3. Complete the guided scenarios in `labs/practice-scenarios.md` **in order**.
+4. Re-do each scenario from memory, then compare with the notes.
+5. Time-box yourself: aim to finish each drill faster on the second pass.
+6. Chain drills once they feel easy: scan → exploit → post-exploit → pivot.
+7. Keep a notes template per engagement (IPs, open ports, versions, creds, commands).
+
+## Common mistakes & tips
+
+- **Testing without authorization.** Only attack your own VMs or platforms that grant
+  permission (VulnHub, TryHackMe, Hack The Box). Never scan your real LAN.
+- **Skipping enumeration.** Most time should go to enumeration — firing exploits blindly
+  is a beginner's trap.
+- **Not writing notes.** Exams reward evidence and organization. Record IPs, ports,
+  versions, credentials, and commands as you go.
+- **Wrong target IPs.** Check `ip a` and `ip route` before every engagement and write the
+  target down.
+- **Treating the exam as your first lab.** Repeat the drills at home until they are
+  routine.
+- **Memorizing specific machines.** Learn the *process*; machines in an exam are new.
+- **Skipping the "clean snapshot" habit.** Break your lab, restore it, and move on.
+
+## Checklist / Self-test
+
+- [ ] I can explain what the eJPT covers and who it is aimed at.
+- [ ] I can describe the exam format in general public terms (practical, VPN labs,
+      time-boxed) without referencing any specific question or machine.
+- [ ] I have a working lab (attacker + targets) that I can rebuild from scratch.
+- [ ] I can walk methodology phases 01–05 against a lab target.
+- [ ] I completed every scenario in `labs/practice-scenarios.md` at least once.
+- [ ] I can re-run the core drills without opening these notes.
+- [ ] I keep organized engagement notes with evidence (commands + output).
+- [ ] I verified current exam logistics on the official INE Security page.
+
+## Further resources
+
+- INE Security — official certifications page (public marketing & syllabus):
+  <https://security.ine.com/certifications/>
+- Nmap official documentation: <https://nmap.org/docs.html>
+- Metasploit documentation: <https://docs.metasploit.com/>
+- OWASP Top 10 (web fundamentals): <https://owasp.org/www-project-top-ten/>
+- MITRE ATT&CK (technique reference): <https://attack.mitre.org/>
+- Authorized practice platforms: <https://www.vulnhub.com/> ·
+  <https://www.tryhackme.com/> · <https://www.hackthebox.com/>

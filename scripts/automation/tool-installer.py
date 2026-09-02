@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-tool-installer.py — Instalador de herramientas de pentesting / blue team.
+tool-installer.py — Pentesting / blue team tool installer.
 
-Detecta el gestor de paquetes del sistema (apt/dnf/pacman/brew) e instala una
-herramienta concreta. Por defecto solo muestra el plan (--dry-run).
+Detects the system package manager (apt/dnf/pacman/brew) and installs a
+given tool. By default it only shows the plan (--dry-run).
 
-Uso:
+Usage:
     python3 tool-installer.py --tool nmap [--yes]
     python3 tool-installer.py --list
 """
@@ -16,7 +16,7 @@ import shutil
 import subprocess
 import sys
 
-# Mapa: nombre normalizado -> paquetes por gestor. (Vacio = usar el mismo nombre)
+# Map: normalized name -> packages per package manager. (Empty = use the same name)
 TOOLS: dict[str, dict[str, str]] = {
     "nmap": {"apt": "nmap", "dnf": "nmap", "pacman": "nmap", "brew": "nmap"},
     "gobuster": {"apt": "gobuster", "dnf": "gobuster", "pacman": "gobuster", "brew": "gobuster"},
@@ -51,11 +51,11 @@ def plan_install(mgr: str, tool: str) -> list[str] | None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--tool", help="Herramienta a instalar (ver --list).")
-    ap.add_argument("--list", action="store_true", help="Listar herramientas conocidas.")
+    ap.add_argument("--tool", help="Tool to install (see --list).")
+    ap.add_argument("--list", action="store_true", help="List known tools.")
     ap.add_argument("--dry-run", action="store_true", default=True,
-                    help="Mostrar el comando sin ejecutarlo (por defecto).")
-    ap.add_argument("--yes", action="store_true", help="Ejecutar la instalacion.")
+                    help="Show the command without running it (default).")
+    ap.add_argument("--yes", action="store_true", help="Run the installation.")
     args = ap.parse_args()
 
     if args.list:
@@ -63,25 +63,25 @@ def main() -> int:
         return 0
 
     if not args.tool:
-        ap.error("--tool es obligatorio (o usa --list).")
+        ap.error("--tool is required (or use --list).")
 
     mgr = detect_pkg_manager()
     if mgr == "unknown":
-        print("[!] No se pudo detectar el gestor de paquetes.", file=sys.stderr)
+        print("[!] Could not detect the package manager.", file=sys.stderr)
         return 2
 
     cmd = plan_install(mgr, args.tool)
     if cmd is None:
-        print(f"[!] Herramienta desconocida o sin soporte para '{mgr}'.", file=sys.stderr)
+        print(f"[!] Unknown tool or no support for '{mgr}'.", file=sys.stderr)
         return 2
 
-    print(f"[*] Gestor: {mgr}")
-    print(f"[*] Comando: {' '.join(cmd)}")
+    print(f"[*] Package manager: {mgr}")
+    print(f"[*] Command: {' '.join(cmd)}")
 
     if args.yes:
-        print("[*] Ejecutando ...")
+        print("[*] Running ...")
         subprocess.run(cmd, check=True)
-        print(f"[+] {args.tool} instalado.")
+        print(f"[+] {args.tool} installed.")
     return 0
 
 

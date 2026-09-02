@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-report-generator.py — Informe de progreso de estudio.
+report-generator.py — Study progress report.
 
-Recorre un arbol de notas Markdown (por defecto el repositorio) contando las
-tareas `- [ ]` (pendientes) y `- [x]` (completadas) de cada fichero, agrupadas
-por modulo, e imprime un resumen en texto plano o JSON.
+Walks a tree of Markdown notes (by default the repository) counting the
+`- [ ]` (pending) and `- [x]` (completed) tasks of each file, grouped by
+module, and prints a summary in plain text or JSON.
 
-Uso:
+Usage:
     python3 report-generator.py [--path .] [--json]
 """
 from __future__ import annotations
@@ -41,13 +41,13 @@ def group_by_module(results: list[dict]) -> dict[str, list[dict]]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--path", default=".", help="Carpeta raiz a analizar.")
-    ap.add_argument("--json", action="store_true", help="Salida en JSON.")
+    ap.add_argument("--path", default=".", help="Root folder to analyze.")
+    ap.add_argument("--json", action="store_true", help="Output as JSON.")
     args = ap.parse_args()
 
     root = Path(args.path)
     if not root.is_dir():
-        print(f"[!] No existe la carpeta: {root}", file=sys.stderr)
+        print(f"[!] Folder does not exist: {root}", file=sys.stderr)
         return 2
 
     results = [analyse_file(p) for p in sorted(root.rglob("*.md"))]
@@ -73,7 +73,7 @@ def main() -> int:
     gtot = grand["pending"] + grand["done"]
     gpct = round(100 * grand["done"] / gtot, 1) if gtot else 100.0
     print("-" * 46)
-    print(f"TOTAL: {grand['done']}/{gtot} tareas ({gpct}%)")
+    print(f"TOTAL: {grand['done']}/{gtot} tasks ({gpct}%)")
     return 0
 
 

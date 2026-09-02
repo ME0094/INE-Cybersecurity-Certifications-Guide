@@ -1,44 +1,59 @@
 # Contributing · INE-Cybersecurity-Certifications-Guide
 
-Gracias por querer mejorar esta guía de estudio. Estas son las convenciones para que el
-repositorio siga siendo ordenado y útil.
+Thank you for wanting to improve this study-guide collection. These conventions
+keep the repository organized, consistent, and useful — please follow them when
+adding or editing content.
 
-## Estructura
+All content in this repository is written in **English**.
 
-- Cada certificación vive en una carpeta propia dentro de su área:
+## Repository conventions
+
+- One folder per certification, placed inside the correct area:
   - `01-Fundamentals/` — eJPT, eEDA
   - `02-RedTeam/` — eCPPT, eWPT, eWPTXv2, eMAPT
   - `03-BlueTeam/` — eSOC, eCIR, eCDFP
   - `04-Emerging-Technologies/` — eAIS, eIAMA
-- Dentro de cada certificación se usan siempre las mismas subcarpetas:
-  - `methodology/` — fases numeradas con prefijo `01-`, `02-`, … (orden de ejecución)
-  - `tools/` — guías de herramientas, scripts propios y referencias
-  - `labs/` — montaje de laboratorios y ejercicios prácticos
-  - `cheatsheets/` — comandos y terminología de consulta rápida
+- Every certification folder uses the same subfolders:
+  - `methodology/` — numbered phases with a `01-`, `02-`, … prefix (execution order)
+  - `tools/` — tool references, own scripts, and guides
+  - `labs/` — lab setups and practical exercises
+  - `cheatsheets/` — quick-reference commands and terminology
+- Each certification folder also has its own `README.md` acting as the module
+  index.
+- File names are **kebab-case** and in English (`01-reconnaissance.md`,
+  `burp-suite-guide.md`).
 
-## Formato de las notas
+## Note format
 
-- Un archivo Markdown por tema, con nombres en kebab-case (`01-reconnaissance.md`).
-- Cada nota comienza con un `# Título` descriptivo.
-- Usa listas de verificación `- [ ]` para marcar lo pendiente y `- [x]` lo completado.
-- Los comandos van en bloques de código indicando el contexto (SO, shell o herramienta).
-- El contenido principal puede estar en español; comandos, payloads y términos técnicos se
-  mantienen en su forma original en inglés.
+- One Markdown file per topic, starting with a descriptive `# Title`.
+- Use `##` headings for the sections of each note.
+- Use `- [ ]` checklists for pending items and `- [x]` for completed ones.
+- Put commands inside fenced code blocks and indicate the context (OS, shell,
+  or tool) so readers know where they run.
+- Keep code, commands, payloads, and technical terms in their original form.
 
-## Política de contenido
+## Content policy
 
-- Solo **apuntes propios**: parafrasea y cita la fuente cuando te apoyes en documentación.
-- **Prohibido** publicar material de exámenes INE/eLearnSecurity, respuestas oficiales o
-  contenido protegido por NDA.
-- No incluyas credenciales, tokens ni datos personales en los ejemplos.
+- **Original notes only**: paraphrase and cite the source when you base content
+  on documentation.
+- **Never** include copyrighted text reproduced verbatim.
+- **Never** publish INE/eLearnSecurity exam content, official answers, or any
+  NDA-protected material.
+- Do not include credentials, tokens, keys, or personal data in examples — use
+  placeholders instead.
+- Only link to publicly available documentation and resources.
 
-## Flujo de trabajo
+## Workflow
 
-1. Haz un *fork* del repositorio y crea una rama descriptiva (`feat/eWPT-methodology`, etc.).
-2. Realiza cambios pequeños y con *commits* de mensaje claro.
-3. Abre un *pull request* describiendo qué añades y por qué.
-4. Si añades una certificación nueva, actualiza el índice del `README.md` raíz.
+1. Fork the repository and create a descriptive branch
+   (`feat/eWPT-methodology`, `fix/eJPT-broken-link`, …).
+2. Make small, focused changes with clear, descriptive commit messages.
+3. Open a pull request describing what you add and why.
+4. If you add a certification, update the root `README.md` index (areas table,
+   repository tree, and status) and this file's area mapping.
 
-## Dudas
+## Where to open issues
 
-Abre un *issue* para proponer mejoras de estructura o reportar enlaces rotos.
+Open an issue in this repository's issue tracker to report broken links,
+propose structural improvements, or discuss new content and conventions before
+writing a pull request.
