@@ -10,11 +10,8 @@ victory and get re-infected by the same actor days later. NIST SP 800-61
 frames eradication as *identifying and eliminating the root cause* and warns
 that this often means rebuilding affected systems rather than trusting a
 cleaned one.
-
 ## Eradication Goals
-
 Eradication is complete only when all of the following are true:
-
 - The root cause (the vulnerability, misconfiguration, or stolen credential
   that let the adversary in) is removed or fixed.
 - All attacker artifacts are gone from every affected host and account.
@@ -35,9 +32,7 @@ Eradication flow (overview):
 6. Verify: hunt for persistence and IOCs again; confirm clean.
 7. Reconnect only after verification, under heightened monitoring.
 ```
-
 ## Reimage vs. Clean In Place
-
 The single most important eradication decision is whether to rebuild a host
 or try to clean it. When in doubt, **reimage**. Modern malware — especially
 ransomware and rootkits — can hide in firmware, bootkits, or deeply
@@ -74,9 +69,7 @@ Rebuild procedure for a Windows host:
 # 3. Restore only known-clean user data from backups taken before compromise
 #    or verified clean after it.
 ```
-
 ## Removing Attacker Artifacts
-
 If a host is cleaned in place (or to remove artifacts such as attacker
 accounts even on rebuilding hosts), check every persistence location the
 adversary commonly uses — see MITRE ATT&CK persistence techniques (T1547,
@@ -116,7 +109,6 @@ ls -la ~/.ssh/authorized_keys /root/.ssh/authorized_keys 2>/dev/null
 ```
 
 Removal rules:
-
 1. Remove artifacts only **after** evidence collection for that host is
    complete.
 2. Remove the *mechanism*, not just the visible file: kill processes, delete
@@ -124,9 +116,7 @@ Removal rules:
    it does not come back.
 3. Audit for attacker-created accounts, remove them, and disable any account
    whose group membership you cannot explain.
-
 ## Verifying Persistence Removal
-
 Deleting is not the same as eradicating. After cleanup, verify actively:
 
 ```text
@@ -147,9 +137,7 @@ Verification checklist (per host):
 If any check fails, stop and reassess — either the artifact list was
 incomplete or the adversary is still active. Never reconnect a host you
 cannot prove is clean.
-
 ## Patching and Closing the Root Cause
-
 Eradicating artifacts without fixing the root cause guarantees a repeat
 visit. Identify the initial access vector from the Detection/analysis
 timeline and close it:
@@ -184,12 +172,9 @@ Credential rotation belongs in eradication too: rotate every password, token,
 API key, and certificate the adversary could have obtained — including
 service accounts and, if a domain compromise is suspected, the `krbtgt`
 account (reset twice, per Microsoft's guidance for a compromised domain).
-
 ## Recovery Steps
-
 Eradication hands off to recovery when the environment is verified clean.
 Recovery (a distinct NIST phase that follows eradication) includes:
-
 1. **Restore from clean backups** — verify integrity and restore into a
    quarantined network first; scan restored data for malware before release.
 2. **Reconnect systems in priority order** — critical business systems first,
@@ -212,9 +197,7 @@ Recovery go/no-go gates:
 - Business owners confirm critical functions.
 If any gate fails -> stay in eradication/recovery; do not resume normal ops.
 ```
-
 ## Common Mistakes & Tips
-
 - **Mistake:** Cleaning artifacts before finishing evidence collection.
   **Tip:** Treat the disk image and volatile capture as the exit ticket for
   cleanup; once cleaned, the forensic record is gone.
@@ -236,9 +219,7 @@ If any gate fails -> stay in eradication/recovery; do not resume normal ops.
 - **Mistake:** Restoring from backups that are themselves infected.
   **Tip:** Test-restore into quarantine, scan, and verify before production
   release.
-
 ## Checklist / Self-test
-
 - [ ] I can list the conditions that must all be true for eradication to be
       complete.
 - [ ] I can apply the reimage-vs-clean decision factors to a scenario (e.g.,
@@ -255,9 +236,7 @@ If any gate fails -> stay in eradication/recovery; do not resume normal ops.
       operations.
 - [ ] I understand when and why `krbtgt` password rotation is required after
       a suspected domain compromise.
-
 ## Further resources
-
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
 - NIST SP 800-83 Rev. 1, *Guide to Malware Incident Prevention and Handling* —

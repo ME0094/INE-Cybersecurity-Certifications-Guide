@@ -101,15 +101,13 @@ Repeat the drill week whenever you feel rusty — this is a skill certification,
 ## Module Checklist
 
 - [ ] Read all four methodology files and summarize each in my own words.
-- [ ] Understand what a tier-1 SOC analyst does in monitoring, detection, investigation, and response.
-- [ ] Can explain — out loud — the difference between a SIEM, an EDR, and a SOAR.
+- [ ] Understand the tier-1 SOC analyst role across monitoring, detection, investigation, and response — and can explain the difference between a SIEM, an EDR, and a SOAR out loud.
 - [ ] Can name at least five Windows Event IDs relevant to SOC work and what each means.
 - [ ] Have a working lab (Elastic Stack or Wazuh) with logs flowing from at least one endpoint.
-- [ ] Can write and run a simple Kibana/OpenSearch query and a simple Sigma + YARA rule.
+- [ ] Can write and run a Kibana/OpenSearch query plus a simple Sigma rule and a YARA rule.
 - [ ] Completed all scenario drills in `labs/soc-scenarios.md` and verified the expected outcomes.
-- [ ] Filled in the alert triage template for every alert I generated.
-- [ ] Re-read the methodology files once more after finishing the lab drills.
-- [ ] Reviewed the official INE material and practice environment before attempting the exam.
+- [ ] Filled in the alert triage template from the cheatsheet for every alert I generated in the lab.
+- [ ] Re-read the methodology files after the lab drills, then reviewed the official INE material and practice environment before attempting the exam.
 
 ## Further Resources
 

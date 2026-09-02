@@ -9,9 +9,7 @@ faster, safer, and more defensible when policies, plans, roles, playbooks,
 tools, and communication paths already exist and have been exercised. This
 guide follows the lifecycle described in NIST SP 800-61, where preparation is
 the first phase and the continuous-improvement loop that closes the cycle.
-
 ## Why Preparation Matters
-
 - **Speed under pressure:** decisions about who does what are made in advance,
   not during an outage.
 - **Evidence integrity:** pre-approved forensic tooling and acquisition
@@ -23,9 +21,7 @@ the first phase and the continuous-improvement loop that closes the cycle.
 
 A useful mental model: preparation turns IR from *"figure it out live"* into
 *"execute the plan and adapt only where the plan does not fit."*
-
 ## IR Policy and Plan
-
 The **IR policy** is a short, executive-level document that establishes the
 program's authority and mandate. The **IR plan** is the operational document
 that implements the policy.
@@ -45,7 +41,6 @@ that implements the policy.
 ```
 
 The **IR plan** should answer six questions concretely:
-
 1. Who is on the IR team, and who is the incident commander?
 2. What constitutes an incident, and how is it reported and escalated?
 3. What are the phases and decision gates of the response process?
@@ -56,9 +51,7 @@ The **IR plan** should answer six questions concretely:
 Keep the plan versioned, stored somewhere reachable during an incident
 (printed and offline copies included), and reviewed at least annually and
 after every exercise and major incident.
-
 ## Team Roles
-
 Every responder needs to know their lane. A useful pattern is a small core
 team plus extended participants, coordinated by an incident commander who owns
 decisions and a scribe who owns documentation.
@@ -76,9 +69,7 @@ decisions and a scribe who owns documentation.
 
 Document a **succession chain** for every role (who replaces the IC if they
 are unavailable) and keep an on-call rotation that is actually staffed 24/7.
-
 ## Playbooks
-
 A playbook is a step-by-step runbook for one incident type. It translates the
 generic plan into actions a tired analyst can follow at 3 a.m.
 
@@ -87,20 +78,17 @@ generic plan into actions a tired analyst can follow at 3 a.m.
 
 ## Trigger
 User-reported suspicious email; gateway alert; impossible-travel logon.
-
 ## Triage (10 min)
 1. Collect the email headers and the reported URL/attachment (do not open it).
 2. Check mail gateway logs and the URL reputation.
 3. Determine if credentials were submitted: search SIEM for failed logons,
    then a successful logon from a new IP shortly after the phish.
 4. Classify severity: credential submitted + sign-in observed = HIGH.
-
 ## Containment (30 min)
 1. Disable the affected account and force a password reset.
 2. Revoke sessions/tokens (see identity-provider playbook).
 3. Block the phishing domain and sender at the gateway.
 4. Preserve a copy of the email as evidence.
-
 ## Escalation criteria
 Lateral movement or data exfiltration observed -> call the IC and activate
 the full IR plan.
@@ -109,9 +97,7 @@ the full IR plan.
 Keep playbooks for the incidents you see most: phishing/credential theft,
 malware/ransomware, unauthorized access, DDoS, data leak, and insider threat.
 Test each playbook in a tabletop before you trust it in production.
-
 ## Tooling Readiness
-
 Prepare, patch, and pre-test your toolchain *before* an incident. Maintain an
 inventory of where each tool lives, who can run it, and which accounts hold
 the permissions it needs (privileged access for EDR isolation and AD actions).
@@ -134,11 +120,8 @@ Log retention is a preparation decision with direct detection impact: if you
 retain 30 days of logs but your average dwell time is 60 days, you are blind
 to half of every incident. Align retention with your threat model and
 compliance obligations, and keep an immutable copy of the critical sources.
-
 ## Communication Channels
-
 Incidents need communication that the attacker cannot read or block. Prepare:
-
 - An **internal incident channel** (out-of-band if the corporate chat may
   itself be compromised) for the IR team.
 - An **escalation matrix** mapping severity to whom to notify and within what
@@ -153,17 +136,13 @@ Incidents need communication that the attacker cannot read or block. Prepare:
 Severity 1 (enterprise-wide ransomware, confirmed data breach):
 - IR team: immediately | Executives: 15 min | Legal: 30 min
 - Customers: per legal | Regulators: per law (e.g., GDPR: 72 hours)
-
 Severity 2 (single-host malware, no data impact):
 - IR team: immediately | Executives: 1 hour
 - Legal: notify only if breach of personal data is possible
-
 Severity 3 (false positive, minor policy violation):
 - IR team: within business hours | No external notification
 ```
-
 ## Training and Tabletop Exercises
-
 People forget procedures they do not rehearse. Build a training calendar:
 
 | Exercise type | Frequency | What it validates |
@@ -187,12 +166,9 @@ Tabletop inject example (ransomware):
 
 Each exercise ends with a short after-action list of two or three fixes, and
 someone must own each fix until it is done.
-
 ## Business Continuity Context
-
 IR stops the bleeding; **business continuity (BC) and disaster recovery (DR)**
 keep the business alive while you work. Know before an incident:
-
 - **RTO (Recovery Time Objective):** how long a system can be down.
 - **RPO (Recovery Point Objective):** how much data loss is acceptable.
 - Which systems are business-critical and which can wait.
@@ -211,9 +187,7 @@ Decision aid (example):
 Coordinate IR and BC plans so the teams do not fight: IR may want systems
 offline for forensics while BC wants them restored — the decision framework
 (severity, criticality, legal hold) must exist in advance.
-
 ## Common Mistakes & Tips
-
 - **Mistake:** A 90-page plan nobody has read. **Tip:** Keep the plan short
   and the playbooks detailed; run a tabletop within a month of publishing.
 - **Mistake:** The only copy of the plan lives on the SharePoint server the
@@ -228,9 +202,7 @@ offline for forensics while BC wants them restored — the decision framework
 - **Mistake:** Preparing only for technical incidents, ignoring legal, PR,
   and regulatory aspects. **Tip:** Include legal and communications in
   exercises so notification timing is realistic.
-
 ## Checklist / Self-test
-
 - [ ] I can explain the difference between an IR policy and an IR plan and
       name the six questions every IR plan must answer.
 - [ ] I can list the core IR roles and the incident commander's
@@ -247,9 +219,7 @@ offline for forensics while BC wants them restored — the decision framework
       interact with containment decisions.
 - [ ] I know where the offline copy of the IR plan and the out-of-band
       contact list are stored at my organization.
-
 ## Further resources
-
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
 - NIST SP 800-184, *Guide for Cybersecurity Event Recovery* —
