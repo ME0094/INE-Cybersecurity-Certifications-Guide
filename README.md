@@ -1,5 +1,9 @@
 # INE-Cybersecurity-Certifications-Guide
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Study guides: English](https://img.shields.io/badge/Study%20guides-English-blue.svg)](README.md)
+[![INE Security: unofficial](https://img.shields.io/badge/INE%20Security-unofficial-lightgrey.svg)](README.md)
+
 This repository is a personal, public collection of study guides for the
 **INE Security (eLearnSecurity)** certification portfolio. Everything is
 written entirely in **English** and organized first by knowledge area and then
@@ -27,22 +31,39 @@ companion while you prepare for these exams.
 
 ## Areas and certifications
 
-The guides are grouped into four areas. Each certification module in the table
-links to that module's `README.md`, which acts as its index.
+The guides are grouped into four knowledge areas. Each certification name in the
+tables below links to that module's `README.md`, which acts as its index.
 
-| Area | Folder | Module | Full certification name |
-|---|---|---|---|
-| Fundamentals | [`01-Fundamentals/`](01-Fundamentals) | [eJPT](01-Fundamentals/eJPT/README.md) | Junior Penetration Tester |
-| Fundamentals | [`01-Fundamentals/`](01-Fundamentals) | [eEDA](01-Fundamentals/eEDA/README.md) | Enterprise Defense Administrator |
-| Red Team | [`02-RedTeam/`](02-RedTeam) | [eCPPT](02-RedTeam/eCPPT/README.md) | Certified Professional Penetration Tester |
-| Red Team | [`02-RedTeam/`](02-RedTeam) | [eWPT](02-RedTeam/eWPT/README.md) | Web Application Penetration Tester |
-| Red Team | [`02-RedTeam/`](02-RedTeam) | [eWPTXv2](02-RedTeam/eWPTXv2/README.md) | Web Application Penetration Tester eXtreme |
-| Red Team | [`02-RedTeam/`](02-RedTeam) | [eMAPT](02-RedTeam/eMAPT/README.md) | Mobile Application Penetration Tester |
-| Blue Team | [`03-BlueTeam/`](03-BlueTeam) | [eSOC](03-BlueTeam/eSOC/README.md) | SOC Analyst |
-| Blue Team | [`03-BlueTeam/`](03-BlueTeam) | [eCIR](03-BlueTeam/eCIR/README.md) | Certified Incident Responder |
-| Blue Team | [`03-BlueTeam/`](03-BlueTeam) | [eCDFP](03-BlueTeam/eCDFP/README.md) | Certified Digital Forensics Professional |
-| Emerging Technologies | [`04-Emerging-Technologies/`](04-Emerging-Technologies) | [eAIS](04-Emerging-Technologies/eAIS/README.md) | AI Security |
-| Emerging Technologies | [`04-Emerging-Technologies/`](04-Emerging-Technologies) | [eIAMA](04-Emerging-Technologies/eIAMA/README.md) | Identity and Access Management Architect |
+### Fundamentals — [`01-Fundamentals/`](01-Fundamentals)
+
+| Certification | Full name |
+|---|---|
+| [eJPT](01-Fundamentals/eJPT/README.md) | Junior Penetration Tester |
+| [eEDA](01-Fundamentals/eEDA/README.md) | Enterprise Defense Administrator |
+
+### Red Team — [`02-RedTeam/`](02-RedTeam)
+
+| Certification | Full name |
+|---|---|
+| [eCPPT](02-RedTeam/eCPPT/README.md) | Certified Professional Penetration Tester |
+| [eWPT](02-RedTeam/eWPT/README.md) | Web Application Penetration Tester |
+| [eWPTXv2](02-RedTeam/eWPTXv2/README.md) | Web Application Penetration Tester eXtreme |
+| [eMAPT](02-RedTeam/eMAPT/README.md) | Mobile Application Penetration Tester |
+
+### Blue Team — [`03-BlueTeam/`](03-BlueTeam)
+
+| Certification | Full name |
+|---|---|
+| [eSOC](03-BlueTeam/eSOC/README.md) | SOC Analyst |
+| [eCIR](03-BlueTeam/eCIR/README.md) | Certified Incident Responder |
+| [eCDFP](03-BlueTeam/eCDFP/README.md) | Certified Digital Forensics Professional |
+
+### Emerging Technologies — [`04-Emerging-Technologies/`](04-Emerging-Technologies)
+
+| Certification | Full name |
+|---|---|
+| [eAIS](04-Emerging-Technologies/eAIS/README.md) | AI Security |
+| [eIAMA](04-Emerging-Technologies/eIAMA/README.md) | Identity and Access Management Architect |
 
 ## Repository structure
 
