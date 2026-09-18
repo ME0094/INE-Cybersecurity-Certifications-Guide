@@ -168,11 +168,12 @@
 - Official page: **https://ine.com/security/certifications/eiama-certification**
   Dedicated product page (verified).
 - Version note: **launched 26 August 2026** as a vendor-neutral IAM certification.
-- Naming note: INE's page for this credential calls it **"Certified Identity & Access
-  Management Technologist (eIAMA)"** — that is the wording to use. This repository
-  previously called it *"Identity and Access Management Architect"* (wrong: it is not an
-  architect-level credential), and briefly *"…Associate"* (also wrong). The page and issued
-  badges are authoritative.
+- Naming note: INE's own **launch announcement** calls it *"Certified Identity & Access
+  Management Associate (eIAMA)"*, while the **product page** and issued badges say
+  *"Certified Identity & Access Management Technologist (eIAMA)"*. Where the two disagree the
+  product page governs, and that is the wording this repository uses. An earlier version of
+  this module called it *"Identity and Access Management Architect"*, which was wrong in a
+  different way: it is not an architect-level credential.
 - Why it helps: direct access to the IAM syllabus (identity lifecycle, authentication,
   authorization, zero trust, federation).
 - Note: if the page ever 404s, fall back to the catalogue **https://ine.com/certifications**.

@@ -210,11 +210,12 @@ standards-driven certification whose content is protocols rather than procedures
 deepest are eAIS, eCDFP and eCTHP. Each module's own README states what it covers, and its
 checklist tells you what you should be able to produce before moving on.
 
-Three automated checks keep the repository from rotting, and they run on every push
-(`.github/workflows/docs-check.yml`, plus a weekly external-link sweep):
+Two automated checks keep the repository from rotting, and they run on every push to `main`
+and on every pull request (`.github/workflows/docs-check.yml`); a third sweeps external links
+weekly and deliberately ignores the lab-local URLs the guides tell the reader to open at home:
 
 - [x] Catalog matches the repository — no module on disk that `README.md` does not link, no table row pointing at a folder that moved, no note that is orphaned from its module index
-- [x] Every relative link and in-repo anchor resolves
+- [x] Every relative link, in-repo anchor and promised path resolves
 - [x] Catalog, names, areas and version notes verified against INE's own pages (18 Sep 2026)
 
 What this repository deliberately does **not** contain, and why:

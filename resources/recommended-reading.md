@@ -34,7 +34,8 @@
 
 ## Web application security (eWPT · eWPTX)
 
-- **The Web Application Hacker's Handbook (2nd edition)** — Why it helps: the classic
+- **The Web Application Hacker's Handbook (2nd edition)** — Dafydd Stuttard and Marcus Pinto
+  (Wiley). Why it helps: the classic
   structured guide to web-app testing methodology; its phase-by-phase mindset maps well to
   how eWPT-style exams are designed.
 - **OWASP Top 10** — free public project (see OWASP section below). Why it helps: the
@@ -45,7 +46,8 @@
 
 ## Mobile application security (eMAPT)
 
-- **The Mobile Application Hacker's Handbook** (Wiley). Why it helps: a thorough reference
+- **The Mobile Application Hacker's Handbook** — Dominic Chell, Tyrone Erasmus, Shaun Colley
+  and Ollie Whitehouse (Wiley). Why it helps: a thorough reference
   on Android and iOS assessment fundamentals — traffic, storage, and app logic.
 - **OWASP Mobile Security Testing Guide (MSTG)** — free public project. Why it helps:
   current, practical testing recipes for mobile apps that stay closer to modern Android/iOS

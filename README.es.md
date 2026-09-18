@@ -139,10 +139,11 @@ Lo que este repositorio **no** contiene, y por qué:
 - **Credenciales retiradas.** No hay módulos de eCPTX, eCXD, eCMAP, eCRE ni eWDP.
 - **Contenido de examen.** Sin dumps, sin preguntas reales, sin material bajo NDA.
 
-Dos comprobaciones automáticas se ejecutan en cada push para que el repositorio no se
-descomponga: que el catálogo del README coincida con las carpetas que existen de verdad, y
-que ningún enlace relativo ni ancla interna se rompa. Un tercer trabajo semanal revisa que
-las URLs externas sigan respondiendo.
+Dos comprobaciones automáticas se ejecutan en cada push a `main` y en cada pull request para
+que el repositorio no se descomponga: que el catálogo del README coincida con las carpetas que
+existen de verdad, y que no se rompa ningún enlace relativo, ancla interna ni ruta prometida.
+Un tercer trabajo semanal revisa que las URLs externas sigan respondiendo (y se salta a
+propósito las URLs de laboratorio que la guía te dice que abras en tu propia máquina).
 
 ## Contribuir
 
