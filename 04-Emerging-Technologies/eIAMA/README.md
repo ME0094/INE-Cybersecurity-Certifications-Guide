@@ -1,16 +1,18 @@
-# eIAMA — Identity & Access Management Associate
+# eIAMA — Certified Identity & Access Management Technologist
 
 > Area: 04-Emerging-Technologies · INE-Cybersecurity-Certifications-Guide
 > Status: Study module for the eIAMA certification track. Public study material only — no exam content or NDA-protected material is included.
 
-> **Nomenclature note:** This module was first published as "Identity and Access Management
-> Architect". That name was incorrect — the credential is **Identity & Access Management
-> Associate**, which is what the acronym IAMA stands for. Official certification page:
-> [eIAMA — Identity & Access Management Associate](https://ine.com/security/certifications/eiama-certification).
+> **Nomenclature note:** INE's page for this credential calls it **"Certified Identity &
+> Access Management Technologist (eIAMA)"**, and that is the wording used throughout this
+> module. Two earlier labels in this repository were wrong: *"Identity and Access Management
+> Architect"* (it is not an architect-level credential) and, briefly, *"…Associate"*. The
+> official certification page is authoritative:
+> [eIAMA — Certified Identity & Access Management Technologist](https://ine.com/security/certifications/eiama-certification).
 
 ## What This Module Covers
 
-The **eIAMA (Identity & Access Management Associate)** certification covers the discipline of designing and operating identity and access management systems — from day-to-day IAM administration through to the architecture concepts that discipline rests on. IAM is the set of processes, policies, and technologies that answer two questions for every user, device, or workload: *who are you?* (identity and authentication) and *what may you do?* (authorization).
+The **eIAMA (Certified Identity & Access Management Technologist)** certification covers the discipline of designing and operating identity and access management systems — from day-to-day IAM administration through to the architecture concepts that discipline rests on. IAM is the set of processes, policies, and technologies that answer two questions for every user, device, or workload: *who are you?* (identity and authentication) and *what may you do?* (authorization).
 
 An IAM architect plans how identities are born, change, and retire across an organization; selects and integrates identity providers; designs authentication and single sign-on (SSO) experiences; decides how access decisions are made and enforced; and aligns all of it with modern security models such as zero trust.
 
@@ -135,6 +137,17 @@ Use this to track your overall preparation:
 - [ ] I completed the Keycloak lab scenarios (SSO, MFA, roles, federation).
 - [ ] I can recall the OAuth 2.0 grant types and OIDC flows from the cheatsheet without looking.
 - [ ] I can compare cloud IdP, open-source IdP, and cloud-provider-native IAM use cases.
+
+## Further Resources
+
+- **Official eIAMA product page** (syllabus and exam information) — <https://ine.com/security/certifications/eiama-certification>
+- **NIST SP 800-207 — Zero Trust Architecture** — <https://csrc.nist.gov/pubs/sp/800/207/final>. The reference definition of zero trust used throughout this module.
+- **NIST Digital Identity Guidelines (SP 800-63 series)** — <https://csrc.nist.gov/publications>. Search by publication number: the 800-63 series is where authentication assurance levels are defined.
+- **OAuth 2.0 (RFC 6749)** — <https://www.rfc-editor.org/rfc/rfc6749>. The authorization framework behind delegated access.
+- **OpenID Connect Core 1.0** — <https://openid.net/specs/openid-connect-core-1_0.html>. The identity layer on top of OAuth 2.0.
+- **SAML 2.0** — <https://www.oasis-open.org/standard/saml/>. The OASIS standard for cross-domain single sign-on.
+- **SCIM (RFC 7643 / RFC 7644)** — <https://www.rfc-editor.org/rfc/rfc7644>. The schema and protocol behind automated provisioning.
+- **MITRE ATT&CK — Credential Access (TA0006)** — <https://attack.mitre.org/tactics/TA0006/>. The adversary techniques that IAM design has to survive.
 
 ---
 

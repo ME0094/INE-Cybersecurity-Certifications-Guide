@@ -3,11 +3,11 @@
 > Personal study resource for the **INE Security** (formerly eLearnSecurity) certification
 > program. **Last verified against INE's public pages: 18 September 2026.**
 >
-> What "verified" means here: the URL appears in INE's own public pages, newsroom or press
-> releases, and the certification name matches what INE publishes. What it does **not**
-> mean: that every page renders the same content tomorrow. INE renames, reorganizes and
-> re-version certifications, and product pages move — so re-check before you book an exam
-> or buy a course.
+> What "verified" means here: on 18 September 2026 every URL on this page was fetched and
+> **answered HTTP 200**, and INE's own sitemap was enumerated to confirm that these twelve
+> are the whole security portfolio. What it does **not** mean: that every page will render
+> the same content tomorrow. INE renames, reorganizes and re-versions certifications, and
+> product pages move — so re-check before you book an exam or buy a course.
 >
 > **A note on exam logistics.** This file deliberately does not reproduce question counts,
 > exam durations, prices, passing scores, or official domain lists. Those details change
@@ -19,11 +19,10 @@
 - The certification sections mirror this repo's area folders (`01-Fundamentals/`,
   `02-RedTeam/`, `03-BlueTeam/`, `04-Emerging-Technologies/`) so you can open the matching
   module while you browse the official page.
-- Each entry says either **dedicated page** (a product-page URL verified to resolve) or
-  **directory** (open <https://ine.com/security/certifications> and select the card). A
-  slug is never guessed: a wrong `…-certification` URL looks official and points somewhere
-  else. As of the verification date, every certification in the repository has a verified
-  dedicated page except **eWPT**.
+- Every entry below has a **dedicated page**: the product-page URL INE publishes for that
+  credential, verified to resolve. A slug is never guessed: a wrong `…-certification` URL
+  looks official and points somewhere else. If a page ever 404s, fall back to the
+  catalogue at <https://ine.com/certifications>.
 - Course and learning-path pages sit behind an INE account, so no course deep links are
   listed: open the platform and search for the certification name once you are logged in.
 - Where a certification has been updated, the announcement link is given so you can read
@@ -35,10 +34,12 @@
   The single most stable entry point: platform, courses, subscriptions, labs, and links
   to everything else. When any bookmark below breaks, start here and navigate from the
   homepage.
-- **Security certifications directory** — https://ine.com/security/certifications
-  The master list of INE Security certifications and their official pages. Use this page
-  to locate a certification's syllabus, exam info, and price, and to re-verify any deep
-  link mentioned in this file.
+- **Certification catalogue** — https://ine.com/certifications
+  INE's own index of certifications, security and non-security alike (its networking and
+  cloud tracks live at `/certifications/networking` and `/certifications/cloud`). Use it to
+  check whether a certification still exists and to reach its page.
+  Note: `https://ine.com/security/certifications` — the URL this repository used before
+  18 September 2026 — returns **404**. The security hub is <https://ine.com/security>.
 - **Digital certificates and badges** — https://certs.ine.com
   General entry point to look up and verify issued digital certificates and badges after
   you pass an exam. (Account-related flows live behind this entry point.) The badge page is
@@ -54,12 +55,12 @@
 
 - Official page: **https://ine.com/security/certifications/ejpt-certification**
   Dedicated product page (verified).
-- Version note: INE announced an **updated eJPT certification on 31 March 2026**, adding
-  web application testing, reconnaissance training and offensive AI:
+- Version note: INE announced an **updated eJPT certification in spring 2026** — the
+  announcement page on INE's newsroom is dated **1 April 2026** and the accompanying press
+  release **31 March 2026** — adding web application testing, reconnaissance training and
+  offensive AI:
   <https://ine.com/newsroom/ine-security-launches-updated-ejpt-certification-with-expanded-web-app-testing-recon-training-and-offensive-ai>
 - Why it helps: confirms the current exam structure and what the *Junior* level expects.
-- Note: *verify current URL on the official directory* — the eJPT product page has moved
-  before and may move again.
 
 ## Red Team — eCPPT, eWPT, eWPTX, eMAPT (`02-RedTeam/`)
 
@@ -72,11 +73,10 @@
 
 ### eWPT — Web Application Penetration Tester
 
-- Official page: **https://ine.com/security/certifications** — locate the eWPT card for
-  the official web-application syllabus.
+- Official page: **https://ine.com/security/certifications/ewpt-certification**
+  Dedicated product page (verified) with the official web-application syllabus.
 - Why it helps: keeps your web study aligned with the official vulnerability categories
   instead of a generic web list.
-- Note: *verify current URL on the official directory*.
 
 ### eWPTX — Web Application Penetration Tester eXtreme
 
@@ -116,13 +116,14 @@
   Dedicated product page (verified).
 - Why it helps: direct access to the SOC Analyst syllabus and exam details without
   navigating the directory.
-- Note: if the page ever 404s, fall back to the directory **https://ine.com/security/certifications**.
+- Note: if the page ever 404s, fall back to the directory **https://ine.com/certifications**.
 
 ### eCIR — Certified Incident Responder
 
 - Official page: **https://ine.com/security/certifications/ecir-certification**
   Dedicated product page (verified).
-- Version note: INE released a **next-generation eCIR certification on 8 September 2025**:
+- Version note: INE published the **next-generation eCIR certification on 3 September
+  2025** (INE's own blog post; the accompanying press release is dated 8 September 2025):
   <https://ine.com/blog/new-ecir-certification-advanced-incident-response-training>
 - Why it helps: confirms the phases the exam drills. The five `methodology/` files in this
   repository (preparation, detection, containment, eradication, lessons learned) are the
@@ -160,31 +161,42 @@
   badges, is **AI Systems Security Specialist**.
 - Why it helps: direct access to the AI Security syllabus (attack vectors, defensive
   controls) for one of INE's newest certifications.
-- Note: if the page ever 404s, fall back to the directory **https://ine.com/security/certifications**.
+- Note: if the page ever 404s, fall back to the directory **https://ine.com/certifications**.
 
-### eIAMA — Identity & Access Management Associate
+### eIAMA — Certified Identity & Access Management Technologist
 
 - Official page: **https://ine.com/security/certifications/eiama-certification**
   Dedicated product page (verified).
 - Version note: **launched 26 August 2026** as a vendor-neutral IAM certification.
-- Naming note: this guide previously called the credential *"Identity and Access Management
-  Architect"*. That was wrong — eIAMA is not an architect-level credential. The module has
-  been corrected; INE's page and issued badges are authoritative for the exact title.
+- Naming note: INE's page for this credential calls it **"Certified Identity & Access
+  Management Technologist (eIAMA)"** — that is the wording to use. This repository
+  previously called it *"Identity and Access Management Architect"* (wrong: it is not an
+  architect-level credential), and briefly *"…Associate"* (also wrong). The page and issued
+  badges are authoritative.
 - Why it helps: direct access to the IAM syllabus (identity lifecycle, authentication,
   authorization, zero trust, federation).
-- Note: if the page ever 404s, fall back to the directory **https://ine.com/security/certifications**.
+- Note: if the page ever 404s, fall back to the catalogue **https://ine.com/certifications**.
 
 ## Retired certifications — do not study for these
 
-Five credentials from the eLearnSecurity era are discontinued and cannot be newly obtained:
-**eCPTX** (Certified Penetration Tester eXtreme), **eCXD** (Certified eXploit Developer),
-**eCMAP** (Certified Malware Analysis Professional), **eCRE** (Certified Reverse Engineer)
-and **eWDP** (Web Defense Professional).
+Five credentials from the eLearnSecurity era were retired from all INE platforms on
+**1 October 2023** and cannot be newly obtained. The names below are the ones INE's own
+notice uses:
 
-- Official notice: *"ELS is retiring 5 certifications: here's what you need to know"* —
+| Code INE used | Name INE used | Retired |
+|---|---|---|
+| eCPTXv2 / PTX v2 | Penetration Testing Extreme | 1 Oct 2023 |
+| eCMAP / Map v1 | Malware Analysis Professional | 1 Oct 2023 |
+| eCXD / XDS v1 | Exploit Development Student | 1 Oct 2023 |
+| eCRE / REP v1 | Reverse Engineering Professional | 1 Oct 2023 |
+| eWDP / PWD v1 | Practical Web Defense | 1 Oct 2023 |
+
+- Official notice: *"eLS is Retiring 5 Certifications: Here's What You Need to Know"*
+  (published 21 April 2023) —
   <https://ine.com/blog/els-is-retiring-5-certifications-heres-what-you-need-to-know>
-- Read that post for the dates, voucher rules and exam deadlines that applied; do not rely
-  on second-hand summaries (including this one) for those specifics.
+  — the names and dates above are copied from it. Read it there for the voucher rules and
+  the course-availability deadlines that applied.
+- The related courses stayed on the INE platform after the certifications were retired.
 - This repository has no modules for them and does not plan to add any. If you find a
   vendor selling "official" training or vouchers for one of them, treat that as a red flag.
 
@@ -192,7 +204,7 @@ and **eWDP** (Web Defense Professional).
 
 1. Open the homepage **https://ine.com**.
 2. Navigate to **Security → Certifications** (the directory at
-   **https://ine.com/security/certifications**).
+   **https://ine.com/certifications**).
 3. Find the certification card, open it, and copy the URL — that is the current product
    page, syllabus page, and exam-information source of truth.
 4. Check **https://ine.com/newsroom** for a version announcement if the card mentions one.
@@ -200,13 +212,16 @@ and **eWDP** (Web Defense Professional).
 
 ## Common Mistakes & Tips
 
-- **Treating directory links as deep links.** Every certification here has a verified
-  `…-certification` product page except eWPT, which links to the directory. Do not guess
-  slug variants such as `ewpt-certification` — they may point to stale or wrong pages.
+- **Treating a guess as a link.** Every certification here links the product page INE
+  publishes, and all twelve answered HTTP 200 on the verification date. Do not invent slug
+  variants: a `…-certification` URL that was never checked looks official and points
+  somewhere else. Note also that `https://ine.com/security/certifications` — the URL this
+  repository used before 18 September 2026 — is dead; the catalogue is at
+  <https://ine.com/certifications>.
 - **Assuming a version suffix is official.** "eWPTXv2"/"eWPTXv3" are community labels for
   generations of the eWPTX exam; INE's credential title carries no version number.
-- **Studying for a retired credential.** eCPTX, eCXD, eCMAP, eCRE and eWDP are gone. Check
-  the certification's status before buying any study material.
+- **Studying for a retired credential.** eCPTXv2, eCMAP, eCXD, eCRE and eWDP were retired
+  on 1 October 2023. Check the certification's status before buying any study material.
 - **Bookmarking login-gated course pages.** Course URLs inside the platform are not stable
   public links and frequently change; bookmark the certification directory instead.
 - **Trusting third-party "official" reseller pages.** Only the ine.com and certs.ine.com
@@ -219,10 +234,10 @@ and **eWDP** (Web Defense Professional).
 
 ## Checklist
 
-- [ ] Re-verify every URL in this file against https://ine.com/security/certifications and record the date
+- [ ] Re-verify every URL in this file against https://ine.com/certifications and record the date
 - [ ] Open the official eJPT syllabus and confirm the post-March-2026 exam scope
-- [ ] Confirm the eJPT, eCPPT, eWPTX, eMAPT, eEDA, eSOC, eCIR, eCDFP, eCTHP, eAIS and eIAMA product pages still resolve (fall back to the directory if not)
+- [ ] Confirm all twelve product pages (eJPT, eCPPT, eWPT, eWPTX, eMAPT, eEDA, eSOC, eCIR, eCDFP, eCTHP, eAIS, eIAMA) still resolve (fall back to the catalogue if not)
 - [ ] Check https://ine.com/newsroom for anything newer than the version notes above
-- [ ] Read the retirement notice before touching any eCPTX / eCXD / eCMAP / eCRE / eWDP material
+- [ ] Read the retirement notice before touching any eCPTXv2 / eCXD / eCMAP / eCRE / eWDP material
 - [ ] Bookmark https://certs.ine.com as the credential/badge lookup entry point
 - [ ] Keep this page updated whenever a certification URL, name or version changes

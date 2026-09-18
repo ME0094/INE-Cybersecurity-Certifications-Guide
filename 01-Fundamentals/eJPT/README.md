@@ -70,7 +70,7 @@ and updated exam deliver stronger alignment between learning and real-world skil
 
 - Official announcement:
   <https://ine.com/newsroom/ine-security-launches-updated-ejpt-certification-with-expanded-web-app-testing-recon-training-and-offensive-ai>
-- Certification directory: <https://ine.com/security/certifications>
+- Certification directory: <https://ine.com/certifications>
 - eJPT product page: <https://ine.com/security/certifications/ejpt-certification>
 
 This module describes the eJPT in general public terms. **Exam logistics — syllabus,
@@ -93,7 +93,7 @@ page**, because those details change and are not reproduced in these notes.
 
 | Folder / file | What it is for |
 |---|---|
-| `methodology/` | Numbered phases in working order: 01-reconnaissance → 05-pivoting |
+| `methodology/` | Five numbered phases in working order: `01-reconnaissance`, `02-enumeration`, `03-exploitation`, `04-post-exploitation`, `05-pivoting` |
 | `tools/nmap-cheatsheet.md` | Nmap: host discovery, scans, NSE, output, timing |
 | `tools/metasploit-basics.md` | Metasploit: msfconsole, payloads, handlers, DB, sessions |
 | `tools/netcat-essentials.md` | Netcat/Ncat: shells, file transfer, ncat extras (SSL, keep-open) |
@@ -147,7 +147,7 @@ build the lab with `labs/lab-setup-guide.md` → work through
 ## Further Resources
 
 - INE Security — official certifications directory (public marketing & syllabus):
-  <https://ine.com/security/certifications>
+  <https://ine.com/certifications>
   (the former `security.ine.com` domain is no longer the correct source)
 - Nmap official documentation: <https://nmap.org/docs.html>
 - Metasploit documentation: <https://docs.metasploit.com/>

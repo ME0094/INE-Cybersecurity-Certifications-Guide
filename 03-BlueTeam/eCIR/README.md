@@ -11,7 +11,8 @@ syllabus and exam guide as the authoritative source for what is tested.
 ## Certification version note
 
 INE Security published the **next generation of the eCIR** certification on
-**8 September 2025**; the official blog post is
+**3 September 2025** (the accompanying press release is dated 8 September 2025); the
+official blog post is
 <https://ine.com/blog/new-ecir-certification-advanced-incident-response-training>.
 
 > **Scope note.** The five phase files in [`methodology/`](methodology/)

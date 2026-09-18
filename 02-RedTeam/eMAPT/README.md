@@ -38,7 +38,7 @@ official announcement is the INE blog post
 This module describes the track in general public terms; the verified INE entry point
 for current details is the eMAPT product page
 <https://ine.com/security/certifications/emapt-certification> (fall back to the
-directory <https://ine.com/security/certifications> if it ever 404s). Confirm exam
+directory <https://ine.com/certifications> if it ever 404s). Confirm exam
 logistics there before booking.
 
 ## Skills You Build
@@ -58,7 +58,7 @@ the phase you are drilling.
 
 | Folder / File | Purpose |
 | --- | --- |
-| `methodology/` | Ordered phases 01–05: reconnaissance, static analysis, dynamic analysis, communication analysis, exploitation |
+| `methodology/` | Five ordered phases: `01-reconnaissance`, `02-static-analysis`, `03-dynamic-analysis`, `04-communication-analysis`, `05-exploitation` |
 | `tools/android-tools.md` | Android toolchain: adb, apktool, jadx, Frida/objection, emulator setup |
 | `tools/ios-tools.md` | iOS toolchain, jailbroken-device concepts, Ghidra, simulators, lab constraints |
 | `tools/burp-setup.md` | Burp Suite proxy + CA installation + pinning-bypass approaches |
