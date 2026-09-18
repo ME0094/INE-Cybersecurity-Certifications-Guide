@@ -1,6 +1,6 @@
 # Advanced Web Techniques — Quick Reference
 
-> eWPTXv2 · Cheatsheets — INE-Cybersecurity-Certifications-Guide (English)
+> eWPTX · Cheatsheets — INE-Cybersecurity-Certifications-Guide (English)
 >
 > Compact recall aid for technique families. Test only authorized targets. "→" means *then try*.
 

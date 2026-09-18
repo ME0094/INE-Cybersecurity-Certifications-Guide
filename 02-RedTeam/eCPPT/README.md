@@ -144,7 +144,8 @@ A suggested order of attack for this module:
 
 ## Further Resources
 
-- [INE Security — official site and certification catalog](https://ine.com)
+- [eCPPT product page (INE Security)](https://ine.com/security/certifications/ecppt-certification) — current syllabus and exam description
+- [INE Security — official certification catalog](https://ine.com/security/certifications)
 - [eJPT module of this repository](../../01-Fundamentals/eJPT/README.md) — fundamentals prerequisite
 - [MITRE ATT&CK — Enterprise matrix](https://attack.mitre.org)
 - [Microsoft Learn — Active Directory Domain Services](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview)

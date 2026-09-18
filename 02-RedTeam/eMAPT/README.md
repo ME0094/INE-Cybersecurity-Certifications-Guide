@@ -29,6 +29,18 @@ eMAPT builds the full assessment cycle on mobile:
 > nothing protected by an NDA. Practice exclusively on devices, apps, and
 > servers you own or are explicitly authorized to test.
 
+## Certification version note
+
+INE Security launched an **enhanced eMAPT certification** on **10 July 2025**. The
+official announcement is the INE blog post
+<https://ine.com/blog/master-real-world-mobile-security-new-cert-launched>.
+
+This module describes the track in general public terms; the verified INE entry point
+for current details is the eMAPT product page
+<https://ine.com/security/certifications/emapt-certification> (fall back to the
+directory <https://ine.com/security/certifications> if it ever 404s). Confirm exam
+logistics there before booking.
+
 ## Skills You Build
 
 - Operating Android and iOS devices from the command line (`adb`, `simctl`).

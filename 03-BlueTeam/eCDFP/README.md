@@ -120,11 +120,12 @@ A realistic self-paced plan for someone with basic Linux and command-line comfor
 
 ## Where this fits the Blue Team path
 
-Digital forensics is the after-the-fact sibling of detection and response: the SOC detects an alert, IR contains the incident, and forensics explains what actually happened so it can be prevented next time. The eCDFP skills here pair naturally with incident response, malware analysis, and threat hunting material in the Blue Team track:
+Digital forensics is the after-the-fact sibling of detection and response: the SOC detects an alert, IR contains the incident, and forensics explains what actually happened so it can be prevented next time. The eCDFP skills here pair naturally with the other Blue Team modules — [eSOC](../eSOC/README.md) (monitoring and triage), [eCIR](../eCIR/README.md) (incident response) and [eCTHP](../eCTHP/README.md) (threat hunting):
 
 - Incident response tells you *what to collect before the box is cleaned*.
 - Memory and disk analysis tell you *what the attacker did while it was running*.
 - Timeline work tells you *the order of events and the initial access point*.
+- Threat hunting turns the artifacts you learn to read here into hypotheses you can test across the whole estate, not just on the one machine you imaged.
 - Reporting closes the loop with management, legal, and the next incident's playbook.
 
 ## Checklist / Self-Test
@@ -144,5 +145,5 @@ Run through this module checklist — each item maps to a concrete artifact you 
 - NIST SP 800-86 — *Guide to Integrating Forensic Techniques into Incident Response* (csrc.nist.gov/publications).
 - Sleuth Kit documentation and wiki — sleuthkit.org (also hosts Autopsy).
 - Volatility 3 documentation — volatility3.readthedocs.io.
-- Official eCDFP product page on the INE website (current syllabus, logistics, and FAQ).
+- Official eCDFP product page (current syllabus, logistics, and FAQ): <https://ine.com/security/certifications/ecdfp-certification>. If it ever 404s, fall back to the certification directory <https://ine.com/security/certifications>.
 - DFRWS digital forensics challenge archives — dfrws.org (authorized practice datasets).

@@ -1,11 +1,16 @@
-# eIAMA — Identity and Access Management Architect
+# eIAMA — Identity & Access Management Associate
 
 > Area: 04-Emerging-Technologies · INE-Cybersecurity-Certifications-Guide
 > Status: Study module for the eIAMA certification track. Public study material only — no exam content or NDA-protected material is included.
 
+> **Nomenclature note:** This module was first published as "Identity and Access Management
+> Architect". That name was incorrect — the credential is **Identity & Access Management
+> Associate**, which is what the acronym IAMA stands for. Official certification page:
+> [eIAMA — Identity & Access Management Associate](https://ine.com/security/certifications/eiama-certification).
+
 ## What This Module Covers
 
-The **eIAMA (Identity and Access Management Architect)** certification path focuses on the discipline of designing and operating identity and access management systems at an architectural level. IAM is the set of processes, policies, and technologies that answer two questions for every user, device, or workload: *who are you?* (identity and authentication) and *what may you do?* (authorization).
+The **eIAMA (Identity & Access Management Associate)** certification covers the discipline of designing and operating identity and access management systems — from day-to-day IAM administration through to the architecture concepts that discipline rests on. IAM is the set of processes, policies, and technologies that answer two questions for every user, device, or workload: *who are you?* (identity and authentication) and *what may you do?* (authorization).
 
 An IAM architect plans how identities are born, change, and retire across an organization; selects and integrates identity providers; designs authentication and single sign-on (SSO) experiences; decides how access decisions are made and enforced; and aligns all of it with modern security models such as zero trust.
 
@@ -21,7 +26,7 @@ This module organizes the domain into five pillars:
 
 ### What the eIAMA Certification Covers (Public Framing)
 
-The eIAMA certification validates the skills of an architect who can design IAM solutions for real-world and cloud environments. At a high level, the body of knowledge spans:
+INE launched eIAMA on **26 August 2026** as a **vendor-neutral** certification. It validates the practical skills of an associate who can work with IAM solutions in real-world and cloud environments, and it assumes familiarity with the architecture concepts those solutions rest on. At a high level, the body of knowledge spans:
 
 - **Identity architecture:** directories, identity stores, and how identities are represented (users, groups, service accounts, workloads).
 - **Authentication architecture:** credential types, MFA and risk-based authentication, SSO standards, and passwordless approaches.

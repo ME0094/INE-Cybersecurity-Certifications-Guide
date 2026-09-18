@@ -9,9 +9,9 @@ All content in this repository is written in **English**.
 ## Repository conventions
 
 - One folder per certification, placed inside the correct area:
-  - `01-Fundamentals/` — eJPT, eEDA
-  - `02-RedTeam/` — eCPPT, eWPT, eWPTXv2, eMAPT
-  - `03-BlueTeam/` — eSOC, eCIR, eCDFP
+  - `01-Fundamentals/` — eJPT
+  - `02-RedTeam/` — eCPPT, eWPT, eWPTX, eMAPT
+  - `03-BlueTeam/` — eEDA, eSOC, eCIR, eCDFP, eCTHP
   - `04-Emerging-Technologies/` — eAIS, eIAMA
 - Every certification folder uses the same subfolders:
   - `methodology/` — numbered phases with a `01-`, `02-`, … prefix (execution order)
@@ -22,6 +22,25 @@ All content in this repository is written in **English**.
   index.
 - File names are **kebab-case** and in English (`01-reconnaissance.md`,
   `burp-suite-guide.md`).
+
+## Certification names and currency
+
+- **Use INE's current official name.** The folder and the module title use the
+  abbreviation INE publishes today, and the full name is spelled as INE spells it
+  (`eWPTX`, not `eWPTXv2`; eAIS is *AI Systems Security Specialist*; eIAMA is
+  *Identity & Access Management Associate*). Check
+  <https://ine.com/security/certifications> before adding or renaming a module.
+- **Never invent a product-page URL.** Link the verified
+  `https://ine.com/security/certifications/<slug>-certification` page if it is known to
+  resolve; otherwise link the directory. A guessed slug is worse than no link.
+- **Do not state exam logistics.** No question counts, durations, prices, passing scores,
+  or official domain lists — they change and cannot be maintained here. Point at the
+  official page instead.
+- **Do not add modules for retired credentials.** eCPTX, eCXD, eCMAP, eCRE and eWDP are
+  discontinued; the root `README.md` lists them so readers can recognize them.
+- **Update the verification date.** Any change to a certification name, area, or version
+  note must also update the *Last verified* date in the root `README.md` and in
+  `resources/official-links.md`.
 
 ## Note format
 

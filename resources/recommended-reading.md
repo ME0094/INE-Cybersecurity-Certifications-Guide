@@ -32,7 +32,7 @@
   systematic survey of how common network services are probed and assessed, useful for
   service enumeration and attack planning.
 
-## Web application security (eWPT · eWPTXv2)
+## Web application security (eWPT · eWPTX)
 
 - **The Web Application Hacker's Handbook (2nd edition)** — Why it helps: the classic
   structured guide to web-app testing methodology; its phase-by-phase mindset maps well to
@@ -69,14 +69,30 @@
   AAron Walters (Wiley). Why it helps: the reference for memory analysis, an area that
   distinguishes advanced forensics work from basic disk forensics.
 
+## Threat hunting and detection engineering (eCTHP)
+
+- **Intelligence-Driven Incident Response** — Rebekah Brown and Scott Roberts (O'Reilly).
+  Why it helps: the clearest explanation of turning threat intelligence into hypotheses
+  about what an adversary would do in *your* environment — the core of hunting.
+- **Crafting the InfoSec Playbook** — Jeff Bollinger, Brandon Enright, and Matthew Valites
+  (O'Reilly). Why it helps: how to define what "normal" looks like and write detection
+  content that survives contact with real data.
+- **The Practice of Network Security Monitoring** — Richard Bejtlich (No Starch Press).
+  Why it helps: the network side of hunting — where to place sensors and how to read what
+  they produce.
+- **MITRE ATT&CK** — free public knowledge base (<https://attack.mitre.org/>). Why it
+  helps: the shared vocabulary that lets a hypothesis name a *technique* instead of a tool.
+- **Sigma** — free public rule format (<https://sigmahq.io/>). Why it helps: the portable
+  way to express a detection, plus a large corpus of existing rules to read and adapt.
+
 ## Emerging technologies: AI security and IAM (eAIS · eIAMA)
 
 - **OWASP Top 10 for LLM Applications** — free public project. Why it helps: a current,
   structured catalog of attacks against LLM-based systems (prompt injection, poisoning,
   and friends), a natural fit for an AI-security syllabus.
 - **Zero Trust Networks — Building Secure Systems in Untrusted Networks** (O'Reilly).
-  Why it helps: the conceptual background for zero-trust architectures that an
-  IAM/architecture certification builds on. (Razi Rais et al. are credited on recent
+  Why it helps: the conceptual background for zero-trust architectures that the
+  IAM certification builds on. (Razi Rais et al. are credited on recent
   editions — confirm the author list on the copy you buy.)
 - **MITRE ATLAS** — free public knowledge base. Why it helps: an adversary-focused
   taxonomy for AI/ML systems that complements the defensive angle of the OWASP LLM list.

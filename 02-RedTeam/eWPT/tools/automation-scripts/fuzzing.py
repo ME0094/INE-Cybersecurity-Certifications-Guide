@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fuzzing.py — Single-parameter HTTP fuzzer (eWPT / eWPTXv2).
+fuzzing.py — Single-parameter HTTP fuzzer (eWPT / eWPTX).
 
 Replaces the FUZZ marker in the URL (or in --data) with each wordlist line
 and prints status + length. Uses only the standard library.

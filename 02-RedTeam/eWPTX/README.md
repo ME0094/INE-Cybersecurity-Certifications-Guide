@@ -1,12 +1,26 @@
-# eWPTXv2 — Web Application Penetration Tester eXtreme (Study Module)
+# eWPTX — Web Application Penetration Tester eXtreme (Study Module)
 
 > Area: `02-RedTeam` · Repository: `INE-Cybersecurity-Certifications-Guide`
 >
-> This folder is an **English** study companion for INE Security's eWPTXv2 track. Everything here is written from public, general knowledge and from practice on authorized lab platforms (for example, PortSwigger Web Security Academy). It contains **no actual exam content** and no NDA-protected material — keep it that way.
+> This folder is an **English** study companion for INE Security's eWPTX track. Everything here is written from public, general knowledge and from practice on authorized lab platforms (for example, PortSwigger Web Security Academy). It contains **no actual exam content** and no NDA-protected material — keep it that way.
 
-## What eWPTXv2 is about
+## Certification version and naming
 
-eWPTXv2 (Web Application Penetration Tester eXtreme) is INE Security's advanced/expert-level web application security certification. It sits above the professional-level web track and targets testers who already know how to find and exploit individual, well-known web vulnerabilities. The theme of this level is **complexity**: real applications rarely fail with a single textbook bug — they fail because an attacker combines several weaknesses and bypasses the controls standing in front of them.
+- **Official title:** *Web Application Penetration Tester eXtreme* — **eWPTX**. INE's
+  credential title carries **no version number**.
+- **Official page:** <https://ine.com/security/certifications/ewptx-certification>
+- **Latest public update:** INE relaunched the certification in the November/December 2024
+  window (public announcement dated **4 December 2024**). Notes written after that refresh
+  are often labelled "eWPTXv3"; material from the previous generation is labelled
+  "eWPTXv2". Both describe the same credential at different points in time, which is why
+  this module keeps the folder name `eWPTX` to match INE's title.
+- Exam logistics (scope, duration, scoring, price) are published by INE only. Confirm them
+  on the official page before booking — nothing in this module should be read as a
+  statement about the current exam.
+
+## What eWPTX is about
+
+eWPTX (Web Application Penetration Tester eXtreme) is INE Security's advanced/expert-level web application security certification. It sits above the professional-level web track and targets testers who already know how to find and exploit individual, well-known web vulnerabilities. The theme of this level is **complexity**: real applications rarely fail with a single textbook bug — they fail because an attacker combines several weaknesses and bypasses the controls standing in front of them.
 
 In public, domain-level terms, the module develops expertise in:
 
@@ -63,7 +77,7 @@ In one sentence: *learn the method, sharpen the tools, script the repetition, pr
 ## Module layout
 
 ```text
-eWPTXv2/
+eWPTX/
 ├── README.md                          <- you are here
 ├── methodology/                       # ordered working procedures
 │   ├── 01-advanced-recon.md
@@ -118,7 +132,7 @@ Tip: keep a personal notes file with **one worked chain per technique family**. 
 
 ## Checklist / Self-Test
 
-- [ ] I can explain, in my own words, what eWPTXv2-level testing adds over basic web testing (chains, bypasses, auth internals).
+- [ ] I can explain, in my own words, what eWPTX-level testing adds over basic web testing (chains, bypasses, auth internals).
 - [ ] I have read `methodology/` files 01–05 in order and can summarize each phase without looking.
 - [ ] I have practiced the Burp advanced features in `tools/burp-advanced.md` (a macro + session rule, one Turbo Intruder script, one extension).
 - [ ] I have run `tools/custom-scripts/advanced-scanner.py` against an authorized target and extended it with one new check.

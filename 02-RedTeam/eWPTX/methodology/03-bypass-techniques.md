@@ -1,6 +1,6 @@
-# Bypass Techniques — eWPTXv2 Methodology Phase 3
+# Bypass Techniques — eWPTX Methodology Phase 3
 
-> eWPTXv2 study guide · Advanced web methodology — INE-Cybersecurity-Certifications-Guide
+> eWPTX study guide · Advanced web methodology — INE-Cybersecurity-Certifications-Guide
 
 Filters, WAFs, rate limits, CAPTCHAs, and client-side checks are controls,
 not walls. Before you can exploit the underlying bug you must get your

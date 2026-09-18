@@ -1,6 +1,6 @@
-# Advanced Authentication & Sessions — eWPTXv2 Methodology Phase 4
+# Advanced Authentication & Sessions — eWPTX Methodology Phase 4
 
-> eWPTXv2 study guide · Advanced web methodology — INE-Cybersecurity-Certifications-Guide
+> eWPTX study guide · Advanced web methodology — INE-Cybersecurity-Certifications-Guide
 
 Modern apps rarely run a simple username/password form anymore: they front
 with JWT-bearing APIs, delegate identity to OAuth/OIDC providers, federate

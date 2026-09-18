@@ -1,14 +1,15 @@
-# eAIS — AI Security (Study Guide)
+# eAIS — AI Systems Security Specialist (Study Guide)
 
 > Area: 04-Emerging-Technologies · INE-Cybersecurity-Certifications-Guide · English
 
 ## What is the eAIS certification about?
 
-INE Security's **eAIS (AI Security)** credential focuses on the *practical* security of
-AI systems — most visibly applications built on large language models (LLMs). Where a
-traditional penetration-testing certification attacks servers and web apps, eAIS is about
-attacking and defending the AI application layer: the prompts, the models, the data they
-are trained or retrieved from, and the tools and agents they can invoke.
+INE Security's **eAIS (AI Systems Security Specialist)** credential, released on
+**23 June 2026**, focuses on the *practical* security of AI systems — most visibly
+applications built on large language models (LLMs). Where a traditional
+penetration-testing certification attacks servers and web apps, eAIS is about attacking
+and defending the AI application layer: the prompts, the models, the data they are
+trained or retrieved from, and the tools and agents they can invoke.
 
 Public information from INE describes the certification as building practical AI security
 readiness and highlights areas such as:
@@ -124,4 +125,4 @@ already know web/application security and only need the AI-specific material.
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/)
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
 - [NIST AI 600-1 — Generative AI Profile of the AI RMF](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1)
-- [INE Security — official certification pages and public blog content on AI security](https://ine.com/)
+- [INE Security — eAIS (AI Systems Security Specialist) official certification page](https://ine.com/security/certifications/eais-certification)

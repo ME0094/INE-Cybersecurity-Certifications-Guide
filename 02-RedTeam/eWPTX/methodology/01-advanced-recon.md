@@ -1,8 +1,8 @@
-# Advanced Recon — eWPTXv2 Methodology Phase 1
+# Advanced Recon — eWPTX Methodology Phase 1
 
-> eWPTXv2 study guide · Advanced web methodology — INE-Cybersecurity-Certifications-Guide
+> eWPTX study guide · Advanced web methodology — INE-Cybersecurity-Certifications-Guide
 
-At eWPTXv2 level, "recon" is no longer "which ports are open." The target is a
+At eWPTX level, "recon" is no longer "which ports are open." The target is a
 modern web stack: a JavaScript single-page application (SPA) talking to REST
 or GraphQL APIs, fronted by a CDN and a WAF, with several subdomains and
 virtual hosts. This phase is about **reconstructing the application from the

@@ -111,7 +111,7 @@ Repeat the drill week whenever you feel rusty — this is a skill certification,
 
 ## Further Resources
 
-- INE Security eSOC official course page (enrollment and authoritative syllabus)
+- INE Security eSOC official course page (enrollment and authoritative syllabus): <https://ine.com/security/certifications/esoc-certification>
 - MITRE ATT&CK — https://attack.mitre.org/ (technique IDs used across these notes)
 - SigmaHQ rule repository — https://github.com/SigmaHQ/sigma
 - Sigma documentation — https://sigmahq.io/

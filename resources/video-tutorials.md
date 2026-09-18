@@ -41,7 +41,7 @@
 - **13Cubed** — system-level and blue-team oriented explanations that also help beginners
   understand what happens on the host during an attack.
 
-## Red team — web and application security (eWPT · eWPTXv2 · eMAPT)
+## Red team — web and application security (eWPT · eWPTX · eMAPT)
 
 - **STÖK** — web-focused security content, including bug bounty methodology; good for
   seeing how web vulnerabilities are found and chained in the wild.
@@ -54,7 +54,7 @@
 - **John Hammond** — CTF web challenges and scripting that build the manual-testing
   reflexes used in web and mobile app assessments.
 
-## Blue team — SOC, incident response, and forensics (eSOC · eCIR · eCDFP)
+## Blue team — SOC, incident response, forensics, and hunting (eSOC · eCIR · eCDFP · eCTHP)
 
 - **13Cubed** — hands-on demos of Windows internals, forensics, and incident response
   tooling; a strong complement to SOC and IR study.
@@ -64,6 +64,10 @@
   same evidence-to-conclusion reasoning used in forensics and IR.
 - **The Cyber Mentor** — occasional blue-team and general security content that rounds out
   the picture, though his catalog skews offensive.
+- **For threat hunting specifically** — individual channels age quickly here, so treat
+  video as a supplement: start from INE's own hunting course, and use the free MITRE
+  ATT&CK (<https://attack.mitre.org/>) and Sigma (<https://sigmahq.io/>) communities for
+  technique-level examples of what a hunt looks like in real telemetry.
 
 ## Emerging technologies — AI security and IAM (eAIS · eIAMA)
 

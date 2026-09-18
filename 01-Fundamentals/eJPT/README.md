@@ -61,6 +61,22 @@ muscle. Do **not** look for "exam dumps" — they violate the NDA and defeat the
 Always confirm current public logistics (price, duration, rules) on the official INE
 Security page, since those details can change.
 
+## Certification version and recent updates
+
+INE Security announced an **updated eJPT** on **31 March 2026**, with "expanded web
+app testing, recon training, and offensive AI": more web application testing,
+reconnaissance, and offensive AI. In the announcement's own words: "Enhanced training
+and updated exam deliver stronger alignment between learning and real-world skills".
+
+- Official announcement:
+  <https://ine.com/newsroom/ine-security-launches-updated-ejpt-certification-with-expanded-web-app-testing-recon-training-and-offensive-ai>
+- Certification directory: <https://ine.com/security/certifications>
+- eJPT product page: <https://ine.com/security/certifications/ejpt-certification>
+
+This module describes the eJPT in general public terms. **Exam logistics — syllabus,
+duration, scoring, and rules — must always be confirmed on the official INE Security
+page**, because those details change and are not reproduced in these notes.
+
 ## Skills you build
 
 - Planning and scoping a small, authorized pentest inside a lab.
@@ -130,8 +146,9 @@ build the lab with `labs/lab-setup-guide.md` → work through
 
 ## Further Resources
 
-- INE Security — official certifications page (public marketing & syllabus):
-  <https://security.ine.com/certifications/>
+- INE Security — official certifications directory (public marketing & syllabus):
+  <https://ine.com/security/certifications>
+  (the former `security.ine.com` domain is no longer the correct source)
 - Nmap official documentation: <https://nmap.org/docs.html>
 - Metasploit documentation: <https://docs.metasploit.com/>
 - OWASP Top 10 (web fundamentals): <https://owasp.org/www-project-top-ten/>

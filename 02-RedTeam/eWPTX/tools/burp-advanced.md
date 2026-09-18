@@ -1,6 +1,6 @@
 # Burp Suite Advanced — Macros, Session Handling, Turbo Intruder, Extensions & Integration
 
-> eWPTXv2 · Tools — INE-Cybersecurity-Certifications-Guide (English)
+> eWPTX · Tools — INE-Cybersecurity-Certifications-Guide (English)
 
 ## Purpose
 

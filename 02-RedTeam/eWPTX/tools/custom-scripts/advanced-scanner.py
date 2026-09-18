@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-advanced-scanner.py — Multi-layer web scanner (eWPTXv2).
+advanced-scanner.py — Multi-layer web scanner (eWPTX).
 
 Collects low-cost "frictions" before attacking by hand: security headers,
 cookies, robots/sitemap, common paths, CORS and redirects.

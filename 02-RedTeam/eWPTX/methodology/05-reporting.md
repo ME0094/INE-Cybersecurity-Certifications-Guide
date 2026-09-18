@@ -1,6 +1,6 @@
-# Reporting — eWPTXv2 Methodology Phase 5
+# Reporting — eWPTX Methodology Phase 5
 
-> eWPTXv2 study guide · Advanced web methodology — INE-Cybersecurity-Certifications-Guide
+> eWPTX study guide · Advanced web methodology — INE-Cybersecurity-Certifications-Guide
 
 A pentest is not finished when the exploit works — it is finished when a
 reader who was not in the room can **reproduce the finding, understand its

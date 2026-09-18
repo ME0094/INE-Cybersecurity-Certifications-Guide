@@ -1,6 +1,6 @@
 # Challenge Practice — Multi-Stage Labs, Evidence, and Chain Reconstruction
 
-> eWPTXv2 · Labs — INE-Cybersecurity-Certifications-Guide (English)
+> eWPTX · Labs — INE-Cybersecurity-Certifications-Guide (English)
 
 ## Purpose
 

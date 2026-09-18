@@ -8,6 +8,18 @@ meant to build the real-world skills the certification domain represents. It con
 **no actual exam content or NDA-protected material** — always treat INE's official
 syllabus and exam guide as the authoritative source for what is tested.
 
+## Certification version note
+
+INE Security published the **next generation of the eCIR** certification on
+**8 September 2025**; the official blog post is
+<https://ine.com/blog/new-ecir-certification-advanced-incident-response-training>.
+
+> **Scope note.** The five phase files in [`methodology/`](methodology/)
+> (01-preparation through 05-lessons-learned) are **this repository's own study
+> organization** of the incident-response lifecycle. They are **not** an official list
+> of eCIR exam domains, and this guide makes no claim about how many domains the exam
+> has. Treat INE's official syllabus as the authoritative source.
+
 ## What the eCIR Domain Covers (Public Framing)
 
 The eCIR sits in INE's blue-team / defensive track and centers on **incident response
@@ -47,14 +59,15 @@ during recovery. As public framing:
 
 | Module | Public domain emphasis | Relationship to eCIR |
 | ------ | ---------------------- | -------------------- |
-| eSOC   | Monitoring, alert triage, Tier-1 analysis | Feeds incidents to the responder; eCIR assumes you can read the alert and the logs behind it. |
+| [eSOC](../eSOC/README.md)   | Monitoring, alert triage, Tier-1 analysis | Feeds incidents to the responder; eCIR assumes you can read the alert and the logs behind it. |
 | eCIR   | Handling incidents end to end: preserve, contain, eradicate, recover, communicate | This module. |
-| eCDFP  | Deep digital forensics: acquisition, analysis, reporting | Supplies the rigorous evidence method eCIR uses in scoped investigations; eCIR stays response-oriented. |
+| [eCTHP](../eCTHP/README.md)  | Proactive, hypothesis-driven hunting for what detection missed | Turns "we were never alerted" into named techniques and new detections; an incident often becomes the next hunt. |
+| [eCDFP](../eCDFP/README.md)  | Deep digital forensics: acquisition, analysis, reporting | Supplies the rigorous evidence method eCIR uses in scoped investigations; eCIR stays response-oriented. |
 
-In practice, incident responders borrow SOC detection context and forensic evidence
-discipline. This module emphasizes the *response process*: fast, correct decisions under
-time pressure, with evidence preserved well enough for anyone (including eCDFP-style
-forensics or law enforcement) to rely on later.
+In practice, incident responders borrow SOC detection context, hunting leads and forensic
+evidence discipline. This module emphasizes the *response process*: fast, correct
+decisions under time pressure, with evidence preserved well enough for anyone (including
+eCDFP-style forensics or law enforcement) to rely on later.
 
 ## How This Module Is Organized
 
@@ -120,7 +133,7 @@ A suggested 4–6 week plan (adjust to your pace):
 
 ## Further Resources
 
-- INE Security — eCIR certification page and official syllabus (check current URL on inesecurity.com).
+- INE Security — eCIR certification page and official syllabus: <https://ine.com/security/certifications/ecir-certification>
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* — https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
 - NIST SP 800-86, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - MITRE ATT&CK — https://attack.mitre.org/

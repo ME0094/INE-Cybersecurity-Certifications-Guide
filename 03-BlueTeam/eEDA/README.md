@@ -1,7 +1,10 @@
 # eEDA — Enterprise Defense Administrator
 
-> Module: 01-Fundamentals · INE-Cybersecurity-Certifications-Guide
+> Module: 03-BlueTeam · INE-Cybersecurity-Certifications-Guide
 > Official program: [INE Security — eEDA Certification](https://ine.com/security/certifications/eeda-certification)
+>
+> Official classification: INE Security lists the eEDA as a **defense (Blue Team)**
+> credential — [eEDA Certification](https://ine.com/security/certifications/eeda-certification).
 
 ## What Is the eEDA?
 

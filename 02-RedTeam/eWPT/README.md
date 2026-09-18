@@ -144,4 +144,6 @@ alone will not make it stick.
 - OWASP Testing Guide — <https://owasp.org/www-project-web-security-testing-guide/>
 - PortSwigger Web Security Academy — <https://portswigger.net/web-security>
 - DVWA project — <https://github.com/digininja/DVWA>
-- INE Security (certification program information) — <https://security.ine.com/>
+- INE Security — official certification directory (select the eWPT card for the current
+  syllabus and exam details) — <https://ine.com/security/certifications>. The former
+  `security.ine.com` domain is no longer the correct source.
