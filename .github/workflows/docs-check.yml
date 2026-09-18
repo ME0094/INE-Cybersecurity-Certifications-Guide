@@ -1,0 +1,34 @@
+name: docs-check
+
+# Guards the two failure modes that actually bit this repository:
+#   1. the catalog in README.md drifting away from what is on disk (a moved or renamed
+#      module that no table links to, or a table row pointing at a folder that is gone);
+#   2. a relative link or an in-repo anchor that no longer resolves.
+# Both checks are plain Node scripts with no dependencies, so they run anywhere.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  catalog-and-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Catalog matches the repository
+        run: node scripts/utilities/check-catalog.mjs .
+
+      - name: Relative links and in-repo anchors resolve
+        run: node scripts/utilities/check-links.mjs .

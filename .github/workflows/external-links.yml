@@ -1,0 +1,30 @@
+name: external-links
+
+# Weekly sweep of the *external* URLs referenced by the guides (INE product pages,
+# standards documents, tool sites). Kept separate from docs-check on purpose: a vendor
+# site being down, rate-limiting us, or moving a page should not block a pull request.
+# The checker tolerates 403/429 (bot protection) and reports everything else.
+
+on:
+  schedule:
+    # Mondays at 06:17 UTC — off the hour to avoid the cron stampede.
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  external:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: External URLs still respond
+        run: node scripts/utilities/check-links.mjs . --external
