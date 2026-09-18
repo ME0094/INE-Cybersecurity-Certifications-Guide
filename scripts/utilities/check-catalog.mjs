@@ -49,10 +49,8 @@ for (const area of AREAS) {
       continue;
     }
     // Sample images and scratch folders are not modules.
-    const top = readdirSync(moduleDir, { withFileTypes: true })
-      .filter((e) => e.isDirectory())
-      .map((e) => e.name);
-    if (top.length === 0) continue;
+    // Every directory that holds a README is a module, even before its subfolders exist:
+    // skipping the empty case would hide exactly the mistake this check exists to catch.
     onDisk.push(`${area}/${entry.name}`);
     for (const sub of REQUIRED_SUBFOLDERS) {
       if (!existsSync(join(moduleDir, sub))) {

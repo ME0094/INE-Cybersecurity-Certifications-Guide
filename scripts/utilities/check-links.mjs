@@ -70,10 +70,21 @@ function headingsOf(file) {
 
 function collectLinks(text) {
   const links = [];
+  // Link syntax written *inside* inline code is documentation about links, not a link:
+  // this file's own audit notes say "the checker collects only `[](...)` and `<...>`",
+  // and that literal must not be reported as a broken target.
+  const codeRanges = [];
+  for (const m of text.matchAll(/`[^`\n]*`/g)) codeRanges.push([m.index, m.index + m[0].length]);
+  const inCode = (index) => codeRanges.some(([start, end]) => index > start && index < end);
+
   const inline = /\[[^\]]*\]\(\s*<?([^)>\s]+)>?(?:\s+"[^"]*")?\s*\)/g;
-  for (const m of text.matchAll(inline)) links.push({ target: m[1], index: m.index });
+  for (const m of text.matchAll(inline)) {
+    if (!inCode(m.index)) links.push({ target: m[1], index: m.index });
+  }
   const autolink = /<((?:https?:\/\/|mailto:)[^>\s]+)>/g;
-  for (const m of text.matchAll(autolink)) links.push({ target: m[1], index: m.index });
+  for (const m of text.matchAll(autolink)) {
+    if (!inCode(m.index)) links.push({ target: m[1], index: m.index });
+  }
   // Inline code that is explicitly relative — `../labs/a-lab.md` — is a promise to the
   // reader even though Markdown will not render it as a link. Only spans starting with
   // ./ or ../ are checked, so prose like `01-reconnaissance.md` (a file that lives in
@@ -95,15 +106,52 @@ function collectLinks(text) {
     if (!/^[A-Za-z0-9._-]+\.md$/i.test(value)) continue;
     links.push({ target: value, index: m.index, bare: true });
   }
+  // URLs written as plain text — not a markdown link, not in angle brackets — are still
+  // claims about the network, and the repository writes several that way (the entry points
+  // in resources/official-links.md, for instance). Collected last so the richer forms above
+  // win; duplicates are deduplicated by the caller.
+  const bareUrl = /(^|[\s("'`>])(https?:\/\/[^\s<>()"'`]+)/g;
+  for (const m of text.matchAll(bareUrl)) {
+    links.push({ target: m[2].replace(/[.,;:]+$/, ''), index: m.index });
+  }
   return links;
 }
+
+// A URL that cannot answer from a CI runner, or that is not really a public address:
+// loopback, RFC 1918, link-local, and single-label hosts such as the `http://lab/login`
+// of the lab guides. The weekly sweep must not go red on the reader's own lab.
+function isUnroutable(url) {
+  let host;
+  try {
+    host = new URL(url).hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  } catch {
+    return true;
+  }
+  if (!host.includes('.')) return true; // single label: lab, dvwa, collector…
+  if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) return true;
+  if (host === '::1' || host.startsWith('fe80:')) return true;
+  const m = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (!m) return false;
+  const a = Number(m[1]);
+  const b = Number(m[2]);
+  return (
+    a === 127 || // loopback
+    a === 10 || // private
+    (a === 192 && b === 168) || // private
+    (a === 172 && b >= 16 && b <= 31) || // private
+    (a === 169 && b === 254) // link-local
+  );
+}
+
 async function checkExternalUrl(url) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
   try {
     let res = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: controller.signal });
-    // Many sites reject HEAD; retry as GET before declaring it dead.
-    if (res.status === 405 || res.status === 403 || res.status === 501) {
+    // A 4xx/5xx from HEAD says nothing on its own: many hosts answer 404 to HEAD while
+    // serving the page to GET (PortSwigger, for one). Any failure is retried as a real
+    // request before the link is called dead.
+    if (res.status >= 400) {
       res = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
     }
     // 403/429 usually mean bot protection, not a dead link: report, do not fail.
@@ -130,6 +178,7 @@ const external = new Map();
 let checked = 0;
 let anchors = 0;
 let bareChecked = 0;
+let skippedLocal = 0;
 
 for (const file of files) {
   const raw = readFileSync(file, 'utf8');
@@ -150,7 +199,11 @@ for (const file of files) {
     if (/^(https?:|mailto:|tel:)/i.test(target)) {
       if (CHECK_EXTERNAL) {
         const key = target.replace(/[.,;]$/, '');
-        if (!external.has(key)) external.set(key, null);
+        if (isUnroutable(key)) {
+          skippedLocal++;
+        } else if (!external.has(key)) {
+          external.set(key, null);
+        }
       }
       continue;
     }
@@ -202,7 +255,10 @@ if (CHECK_EXTERNAL && external.size > 0) {
 
 console.log(
   `check-links: ${files.length} Markdown files, ${checked} relative link(s), ` +
-    `${anchors} anchor check(s)` + (CHECK_EXTERNAL ? `, ${external.size} external URL(s)` : ''),
+    `${anchors} anchor check(s)` +
+    (CHECK_EXTERNAL
+      ? `, ${external.size} external URL(s), ${skippedLocal} lab-local URL(s) skipped`
+      : ''),
 );
 if (broken.length > 0) {
   console.error(`\nBROKEN (${broken.length}):`);

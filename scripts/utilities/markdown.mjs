@@ -29,9 +29,11 @@ export function stripFences(text) {
     .join('\n');
 }
 
-// GitHub's heading-anchor slug: lowercase, drop punctuation and formatting, spaces to
-// hyphens. Kept simple — if it ever disagrees with GitHub on an exotic heading, the
-// check reports a false positive, which is visible and harmless.
+// GitHub's heading-anchor slug: lowercase, drop punctuation and formatting, whitespace to
+// hyphens. Each whitespace character becomes one hyphen rather than runs collapsing, because
+// that is what GitHub does: `## Common Mistakes & Tips` resolves as
+// `#common-mistakes--tips`, and collapsing the run would both reject the real anchor and
+// accept one that does not exist.
 export function slugify(heading) {
   return heading
     .trim()
@@ -40,7 +42,7 @@ export function slugify(heading) {
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
     .replace(/[^\p{L}\p{N}\s-]/gu, '')
     .trim()
-    .replace(/\s+/g, '-');
+    .replace(/\s/g, '-');
 }
 
 // All heading lines of a Markdown file, fences stripped.
