@@ -30,6 +30,8 @@ This module covers the four knowledge pillars the eEDA program is built around:
 
 The distinction matters throughout your study: **governance decides, risk management prioritizes, compliance proves, and engineering builds.** A single activity usually touches several pillars — for example, running a hardening scan is *engineering*, but choosing which baseline to scan against is *compliance*, and deciding which findings to fix first is *risk management*.
 
+The `methodology/` folder carries those pillars into **nine numbered phases**: 01–04 are the conceptual notes above, and 05–09 are the operating phases an administrator owns — asset inventory and configuration, identity and privileged access, vulnerability and patch management, continuity and recovery, and the SOC / incident-response interface.
+
 ## Target Audience
 
 The eEDA is aimed at people who want to **start or formalize a career on the blue team**, including:
@@ -50,6 +52,11 @@ By working through this module you build practical, job-relevant abilities:
 - Write and critique **security policies, standards, baselines, and an Acceptable Use Policy**.
 - Build and maintain a **risk register** and propose treatment strategies (accept, mitigate, transfer, avoid).
 - Run **compliance and hardening tools** — OpenSCAP, Lynis, osquery, auditd — and interpret their findings.
+- Keep **evidence defensible**: know which auditing source answers a given question, and how long each one actually retains what it records.
+- Keep an **asset and software inventory** honest, tier assets by criticality, and hold systems to **configuration baselines** while measuring drift.
+- Review **access and privileged accounts** on a schedule, and keep service credentials out of scripts and repositories.
+- Run a **vulnerability and patch cycle** with defensible SLAs, and **prove recovery** with restore tests against agreed RTO and RPO.
+- Work the **SOC / incident-response interface**: supply the log and asset context analysts need, and hand over cleanly under time pressure.
 - Understand what **SIEM and GRC platforms** do in real enterprises and where they fit in a defense workflow.
 - Speak the language of **audits, attestations, and evidence** so you can support an assessor or auditor.
 
@@ -64,21 +71,44 @@ eEDA/
 │   ├── 01-security-governance.md
 │   ├── 02-risk-management.md
 │   ├── 03-compliance-basics.md
-│   └── 04-security-engineering.md
+│   ├── 04-security-engineering.md
+│   ├── 05-asset-inventory-and-configuration.md
+│   ├── 06-identity-and-privileged-access.md
+│   ├── 07-vulnerability-and-patch-management.md
+│   ├── 08-continuity-and-recovery.md
+│   └── 09-soc-and-incident-response-interface.md
 ├── tools/                     <- the "how": guides for the tools defenders use
 │   ├── security-frameworks.md
-│   └── compliance-tools.md
+│   ├── compliance-tools.md
+│   ├── hardening-and-configuration-scanning.md
+│   ├── endpoint-inventory-and-query.md
+│   └── system-auditing-and-log-integrity.md
 ├── labs/                      <- the "practice": hands-on exercises
-│   └── security-policy-exercises.md
+│   ├── security-policy-exercises.md
+│   ├── inventory-and-unauthorized-software.md
+│   └── risk-exception-writeup.md
 └── cheatsheets/               <- the "reference": quick lookup tables
     └── terminology-reference.md
 ```
 
 Suggested workflow:
 
-1. **Read the methodology in order** — [01-security-governance](methodology/01-security-governance.md), [02-risk-management](methodology/02-risk-management.md), [03-compliance-basics](methodology/03-compliance-basics.md), [04-security-engineering](methodology/04-security-engineering.md). These give you the conceptual spine of the whole program.
-2. **Study the two tool guides** — [security-frameworks](tools/security-frameworks.md) and [compliance-tools](tools/compliance-tools.md) — and run the commands yourself on a Linux VM.
-3. **Do the lab** — [security-policy-exercises](labs/security-policy-exercises.md) — where you draft a policy, build a risk register, map CIS Controls, and interpret real scan output.
+1. **Read the methodology in order.** Phases [01-security-governance](methodology/01-security-governance.md), [02-risk-management](methodology/02-risk-management.md), [03-compliance-basics](methodology/03-compliance-basics.md), and [04-security-engineering](methodology/04-security-engineering.md) give you the conceptual spine of the whole program; phases 05–09 turn it into administrator work:
+   - [05-asset-inventory-and-configuration](methodology/05-asset-inventory-and-configuration.md) — what you own, what is installed on it, and the configuration baselines it is held to.
+   - [06-identity-and-privileged-access](methodology/06-identity-and-privileged-access.md) — joiner/mover/leaver, access reviews, privileged access patterns, and service accounts and secrets.
+   - [07-vulnerability-and-patch-management](methodology/07-vulnerability-and-patch-management.md) — the discovery-to-verification cycle, patch SLAs, and what to do with what you cannot patch.
+   - [08-continuity-and-recovery](methodology/08-continuity-and-recovery.md) — RTO/RPO inputs, backup design rules, restore testing, and recovery ordering.
+   - [09-soc-and-incident-response-interface](methodology/09-soc-and-incident-response-interface.md) — what the administrator owes the SOC, what comes back, the handover packet, and containment authorization.
+2. **Study the five tool guides**, and run the commands yourself on a Linux VM:
+   - [security-frameworks](tools/security-frameworks.md) — NIST CSF, NIST RMF, ISO/IEC 27001, CIS Controls, and COBIT, and how to compare and map them.
+   - [compliance-tools](tools/compliance-tools.md) — OpenSCAP, Lynis, osquery, and auditd for scan-and-evidence work on Linux, plus what SIEM and GRC platforms add.
+   - [hardening-and-configuration-scanning](tools/hardening-and-configuration-scanning.md) — assessing a host against a benchmark, turning scan output into evidence, and Windows checks that work without WMI.
+   - [endpoint-inventory-and-query](tools/endpoint-inventory-and-query.md) — osquery queries plus agentless inventory on Windows and Linux, and how to detect unauthorized software.
+   - [system-auditing-and-log-integrity](tools/system-auditing-and-log-integrity.md) — auditd rules, journald persistence, Windows channel configuration, and what makes a log survive as evidence.
+3. **Do the labs**, in this order:
+   - [security-policy-exercises](labs/security-policy-exercises.md) — draft a policy, build a risk register, map CIS Controls, and interpret real scan output.
+   - [inventory-and-unauthorized-software](labs/inventory-and-unauthorized-software.md) — build an inventory, publish an allowlist, diff two snapshots, and detect configuration drift.
+   - [risk-exception-writeup](labs/risk-exception-writeup.md) — write and defend a risk exception with a compensating control, a named owner, and an expiry date.
 4. **Keep the cheatsheet open** — [terminology-reference](cheatsheets/terminology-reference.md) — and use it while writing any summary, report, or self-test answer.
 5. Finish each file with its **Checklist / Self-Test**; only move on when every box is honest to check.
 
@@ -86,9 +116,9 @@ Suggested workflow:
 
 | Week | Focus | Concrete output |
 |---|---|---|
-| 1 | Governance + risk methodology notes | One-page summary of each note |
-| 2 | Compliance + engineering methodology notes; read both tool guides | Terminology quiz using the cheatsheet |
-| 3 | Run the lab exercises (policy, risk register, CIS mapping, scans) | AUP draft, 6-row risk register, CIS mapping table, saved scan reports |
+| 1 | Methodology 01–05: governance, risk, compliance, engineering, asset inventory | One-page summary of each note |
+| 2 | Methodology 06–09: identity, patching, recovery, SOC/IR interface; read the five tool guides | Terminology quiz using the cheatsheet |
+| 3 | Run the lab exercises (policy, risk register, CIS mapping, scans, inventory diff, exception memo) | AUP draft, 6-row risk register, CIS mapping table, saved scan reports, classified inventory diff, one signed risk exception |
 | 4 | Re-run every file's Checklist / Self-Test; fill your gaps | All checkboxes checked with evidence |
 
 Spacing matters more than cramming: this material is vocabulary-and-frameworks heavy, and it sticks when you *apply* each concept in the lab within a day or two of reading it.
@@ -104,10 +134,15 @@ Spacing matters more than cramming: this material is vocabulary-and-frameworks h
 ## Checklist / Self-Test
 
 - [ ] I can explain, in one paragraph each, what the eEDA certifies and who it is for.
-- [ ] I can list the four methodology pillars and give one concrete task per pillar.
-- [ ] I have read the four methodology notes in order and can summarize each in three sentences.
+- [ ] I can list the four knowledge pillars and give one concrete task per pillar.
+- [ ] I have read the nine methodology notes in order and can summarize each in three sentences.
+- [ ] I can explain why an asset inventory is the precondition for vulnerability, access, backup, and incident work.
+- [ ] I have written one risk exception with a named owner, a compensating control, and an expiry date.
+- [ ] I have restored from a backup and can state the RTO and RPO that restore actually proved.
 - [ ] I have run at least one scan with Lynis or OpenSCAP on a Linux VM and written down what the output means.
-- [ ] I have drafted one security policy and one risk register entry using the lab guide.
+- [ ] I have drafted one security policy and one risk register entry using the lab guides.
+- [ ] I have produced an inventory diff, classified its dispositions, and written one finding from it.
+- [ ] I can name which auditing source answers a given question, and what my hosts' log retention actually is.
 - [ ] I can look up any GRC term in the terminology cheatsheet without opening a browser.
 - [ ] I have completed the Checklist / Self-Test section of every file in this module.
 

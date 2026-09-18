@@ -1,6 +1,8 @@
 # Risk Management
 
 > eEDA · Methodology — Enterprise Defense Administrator
+>
+> Phase 02 of nine. Risk management is the decision engine behind every control the later phases build: [05](05-asset-inventory-and-configuration.md) inventories what is at risk, [07](07-vulnerability-and-patch-management.md) prioritises by the logic set here, and [08](08-continuity-and-recovery.md) buys down the worst outcomes.
 
 ## Purpose
 
@@ -189,6 +191,112 @@ Carlo simulation to produce a loss exceedance curve:
 
 FAIR's value is discipline: it forces you to separate *frequency of attack* from *probability of success* and to model loss in multiple forms rather than one gut-feeling dollar figure.
 
+## Writing a Risk Statement
+
+The register is only as useful as the sentence in its second column. A vague statement cannot be scored consistently, cannot be treated specifically, and cannot be re-assessed next quarter.
+
+Use this shape:
+
+```text
+<Threat source> exploits <vulnerability or condition> on <asset / process>
+causing <business impact>, with <qualifying context>.
+```
+
+| Weak statement | Why it fails | Rewritten |
+|---|---|---|
+| "Cyber attack" | No asset, no impact, nothing to treat | "Ransomware encrypts finance file shares, stopping month-end close for more than 72 hours" |
+| "Unpatched CMS plugin" | That is a vulnerability, not a risk | "An attacker exploits the unpatched CMS plugin on the public web shop to deface the storefront, causing a 48-hour sales outage and media attention" |
+| "Insider threat" | Too broad to score or treat | "A departing engineer with standing production access copies the customer database to personal storage, triggering a GDPR breach-notification duty" |
+| "Cloud misconfiguration" | Names a cause, not a loss event | "A public read permission on the analytics storage bucket exposes 400,000 customer records until discovered" |
+| "Users are the weakest link" | An opinion, not a scenario | "A finance user approves a payment redirected by a business-email-compromise email, losing up to €50,000 per event" |
+
+Two tests before a statement enters the register: **can you name the loss event** (what actually happens to the business), and **can you name the owner** (who is accountable for treating it). If either fails, it is an observation, not a risk.
+
+## Worked Example: One Risk, End to End
+
+Acme Widgets Inc. (see [../labs/security-policy-exercises](../labs/security-policy-exercises.md)) runs a single risk through the whole process — this is the exercise worth repeating with your own scenarios.
+
+```text
+1. IDENTIFY
+   Source        : incident post-mortem at a peer company + vulnerability scan finding
+   Statement     : "An attacker exploits the internet-facing web shop CMS to deploy
+                    ransomware on the web server, taking the shop offline for more
+                    than 24 hours and exposing customer personal data."
+   Asset         : ACME-WEB-01 (T1, internet-facing, PCI DSS and GDPR scope)
+   Owner         : Web systems lead (accountable), security team (treatment actions)
+
+2. ASSESS (qualitative)
+   Likelihood 4 (Likely) — internet-facing, public exploit code exists, patching lag
+   Impact     4 (Major)  — 24h+ sales outage, breach-notification duty, contractual penalties
+   Inherent score 16 (High) against the defined 5x5 criteria
+
+3. QUANTIFY (where the numbers exist)
+   AV  = €1,200,000  (revenue at risk + remediation + notification cost)
+   EF  = 0.35        (partial service loss and remediation, not total asset loss)
+   SLE = €420,000
+   ARO = 0.25        (approximately once every four years)
+   ALE = €105,000 per year
+
+4. TREAT
+   Mitigate: emergency patching within the critical SLA, WAF virtual patching,
+             web server rebuild from a hardened image, daily verified backups,
+             alerting on file-integrity changes in the web root.
+   Cost    : €18,000/year (tooling, licence, engineering time)
+   Residual: likelihood 2, impact 4 -> residual score 8 (Medium)
+   Justification: ALE falls far more than the control cost, and the residual fits
+                  the board-approved appetite for a T1 internet-facing asset.
+
+5. RECORD AND REVIEW
+   Register entry R-014, owner: Web systems lead, treatment due 2026-04-30,
+   next review 2026-07-01 or on any change to the web platform.
+```
+
+What makes this defensible in a review: the impact claim is tied to a named business consequence, the residual score is recorded separately from the inherent one, the control has a cost, and the owner is a person rather than a team name.
+
+## The Register: Fields That Pay for Themselves
+
+A register with just ID / description / score / owner is a start, but four extra fields do the heavy lifting in audits and budget conversations:
+
+| Field | Why it earns its column |
+|---|---|
+| **Existing controls** | Prevents the classic mistake of scoring inherent risk as if nothing were in place, and shows reviewers what already works |
+| **Planned treatment + due date** | Turns the register into a project list; each open treatment is a tracked action |
+| **Residual score** | The number decisions are actually made on (see the mistakes section) |
+| **Framework mapping** | Lets one register serve risk management, compliance evidence, and internal audit at once |
+
+Markdown template you can copy into a working document:
+
+```markdown
+| ID | Category | Risk statement | Asset(s) | Existing controls | Inherent L | Inherent I | Inherent score | Treatment | Planned control | Owner | Due | Residual L | Residual I | Residual score | Status | Review date | Framework refs |
+|----|----------|----------------|----------|-------------------|-----------|-----------|----------------|-----------|-----------------|-------|-----|-----------|-----------|----------------|--------|-------------|----------------|
+| R-014 | Malware / availability | Attacker exploits CMS on public web shop to deploy ransomware, taking the shop offline >24h and exposing personal data | ACME-WEB-01 | WAF, EDR, nightly backup | 4 | 4 | 16 High | Mitigate | Emergency patch SLA, image rebuild, FIM alerting | Web lead | 2026-04-30 | 2 | 4 | 8 Medium | In progress | 2026-07-01 | CIS 7, A.8.8, CSF ID.RA |
+```
+
+Keep two working views of the same data: a **treatment view** (everything with an open action, sorted by due date) and a **residual view** (everything still above appetite, sorted by residual score). The board sees the second; the engineers work the first.
+
+## Assessing Risk in a Change Request
+
+Administrators approve and implement changes constantly, and most change processes treat security as a checkbox. A five-question assessment keeps it proportionate:
+
+```text
+1. What new exposure does this create?     (new port, new service, new data flow, new third party)
+2. Which assets and data classes does it touch, and at what tier?
+3. Does it weaken any existing control?    (encryption, logging, segmentation, access control)
+4. Can it be reversed, and how quickly?    (rollback plan and time)
+5. What monitoring would tell us within 24 hours if it goes wrong?
+```
+
+Decision rule: if the change creates new internet exposure, touches T1 assets, or weakens a control, it needs a security review and a rollback plan before implementation — and the assessment is attached to the change record. Otherwise, implement it as a standard change. Two of these assessments filled in honestly will show you whether your change process is a control or a formality.
+
+## Third-Party and Cloud Risk
+
+Two risk classes that behave differently from internal ones, and that administrators end up implementing:
+
+- **Third-party (supply chain).** You inherit their incident as your own. Assess: what data do they hold, what access do they have to your environment, how would you know if they were breached, and what does the contract require them to tell you and within what time? Map it to CIS Controls v8 control 15 and ISO/IEC 27001 Annex A 5.19/5.20.
+- **Cloud.** Your risk is a shared responsibility: the provider secures the platform, you secure the configuration. The most common loss events are misconfigured storage, over-broad identity roles, and unmanaged accounts in forgotten subscriptions — all three are inventory and access problems ([05](05-asset-inventory-and-configuration.md), [06](06-identity-and-privileged-access.md)) before they are anything else.
+
+> For both classes, the useful register fields are the ones that force accountability: which contract clause obliges them to notify you, and which internal owner monitors that they do.
+
 ## Common Mistakes & Tips
 
 - **Risk = vulnerability scanning.** A list of CVEs is not a risk assessment — you must attach assets, threat context, and business impact.
@@ -199,6 +307,12 @@ FAIR's value is discipline: it forces you to separate *frequency of attack* from
 - **Treating insurance as transfer of everything** — legal liability, operational impact, and reputational harm stay with you.
 - **Tip**: pick one risk scenario and run it through all three styles (qualitative heat map, ALE arithmetic, and a FAIR-style range) to see how conclusions differ and converge.
 - **Tip**: tie every security project in your roadmap back to a register entry — this is how security budgets get defended.
+- **Statements that name a cause instead of a loss.** "Unpatched plugin" and "misconfigured bucket" are conditions. The risk is the loss event they enable. If a row cannot be scored by two different people to within one point, rewrite it.
+- **Registers that only engineers can read.** A register nobody outside security understands cannot be used to accept risk, fund treatment, or brief a board. Write the statement in business language and keep the technical detail in the treatment column.
+- **No existing-controls column.** Without it, reviewers score inherent risk as if nothing were deployed, overstate exposure, and lose trust in the register the first time an engineer points out the control that already exists.
+- **Treatments with no due date and no owner.** A register row with no tracked action is a note. Every treatment needs a person and a date, or it belongs in the observations pile.
+- **Assessing third parties once, at onboarding.** Supply-chain risk changes when they change their platform, their subcontractors, or their ownership. Put them on the same review cycle as internal risks.
+- **Tip**: after each incident, ask the blunt question — "was this scenario in the register, and if not, why not?" Both answers are useful: a missing scenario is a coverage gap, and a present-but-untreated one is an escalation.
 
 ## Checklist / Self-Test
 
@@ -210,6 +324,11 @@ FAIR's value is discipline: it forces you to separate *frequency of attack* from
 - [ ] I can build and maintain a risk register with owners, residual scores, and review dates.
 - [ ] I can recite the seven NIST RMF steps and explain the purpose of the ATO.
 - [ ] I can outline ISO 31000's process loop and FAIR's core decomposition (LEF × LM).
+- [ ] I can rewrite a vague risk observation into a statement naming threat source, condition, asset, and business impact.
+- [ ] I can run one risk end to end: identify, assess qualitatively, quantify with ALE, choose a treatment, record the residual, and set a review date.
+- [ ] I can list the register fields that earn their column, and explain why existing controls and residual scores are not optional.
+- [ ] I can assess a change request against the five exposure questions and decide whether it needs a security review.
+- [ ] I can explain how third-party and cloud risk differ from internal risk, and which contract and Annex A clauses make them accountable.
 
 ## Further Resources
 

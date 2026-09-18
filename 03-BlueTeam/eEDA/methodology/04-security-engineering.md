@@ -1,6 +1,8 @@
 # Security Engineering
 
 > eEDA · Methodology — Enterprise Defense Administrator
+>
+> Phase 04 of nine. Engineering is where the other phases get built: the baselines from [05](05-asset-inventory-and-configuration.md) are enforced here, the identity design serves [06](06-identity-and-privileged-access.md), the exposure measured in [07](07-vulnerability-and-patch-management.md) comes from these designs, and the visibility designed here is what [09](09-soc-and-incident-response-interface.md) depends on.
 
 ## Purpose
 
@@ -193,6 +195,123 @@ Admin task needed                     ->  elevate via PAM/just-in-time
 All privileged sign-ins                ->  MFA + sent to SIEM as high-value events
 ```
 
+## Worked Example: Hardening a Web Server to a Baseline
+
+A concrete pass through the baseline → enforce → verify cycle on a Linux web server. The point of the example is the *decisions*, not the commands.
+
+```text
+0. DEFINE THE TARGET
+   Asset        : ACME-WEB-01, T1, internet-facing, web shop front end
+   Baseline     : CIS-based profile from the SCAP Security Guide (see
+                  ../tools/hardening-and-configuration-scanning.md)
+   Level choice : Level 1 (sane, low-disruption) applied everywhere, plus selected
+                  Level 2 items where the asset tier justifies them
+   Deviations   : must be documented before the first scan, not discovered by the scan
+
+1. ENFORCE BEFORE YOU SCAN
+   - Rebuild from the current hardened image rather than hardening in place.
+   - Configuration in version control (sshd_config, host firewall, service list,
+     auditd rules), applied by the configuration management tool.
+   - Result: the host arrives approximately compliant; the scan then measures the
+     exceptions rather than producing a 400-item backlog.
+
+2. VERIFY
+   Run the benchmark scan against the profile, save the HTML report for the asset
+   owner and the machine-readable results for the evidence index:
+     sudo oscap xccdf eval --profile <profile-id> \
+       --report /var/tmp/report.html --results /var/tmp/results.xml <data-stream>
+
+3. TRIAGE THE FAILURES
+   Three classes, and they get treated differently:
+     FIX      Something the image or the config should already have set.
+              Fix the image/config, not the host, or it will drift back.
+     DEVIATE  A rule that cannot apply (an unused subsystem, a vendor requirement).
+              Tailor it out with a documented reason and an owner.
+     ACCEPT   A rule whose remediation would break the application. This is a risk
+              acceptance with an expiry date, not a silent exception.
+
+4. RE-SCAN AND RECORD
+   Re-run the scan; the finding count must fall and the remaining items must all be
+   in class DEVIATE or ACCEPT with a written justification.
+```
+
+Typical first-pass findings on an internet-facing Linux host, and the engineering judgement behind each:
+
+| Rule area | Typical finding | Fix or deviate? |
+|---|---|---|
+| Remote administration | Root login permitted over SSH | **Fix** — `PermitRootLogin no`, key-only authentication, source restriction |
+| Account policy | Password authentication enabled for accounts that should use keys | **Fix** — disable password auth for administrative access |
+| Service exposure | Legacy or unused services listening | **Fix** — remove the package, or stop and disable the unit |
+| Host firewall | Filtering absent or default-allow | **Fix** — default deny with explicit allows, applied from config |
+| Auditing | No audit rules loaded, so no record of privileged activity | **Fix** — keyed rules shipped from configuration management (see [../tools/system-auditing-and-log-integrity](../tools/system-auditing-and-log-integrity.md)) |
+| Time sync | Clock not synchronised | **Fix** — without it, correlation and evidence are unreliable |
+| Unused filesystem modules | Rules requiring modules the workload does not use | **Deviate** if genuinely unused; document the reason in the tailoring file |
+| Kernel parameters tuned for a database | Rules requiring settings this workload must not have | **Accept** — with the application reason recorded and the risk owner named |
+
+The two rules that make this repeatable: **fixes belong in the image or the config management repository**, never in a hand-edited file on one host; and **every remaining failure is either a deviation or an acceptance with a name and an expiry date**, never an unexplained red line in a report.
+
+## Verifying Segmentation Instead of Assuming It
+
+Segmentation is the control most often declared and least often tested. Verify it from the position of an attacker, using the assets you already own.
+
+```text
+Test design (run in a lab that mirrors production rules, or with approval during a window):
+
+  FROM                          TO                                  EXPECTED
+  workstation segment           domain controller, admin ports       BLOCKED
+  workstation segment           database segment, database port      BLOCKED
+  workstation segment           internet, DNS and web               ALLOWED (per policy)
+  DMZ web server                internal application tier, app port  ALLOWED (specific flow only)
+  DMZ web server                database segment, directly           BLOCKED
+  DMZ web server                internal network, arbitrary ports    BLOCKED
+  management segment            every segment, admin ports           ALLOWED (documented admin plane)
+  any segment                   management segment, from below       BLOCKED
+
+  Record for each row: source, destination, port, result, date, rule that governs it.
+  An "expected BLOCKED, observed ALLOWED" row is a finding with an owner -- not a
+  curiosity to be noted in passing.
+```
+
+Two practical cautions: test with the project's own tooling and on hosts you own, and remember that a control verified only by reading the firewall rule set is verified by hypothesis. Rules drift, exceptions accumulate, and a rule that was correct two years ago may permit exactly the path you fear.
+
+## Retention, Volume, and Cost Decisions
+
+Logging architecture is as much an economic decision as a technical one, and administrators are usually the ones who have to defend the bill.
+
+| Data class | Typical need | Retention shape | Cost lever |
+|---|---|---|---|
+| High-value security events (authentication, privilege change, process creation) | Detection, incident reconstruction | Long, searchable hot/warm; immutable copy | Volume reduction by field selection, not by dropping event classes |
+| Network flow records | Scope, lateral movement, exfiltration shape | Medium; aggregated after a period | Flow sampling, aggregation, tiering |
+| Full packet capture | Deep analysis, rare | Short window; keep on evidence only | Capture scope and triggers, not always-on everywhere |
+| Application and database audit logs | Fraud investigation, compliance | Per regulation; often the longest requirement | Field-level filtering with the legal requirement in writing |
+| Cloud control-plane audit trails | Configuration change history, forensics | Long; usually cheap to store, expensive to search | Storage class tiering |
+
+Decisions worth writing down once, so they do not get re-litigated monthly:
+
+- **What we deliberately do not collect**, and why. A documented blind spot is a managed risk; an undocumented one is a future surprise.
+- **Where the immutable copy lives** and what protects it from a compromised administrator (see [08](08-continuity-and-recovery.md)).
+- **What triggers a capture escalation** — which alert or incident type turns on full packet capture for a host or segment.
+- **Who owns the log bill**, and which growth is expected versus anomalous.
+
+## Reviewing a Design: Ten Questions
+
+Use these when someone proposes a new system, a new integration, or a significant change. They are cheap to ask and they surface most of what a review board would find:
+
+```text
+1.  What does this design trust, and what happens when that trust is broken?
+2.  What is the blast radius if this component is fully compromised?
+3.  Where do credentials, keys, and tokens live, and who can read them?
+4.  What fails open, and is that acceptable for each failure mode?
+5.  What is exposed to the internet, and what is the justification?
+6.  What is logged, where do the logs go, and who will read them?
+7.  How is it patched, and how fast can a critical fix reach it?
+8.  How is it backed up, and how have the restores been tested?
+9.  How will we know it is misconfigured or drifting from its baseline?
+10. How is it decommissioned, and what happens to its data at that point?
+```
+
+Question 10 is the one designs usually omit, and it is where a surprising amount of long-term risk lives: services nobody owns, data that outlives its purpose, and credentials that were never revoked.
+
 ## Common Mistakes & Tips
 
 - **Flat networks** — "we have a firewall, so we are segmented." Segmentation is judged by what a compromised workstation can reach; test it with real east-west rules and breach simulations.
@@ -203,6 +322,12 @@ All privileged sign-ins                ->  MFA + sent to SIEM as high-value even
 - **Skipping time sync and log integrity** — skewed or deletable logs destroy your only forensic advantage.
 - **Tip**: segment and harden with the "blast radius" question in mind: if this one host is compromised, what is the maximum damage? Design so the answer shrinks every quarter.
 - **Tip**: document every deviation from baseline with an owner and an expiry date — undated exceptions become permanent holes.
+- **Hardening a host instead of an image.** A hand-fixed host drifts back at the next rebuild; the image is the unit of enforcement. Fix the source, then the host.
+- **Treating a scan's red lines as a to-do list for the host.** Repeated failures usually mean the image, the configuration management, or the baseline choice is wrong — not that the host is stubborn.
+- **Declaring segmentation because rules exist.** Verify from the attacker's position on both sides of the boundary, and record the result with a date and the governing rule.
+- **No documented "what we do not collect".** Undocumented blind spots get discovered during an incident, at the worst possible moment. Write them down while the environment is calm.
+- **Ignoring decommissioning in design reviews.** Unretired services, data, and credentials are how exposure grows while the estate appears to shrink.
+- **Tip**: keep the configuration baseline in version control and treat a baseline change as a reviewed change; the diff history is evidence and it explains the estate's state to the next engineer.
 
 ## Checklist / Self-Test
 
@@ -214,6 +339,11 @@ All privileged sign-ins                ->  MFA + sent to SIEM as high-value even
 - [ ] I can design a logging pipeline: sources, normalization, SIEM, retention, tamper protection.
 - [ ] I can describe identity foundations: lifecycle, MFA, least-privilege administration, service accounts.
 - [ ] I can explain why time sync and detection testing are non-negotiable in a monitoring architecture.
+- [ ] I can run the hardening cycle on one host: choose a baseline level, enforce from configuration, verify with a benchmark scan, and classify every remaining failure as fix, deviate, or accept.
+- [ ] I can explain why a fix belongs in the image or configuration repository rather than on the host.
+- [ ] I can design a segmentation test matrix with expected results and describe what a "blocked, but allowed in practice" result means.
+- [ ] I can make and document retention decisions for five log classes, including one deliberate blind spot.
+- [ ] I can ask the ten design-review questions of a proposed system and name the one designs usually omit.
 
 ## Further Resources
 

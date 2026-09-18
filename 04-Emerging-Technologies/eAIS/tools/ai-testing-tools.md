@@ -4,6 +4,10 @@
 
 ## Purpose
 
+> **Syntax reference only — nothing here was executed.** No command in this file was
+> executed while writing it: this machine has no local model server, no API keys, and no
+> GPU. Every invocation is a syntax reference to run in your own lab.
+
 This file maps the AI security tooling landscape so you can pick the right instrument for
 a job: automated scanning of a model endpoint, structured red-team campaigns, adversarial
 research on a local model, regression-style evaluation of an app, or runtime guardrails.
@@ -17,16 +21,62 @@ the project's own documentation.
 
 ## Categories of tooling
 
-| Category | What it does | Representative projects |
-| --- | --- | --- |
-| **Prompt fuzzing / red-teaming suites** | Automatically generate and run many attack prompts against a model or app and flag failures (injection, jailbreaks, data leakage). | garak, Microsoft PyRIT, Promptfoo (red-team mode) |
-| **Evaluation frameworks** | Define test cases with expected behavior, run them repeatedly, and report pass/fail and regressions — the "unit tests" of an AI app. | Promptfoo, DeepEval, Giskard, OpenAI Evals |
-| **Adversarial robustness libraries** | Research-oriented frameworks that craft adversarial examples against ML/NLP models to measure robustness. | TextAttack, IBM Adversarial Robustness Toolbox (ART) |
-| **Guardrails / runtime filters** | Components that sit between the user, the model, and the app to enforce policy on inputs and outputs at runtime. | NVIDIA NeMo Guardrails (concept), Guardrails AI, Llama Guard models |
+| Category | What it does | Artifact it produces | Representative projects |
+| --- | --- | --- | --- |
+| **Prompt fuzzing / red-teaming suites** | Automatically generate and run many attack prompts against a model or app and flag failures (injection, jailbreaks, data leakage). | A scan or campaign report: which probes/attacks failed, per-detector scores, and the raw attempts behind each hit. | garak, Microsoft PyRIT, Promptfoo (red-team mode) |
+| **Evaluation frameworks** | Define test cases with expected behavior, run them repeatedly, and report pass/fail and regressions — the "unit tests" of an AI app. | A per-case result set (machine-readable, e.g. JSON/CSV) plus a pass/fail summary you can gate a build on. | Promptfoo, DeepEval, Giskard, OpenAI Evals |
+| **Adversarial robustness libraries** | Research-oriented frameworks that craft adversarial examples against ML/NLP models to measure robustness. | Perturbed inputs and a robustness figure per attack recipe — a measurement, not an operational report. | TextAttack, IBM Adversarial Robustness Toolbox (ART) |
+| **Guardrails / runtime filters** | Components that sit between the user, the model, and the app to enforce policy on inputs and outputs at runtime. | A decision per input/output (allow, block, rewrite) in the application's own logs, plus the cases that assert each rail. | NVIDIA NeMo Guardrails (concept), Guardrails AI, Llama Guard models |
+| **Vector store / retrieval security tooling** | Inspects the retrieval half of a RAG app: which chunks a query actually pulls, with which scores, from which document — the evidence for poisoned, over-broad, or cross-tenant retrieval. | A retrieval trace per query: query → chunk IDs → similarity scores → source document and its provenance metadata. | The retrieval layer of your own app, exercised with retrieval-specific cases in Promptfoo or DeepEval (confirm each project's current RAG support in its docs). |
+| **Observability and tracing** | Records what a session actually did — prompt, retrieved context, model, tool calls, latency, tokens — so a finding can be reconstructed after the fact. | Traces and queryable logs, plus the dashboards or queries you build on top of them. | Instrumentation in your own app (Flask middleware writing prompt/response records) and the run artifacts of evaluation frameworks. Hosted LLM observability platforms exist; review licensing, retention, and data residency before sending production prompts to one. |
+| **Agent / tool sandbox harnesses** | A controllable target where the model's tools are fake but the side effects are observable — the only safe way to prove a tool was called with attacker-chosen arguments. | A transcript of tool calls with their arguments and the harness's recorded effects, correlated with the prompt that caused them. | Your own harness (Flask lab target with stub tools and fake credentials), driven by PyRIT orchestrators or Promptfoo cases. |
+| **Test-corpus management** | Keeps the cases themselves: stable IDs, intent, expected safe behaviour, and the rubric, under version control so runs are comparable. | A versioned corpus file (one case per line) with an ID, the prompt, the expected behaviour, and the label scheme. | The `prompts.jsonl` contract in `../labs/llm-testing.md`, extended; Promptfoo test files and PyRIT datasets for the same job. |
 
 The boundary between categories blurs: Promptfoo is both an evaluation framework and a
 red-teaming tool; PyRIT orchestrates attacks but also scores them. Choose by *workflow*,
-not by label.
+not by label. The three offensive tools are developed in depth — commands, output, failure
+diagnosis — in `offensive-scanners.md`; this file stays at the level of categories and
+selection, and the runtime side of defense is the subject of `../methodology/05-defensive-controls.md`.
+
+## Before you install anything
+
+Installing a scanner is the cheap part; containing it is the work. Decide these five things
+before the first command, and record the answers next to your results:
+
+1. **Isolation.** Run the tool in a disposable VM, container, or at least a separate user
+   account with no access to real data, no production credentials, and no route into
+   internal networks. A scanner that pulls a retrieved document and sends it to a model
+   endpoint is an exfiltration path you built yourself.
+2. **Local endpoint, or a throwaway key.** A local model (the Ollama server on
+   `http://localhost:11434`, or any OpenAI-compatible server) removes cost and
+   terms-of-service ambiguity and lets you re-run the same test tomorrow. If only a hosted
+   model answers your question, create a throwaway key in a sandbox project — never a
+   production key — and read the provider's terms before pointing an automated attacker at
+   it: many prohibit automated red teaming.
+3. **A spend cap you cannot exceed.** Set the provider-side hard limit *and* a local
+   stop-loss, because a campaign is multiplicative: cases × variants × providers × attempts
+   = requests. Cost per query is the budget line that surprises people; on a hosted model a
+   modest-looking case set becomes thousands of paid generations.
+4. **Terms of service and authorization.** "It is my application" answers the legal
+   question, not the provider's. Self-hosted and local models have no such constraint, which
+   is one more reason the lab default is local.
+5. **A pinned tool version.** Scanners change probe sets, detector names, flags, and scoring
+   between releases. Pin the version you installed (and, for Node tools, a fixed version
+   rather than always fetching the newest), record it in the run record, and re-read the
+   project's current docs. Two scans produced by different tool versions are not comparable
+   data: a difference you observe may be the tool, not your system.
+
+Keep the record small and mechanical — one per results file:
+
+```text
+run record — keep with every results file
+date / time        : <when the run started, and its timezone>
+tool and version   : <name> <version as the tool itself reports it>
+target             : <endpoint URL> + <model name and tag>
+corpus / config    : <file> at <git revision or hash>
+parameters         : <temperature, max tokens, probe/plugin set, seed if the tool exposes one>
+result files       : <paths> — partial run? <yes/no, and how many cases completed>
+```
 
 ## Well-known projects (conceptual overview)
 
@@ -143,6 +193,42 @@ Ask yourself these questions first:
 | "Test my app's prompts/RAG/agents in CI" | Promptfoo | Current config schema and red-team subcommands |
 | "Study adversarial examples on a local NLP model" | TextAttack | Current model/dataset/recipe support |
 | "Block bad inputs/outputs at runtime" | NeMo Guardrails or similar | Current config language and integration path |
+| "Prove the app retrieves chunks it should not" | Retrieval tracing in your own app, driven by retrieval-specific test cases | That the trace records chunk IDs, scores, and source provenance — without those, a "leak" is not provable |
+| "Reconstruct what a session actually did" | Instrumentation in the app before any external platform | What is stored, for how long, how it is redacted, and who can read it |
+| "Prove an agent called a tool with attacker-chosen arguments" | An agent/tool sandbox harness with stub tools and fake credentials | That the harness logs arguments *and* effects, not only the final reply |
+| "Make regressions visible release after release" | A versioned corpus plus an evaluation framework | The corpus schema (ID, intent, expected safe behaviour) and where the corpus lives |
+
+The last four rows share one property: the artifact you need is a *record of what happened*,
+not a verdict. If the app does not already log retrieval, tool calls, and decisions, no
+scanner can supply that evidence after the fact — instrument first, then scan.
+
+## From scan to finding
+
+Raw tool output is not a finding. Four gates turn one into the other, and a hit that fails
+any gate is a note in your log, not a result:
+
+| Gate | What it means | What it eliminates |
+| --- | --- | --- |
+| **Reproduce it by hand** | You can send the same input yourself — one request, one case ID — and get the failing behaviour. | Detector false positives, stale payload files, artifacts only the tool can trigger. |
+| **Isolate the variable** | You know the single change that makes the failure go away: the guardrail, the prompt template, the retrieval filter, the model version. | "Something about the app" findings nobody can act on. |
+| **Measure before and after** | You have a count or rate on both sides of the change, over a corpus rather than one prompt. | Anecdotes presented as improvements. |
+| **Name the control** | You can state the mitigation in one sentence a developer could implement, and what it leaves uncovered. | Findings that end at "use guardrails". |
+
+The write-up that survives review is short and mostly made of facts you already collected:
+
+```text
+Finding : <one sentence: what an attacker gains>
+Target  : <app/endpoint, model name and tag, tool + version, date>
+Repro   : <the exact request or case ID that fails, and the signature in the response>
+Before  : <n of total cases failed, or the observed behaviour>
+After   : <the same measurement with the candidate control applied>
+Control : <the change, where it lives, and the residual risk it leaves>
+Not tested: <the surfaces you did not cover — say so explicitly>
+```
+
+"Not tested" is not a weakness in the report; it is the boundary that keeps the finding
+honest. A scanner run you cannot describe in these terms is raw material for the next run,
+nothing more — see `offensive-scanners.md` for how each tool feeds this pipeline.
 
 ## Common Mistakes & Tips
 
@@ -162,16 +248,34 @@ Ask yourself these questions first:
   automated scanning with manual review of your app's architecture.
 - **Running payloads from memory.** Public jailbreak templates are training data for the
   models they target. Generate variants programmatically instead of pasting stale ones.
+- **Comparing results from different tool versions.** Probe sets, detector names, and
+  defaults move between releases, so a "regression" may be nothing but a scanner update.
+  Pin the version, record it, and re-baseline whenever you upgrade the tool.
+- **Treating a scanner as coverage.** A clean run means the installed probes found nothing
+  on this target with these parameters — not that the application is safe. Name the surfaces
+  the run did not touch: your retrieval layer, your tool permissions, your language, your
+  domain vocabulary.
+- **Ignoring cost per query.** Probes × variants × providers multiplies faster than anyone
+  expects, and rate limits and timeouts can look like refusals in a report. Cap the spend at
+  the provider, cap the attempts locally, and count error rows before computing any rate.
 
 ## Checklist / Self-Test
 
-- [ ] I can name the four tool categories and give one project for each.
+- [ ] I can name the tool categories in the table above, say which artifact each produces,
+  and give one project for each.
 - [ ] I can explain the difference between garak and PyRIT (scan vs. orchestrated campaign).
 - [ ] I have run at least one automated scan (e.g., garak or Promptfoo red team) against a model I control.
 - [ ] I can write (or adapt from current docs) a small Promptfoo or PyRIT test case.
 - [ ] I understand where guardrails fit at runtime and can describe input vs. output rails.
 - [ ] I know how to verify that a tool's current CLI matches its documentation before running it.
 - [ ] I can explain which tool I would pick for a CI regression test vs. a one-off scan, and why.
+- [ ] Every results file I keep has a run record: tool and version, model name and tag,
+  corpus revision, parameters, date, and whether the run was partial.
+- [ ] I turned at least one scanner hit into a finding by reproducing it by hand, isolating
+  the variable, and measuring before and after the fix.
+- [ ] I can state, for my most recent test, which surfaces it did *not* cover.
+- [ ] I know my spend cap and attempt cap before starting a campaign, and where the numbers
+  for the last run came from.
 
 ## Further Resources
 
@@ -183,3 +287,9 @@ Ask yourself these questions first:
 - [Promptfoo](https://github.com/promptfoo/promptfoo)
 - [TextAttack (QData)](https://github.com/QData/TextAttack)
 - [NVIDIA NeMo Guardrails](https://github.com/NVIDIA/NeMo-Guardrails)
+- [NIST AI 600-1 — Generative AI Profile of the AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1)
+- OWASP GenAI Security Project — the project that maintains the LLM Top 10 above; use its
+  current guidance when mapping findings: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- [INE Security — eAIS (AI Systems Security Specialist) official certification page](https://ine.com/security/certifications/eais-certification)
+- In-repo: `offensive-scanners.md` (depth on garak, PyRIT, and Promptfoo) and
+  `../labs/llm-testing.md` (the local lab where these runs belong).

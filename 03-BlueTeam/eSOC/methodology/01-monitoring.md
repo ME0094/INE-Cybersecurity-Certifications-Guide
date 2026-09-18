@@ -136,21 +136,40 @@ An alert is a *use case*: a detection condition plus the metadata an analyst nee
 - **Thresholds with time windows:** "5+ failed logons for one user within 15 minutes" beats "failed logon = true" noise.
 - **Every alert carries context:** who/what/where plus links to the raw events, assigned priority, and the playbook reference.
 
-Pseudo-detection-rule for a password-spray pattern (Sigma-style logic):
+Password-spray correlation is *pseudocode* below, not Sigma. Sigma has no `timeframe` or `count()` operator: a single rule describes the condition on one event, and correlation across events belongs to the backend (an Elastic Security threshold rule, a Splunk `stats` search, a Sentinel `summarize`). Read the block as the logic you are implementing, then write it in your platform — the valid, copyable syntax lives in `../tools/detection-rules/sigma-rules/`.
 
 ```yaml
-title: Suspicious Failed Logons Followed by Success — Possible Password Spray
+# NOT VALID SIGMA — pseudocode for the correlation to implement in the backend
+title: Failed Logons Followed by Success — Possible Password Spray
 logsource:
   product: windows
   service: security
 detection:
   selection_fail:
-    EventID: 4625
+    EventID: 4625        # note: the Windows Security schema names the source field
+    IpAddress: '*'       # "IpAddress", not "src_ip"; check the real schema before writing
   selection_success:
     EventID: 4624
-  timeframe: 15m
-  condition: selection_fail | count() by src_ip > 5 and selection_success by same user
+  timeframe: 15m         # backend concept, not a Sigma key
+  condition: count(selection_fail by IpAddress) > 5 and selection_success
 level: medium
+```
+
+Backend forms of that same correlation, all valid syntax for their own language:
+
+```spl
+# Splunk SPL: spray from one source, then a success for any of the targeted users
+index=windows (EventCode=4625 OR EventCode=4624)
+| stats count(eval(EventCode=4625)) as fails, count(eval(EventCode=4624)) as oks by IpAddress, Account
+| where fails > 5 and oks > 0
+```
+
+```kusto
+// Microsoft Sentinel KQL
+SecurityEvent
+| where EventID in (4625, 4624)
+| summarize Fails = countif(EventID == 4625), Oks = countif(EventID == 4624) by IpAddress, Account
+| where Fails > 5 and Oks > 0
 ```
 
 Alert metrics to watch: **false positive rate**, **time-to-acknowledge**, **time-to-detect (MTTD)**, and **coverage** (ATT&CK techniques with at least one detection). If an alert has never fired or never been confirmed, tune or retire it.
@@ -174,6 +193,129 @@ alert.severity:high AND alert.status:open
 
 Rules of thumb: keep fewer than a dozen well-curated panels per board; every panel must answer an operational question; add a "last updated" timestamp panel so stale data is obvious.
 
+## Coverage: What You Can and Cannot See
+
+Detection coverage is a property of *data* before it is a property of rules. The table below is the one to keep in mind when you wonder why a rule never fires: for each tactic, it names the source that has to be collected for the behaviour to be visible at all.
+
+| ATT&CK tactic | What the analyst must be able to see | Sources that carry it | Blind spot when the source is missing |
+|---|---|---|---|
+| Initial Access | A logon made with explicit credentials; the delivery channel | Security 4648; proxy and mail-gateway logs | Delivery is invisible, so the first visible event becomes *execution* and you lose the "how did they get in" answer |
+| Execution | Which process started, with which command line | 4688 **with command-line auditing enabled**, Sysmon 1 | You learn that something ran but never how it was invoked |
+| Persistence | Service installs, scheduled-task creation, autostart registry writes | 4697 / System 7045, 4698, Sysmon 13 | Persistence becomes visible only when it acts, usually much later |
+| Privilege Escalation | Special privileges assigned, token and process access | 4672, Sysmon 10 | Escalation is inferred from later behaviour instead of observed |
+| Defense Evasion | Log clearing, AV/AMSI/ETW tampering, config changes | Security 1102, System 104, Defender 5001/5007, Sysmon 12/13 | You cannot distinguish *the attacker removed the data* from *we never had it* |
+| Credential Access | Access to LSASS, Kerberos ticket requests | Sysmon 10, Security 4768/4769/4771 | Theft stays invisible until the stolen account is used somewhere else |
+| Discovery | Enumeration commands and their targets | Sysmon 1, 4688 with command line, `auditd` execve | Reconnaissance becomes indistinguishable from routine administration |
+| Lateral Movement | Remote service creation, remote logons, admin-share access | 7045, 4624 type 10 and 3, 5140/5145 | Movement surfaces only as a fresh alert on the destination host |
+| Command and Control | Outbound connections attributed to a **process** | Sysmon 3, EDR network telemetry, proxy and DNS logs | You see traffic with no owner process, which is a lead, not a finding |
+| Exfiltration | Volume per host, destination and process | Flow records (NetFlow/IPFIX), proxy logs, Sysmon 3 | Volume baselines are the most commonly missing exfiltration control |
+
+> The gap that hurts most is rarely a missing tool; it is a collected channel that is *half* collected. `4688` without command-line auditing, Sysmon installed with a narrow configuration, or PowerShell script-block logging enabled only on some hosts all produce a source that looks present in the dashboard and answers nothing.
+
+**Validate coverage by generating the event, not by reading the dashboard.** The procedure below is written for a lab you own; it runs the same way in production, with authorization, and it is the only way to tell "no activity" from "no data". None of these commands was executed while writing this note — there is no SIEM or event log on the machine that produced this document, so the outputs are what you should go and confirm for yourself.
+
+```powershell
+# 1. Confirm the channel exists and is switched on (Windows endpoint, elevated)
+Get-WinEvent -ListLog Security, System, "Microsoft-Windows-Sysmon/Operational" |
+    Select-Object LogName, IsEnabled, RecordCount, MaximumSizeInBytes
+
+# 2. Confirm the audit subcategory that feeds 4688 is actually enabled
+#    (command-line inclusion is a PolicyChange/ProcessCreation setting, not a default)
+auditpol /get /subcategory:"Process Creation"
+
+# 3. Generate one known-good event and note the exact UTC time
+cmd /c whoami        # produces a process-creation event with a recognisable command line
+
+# 4. Prove the pipeline, not just the host: search for it in the SIEM
+#    (Kibana KQL example - the host must be the one from step 3)
+#    process.command_line : "*whoami*" and host.name : "win-lab-01"
+```
+
+Read the result in two directions: the endpoint must show the event *and* the SIEM must show the same event with the same timestamp and a parsed `user.name` / `process.name`. If the endpoint has it and the SIEM does not, the problem is collection, not detection. If both have it but the fields are empty, the problem is parsing. Record the outcome as a dated coverage note — "4688 with command line: verified 2025-06-01" is a fact you can rely on next quarter.
+
+## Choosing What to Collect (and What Not To)
+
+"Collect everything" is not a strategy; it is a storage bill with a search problem attached. Decide per channel, and write the decision down so the next analyst knows what was deliberate.
+
+| Channel | Collect? | Why |
+|---|---|---|
+| Security log, process creation, logons, account changes, Kerberos | Yes, full | Highest-value triage evidence per stored byte |
+| Sysmon 1/3/11/13/22 at minimum | Yes, tuned by config | Turns process creation into a story with parents, paths, network and DNS |
+| PowerShell 4104 script block | Yes | The only record of script content that never touched disk |
+| System log (7045, 104, 1074) | Yes | Service persistence and log clearing live here |
+| Defender/AV operational log | Yes | Detection *and* tampering (5001, 5007) both matter |
+| Firewall allow logs on internal east–west links | Yes if volume allows | Lateral movement and C2 egress are found here |
+| DNS query logs | Yes, with retention | Fastest cheap indicator of beaconing and tunnelling |
+| Object-access auditing (4663) on all file servers | Usually no, by default | Enormous volume; enable per-share for a defined investigation window instead |
+| Verbose/debug informational channels, print spoolers, legacy app logs | No | Cost without triage value; document the exclusion |
+| Full packet capture everywhere | Only at chokepoints | PCAP is the most expensive byte you can store; keep it where the hypothesis needs it |
+
+Three rules that keep this decision defensible:
+
+1. **Volume is a coverage decision too.** A channel that pushes the indexer past capacity will be dropped by someone at 3 a.m. during an incident, and that is how blind spots appear. Size retention deliberately.
+2. **Record the exclusions.** A documented "we do not collect object access except on demand" is a known gap; an undocumented one is a surprise during an audit.
+3. **Separate "collect" from "alert".** Collecting a channel costs storage; alerting on it costs analyst attention. High-volume channels are worth *storing* long before they are worth *alerting* on — you cannot retro-hunt what you never stored.
+
+## Worked Example: Diagnosing a Silent Detection
+
+A rule that has never fired in 90 days is either an excellent rule in a quiet environment or a broken pipeline. Work the chain in order, and stop at the first break.
+
+| Symptom | Most likely cause | Where to check first |
+|---|---|---|
+| Endpoint has the event; SIEM has nothing for that host | Agent stopped, buffering, or the host is in no collection policy | Agent service state and its log, then the collector's ingest rate for that host |
+| SIEM has events from the host, but not this event code | Channel not in the collection configuration | The agent/pipeline configuration for that channel |
+| Events arrive, but the fields the rule uses are empty | Parsing or normalization break (field renamed, message format changed) | Expand one raw event; compare actual field names to the names in the rule |
+| Fields are populated, but the rule still does not match | Rule logic wrong for the data (case sensitivity, field type, path separators) | Re-run the rule's condition by hand as a plain search |
+| Rule matches in the search bar but no alert appears | Detection engine not enabled for that rule, wrong index pattern, or a suppression filter swallowing it | Rule status, index pattern, and any active suppression/exception list |
+| Alert appears but with the wrong timestamp | Timezone or timestamp-source misconfiguration | Compare `@timestamp` with the event's own `TimeCreated` field |
+| Everything works, the rule is correct, nobody has done this | Genuinely quiet | Check the rule's ATT&CK technique against the environment's exposure, then decide whether to keep it |
+
+The general principle: **a silent rule is a hypothesis about your data, not a conclusion about your adversary.** Prove the data first, then the rule, then the behaviour — in that order.
+
+```text
+Silent rule
+   |-> Does the endpoint produce the event?            no -> collection problem
+   |-> Does the SIEM receive it for that host?         no -> ingestion problem
+   |-> Are the rule's fields populated?                no -> parsing problem
+   |-> Does the raw search match the logic?            no -> rule problem
+   |-> Is the rule enabled on the right index?         no -> engine problem
+   V
+Rule is fine: the technique is either not present or not exposed
+```
+
+## Time Discipline in Practice
+
+Every event carries more than one timestamp, and confusing them is the most common cause of a timeline that does not add up.
+
+| Timestamp | Meaning | Trust it for |
+|---|---|---|
+| Event time (`TimeCreated`, `@timestamp` after parsing) | When the host says it happened | Ordering events on one host |
+| Host clock vs NTP | Whether the host's idea of now is correct | Cross-host correlation — a skewed host silently reorders your timeline |
+| Ingest time (`event.ingested`, `_index_time`) | When the platform received it | Diagnosing lag and backfill, never for the story |
+| Display time | The analyst's local rendering | Nothing. Convert to UTC before you write a note |
+
+Practical consequences:
+
+- **Always reason in UTC and state the offset when you write the timeline.** "02:14" is ambiguous; "02:14 UTC (04:14 local)" is evidence.
+- **A burst of events with one ingest timestamp is a backfill, not an attack.** When agents reconnect after an outage, hundreds of old events arrive at once. Check `event.ingested` before you get excited about the spike.
+- **Clock skew is a coverage gap.** If two hosts disagree by minutes, every sequence-based detection (failed logon *then* success) can fail silently on that pair. NTP is a security control, not housekeeping.
+- **Missing events inside a window you expected traffic in are themselves findings.** A gap in a normally chatty channel is evidence of collection failure or of log tampering; note it either way.
+
+## Alert Queue Health
+
+The queue is the analyst's actual working surface, and its shape predicts whether real alerts get missed. Watch for these signals rather than waiting for them to be reported:
+
+| Signal | What it usually means | Reasonable response |
+|---|---|---|
+| One rule is more than ~30 % of the queue | Threshold or exclusion is wrong | Take the rule out of the queue and fix it at the source |
+| Queue depth grows faster than analysts can clear it for a week | Detection volume exceeds staffing | Prioritize aggressively and escalate the tuning backlog as a work item, not a complaint |
+| Many alerts share one host, one user, or one subnet | A local condition (broken app, new deployment, scanner) | One investigation, one suppression with an expiry, not N separate closures |
+| Alerts with no owner for hours | Acknowledge SLA is not being respected | Escalation path problem; fix the rotation, not the queue |
+| Alerts closed as false positive with no reason text | Tuning signal being thrown away | Treat as a quality defect; the reason is the input to the next fix |
+| Rules that have never fired or never confirmed | Either bad logic or the technique is not exposed | Quarterly review: fix, retire, or document why it stays |
+
+Prioritization discipline for a full queue: work **severity × blast radius × time-sensitivity**, not arrival order. A medium-severity alert on a domain controller outranks a high-severity alert on an isolated lab subnet; an alert that is still ongoing outranks one that finished six hours ago.
+
 ## Common Mistakes & Tips
 
 - **Mistake:** trusting alert content without validating the underlying events. *Tip:* always open the raw events; alert logic and parsers drift.
@@ -182,6 +324,10 @@ Rules of thumb: keep fewer than a dozen well-curated panels per board; every pan
 - **Mistake:** treating dashboards as decoration. *Tip:* define the one question per panel and review the board in every shift handover.
 - **Mistake:** fixed thresholds that never change. *Tip:* review baseline windows regularly and document why a threshold is what it is.
 - **Mistake:** no test of the pipeline. *Tip:* periodically generate known events (failed logon, `whoami` execution) and confirm they arrive parsed and searchable — a "canary log" test.
+- **Mistake:** treating "collect everything" as a strategy. *Tip:* decide per channel, write down the exclusions, and remember that an indexer pushed past capacity will have channels dropped during the incident, not before it.
+- **Mistake:** reading a dashboard as proof of coverage. *Tip:* dashboards show what arrived; only a generated-and-found event proves the path works end to end.
+- **Mistake:** reasoning about a spike without checking ingest time. *Tip:* a burst with one `event.ingested` value is a backfill after an agent outage, not an attack.
+- **Mistake:** letting one noisy rule own the queue. *Tip:* measure alert share per rule; a rule at a third of the queue is a tuning defect that hides everything behind it.
 
 ## Checklist / Self-Test
 
@@ -193,6 +339,11 @@ Rules of thumb: keep fewer than a dozen well-curated panels per board; every pan
 - [ ] I can list three metrics that indicate a detection rule is unhealthy (noise or silence).
 - [ ] I know which of my organization's critical assets are NOT currently sending logs to the SIEM.
 - [ ] I can map one monitoring gap in my environment to the MITRE ATT&CK techniques it would hide.
+- [ ] I can fill the coverage table for execution, credential access, and C2 from memory and name the source that carries each one.
+- [ ] I have generated a known event and confirmed it arrived in the SIEM parsed, with the host clock within seconds of NTP.
+- [ ] I can walk the silent-detection chain (endpoint → ingest → parse → rule → engine) and name the check for each step.
+- [ ] I can explain the difference between event time, ingest time, and display time, and which one belongs in my notes.
+- [ ] I can name the channels I deliberately do not collect, and why.
 
 ## Further Resources
 

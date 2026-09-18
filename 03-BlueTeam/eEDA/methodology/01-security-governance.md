@@ -1,6 +1,8 @@
 # Security Governance
 
 > eEDA · Methodology — Enterprise Defense Administrator
+>
+> Phase 01 of nine. Governance is the frame every later phase hangs from: it decides, and phases [05](05-asset-inventory-and-configuration.md) to [09](09-soc-and-incident-response-interface.md) execute those decisions as inventories, access control, patching, recovery, and detection.
 
 ## Purpose
 
@@ -138,6 +140,92 @@ Security KPI Dashboard — Q3
 
 The same data serves different audiences: technical detail for the security team, risk-level summaries for the CISO, and trend lines plus exception notes for the board. Never let a metric become a surprise at the board meeting — escalate negative trends as they develop.
 
+## Translating Findings into Board Language
+
+The most common failure in security reporting is not bad data; it is untranslated data. The board does not fund a control, it funds an outcome. Practise the translation until it is automatic:
+
+| Technical finding | Business exposure (the board line) | The ask |
+|---|---|---|
+| "MFA is not enforced on 3 of 214 privileged accounts" | "Three administrator accounts can be taken over with a stolen password; those accounts can reach customer data." | Approve the 3-week remediation project; accept a temporary access freeze |
+| "No tested restore of the ERP backup in 14 months" | "If the ERP is encrypted today, we cannot state when order processing resumes — the recovery objective is unproven." | Fund the standby environment and the quarterly restore test |
+| "18% of endpoints are outside the managed inventory" | "We cannot patch, monitor, or prove compliance for roughly one in five devices, and we do not know what they are." | Approve the discovery-and-onboarding cycle and its owner |
+| "24 findings past the critical patch SLA" | "24 known, fixable weaknesses are open beyond the deadline we set for ourselves; a breach here would be hard to defend as unforeseeable." | Approve the emergency patch window and the exception review |
+| "1,400 audit-log failures per day from the finance segment" | "We are blind in the segment that processes payments, so we cannot say whether it has already been accessed." | Fund the log pipeline fix as an outage-risk item |
+
+Two rules make these lines land. **Name the consequence, not the control** — "we cannot demonstrate recovery" beats "the backup job is unverified". And **always pair the exposure with a specific decision** — a finding presented without an ask becomes an agenda item that recurs every quarter.
+
+## Delegated Authority: Writing Down Who May Decide What
+
+Governance fails quietly when decision rights are assumed. A delegation-of-authority table turns "someone should decide" into a named, bounded decision — and it is the artifact that stops escalation paralysis during an incident.
+
+| Decision | Who decides | Bounded by | Recorded as |
+|---|---|---|---|
+| Approve a policy or a change to a standard | CISO (policy), security architecture board (standards) | Board-approved risk appetite | Version-controlled document with approval record |
+| Accept residual risk on a new system | Business owner with the CISO's concurrence | Risk register entry, reviewed annually | Signed acceptance with expiry |
+| Approve a temporary policy exception | CISO, or the delegate named in the policy | Maximum 90 days before review | Exception register entry |
+| Approve an emergency change outside the CAB | Duty manager + security on-call | Security-relevant changes only, retro-approved within 5 days | Change ticket marked emergency |
+| Isolate a system during a live incident | Incident responder (see [09](09-soc-and-incident-response-interface.md)) | Scope of the declared incident | Incident action log |
+| Approve an unpatched exception past the SLA | Risk owner, not the engineering team (see [07](07-vulnerability-and-patch-management.md)) | Compensating controls documented | Exception with expiry date |
+| Onboard a third party with data access | Data owner + procurement + security review | Data classification and contract clauses | Third-party register entry |
+
+If a table like this does not exist, the practical consequence is that urgent decisions get made by whoever is most senior in the room, and the risk is accepted by nobody in particular.
+
+## Policy Documents: The Artifact and Its Control Fields
+
+Auditors do not assess intent; they assess documents. Every policy, standard, and procedure you write needs the same control block, because a document without it cannot be shown to be current, owned, or approved.
+
+```markdown
+# <Organization> — <Policy title>
+
+| Field | Value |
+|---|---|
+| Document type | Policy / Standard / Procedure / Guideline |
+| Document ID | SEC-POL-004 |
+| Version | 1.2 |
+| Owner (accountable) | CISO |
+| Author (responsible) | Security Governance Lead |
+| Approved by / date | Executive Committee / 2026-02-14 |
+| Effective date | 2026-03-01 |
+| Next review date | 2027-03-01 (or on material change) |
+| Related frameworks | ISO/IEC 27001:2022 A.5.1; NIST CSF 2.0 GV.PO; CIS Controls v8 control 5 |
+| Related documents | SEC-STD-011 MFA standard; SEC-PR-020 MFA enrolment procedure |
+| Exceptions register | EXC-REG-2026 (see section 6) |
+
+## 1. Purpose
+## 2. Scope (who and what it applies to; what is explicitly out of scope)
+## 3. Policy statements (numbered, testable requirements)
+## 4. Roles and responsibilities (mapped to the governance RACI)
+## 5. Compliance and enforcement (who monitors, what happens on breach)
+## 6. Exceptions (how to request one, who approves, maximum duration)
+## 7. Related documents and revision history
+```
+
+Two quality tests to apply before publication:
+
+- **Testability.** "Systems must be secure" cannot be audited. "All remote access is authenticated with MFA; enrolments are recorded in the identity platform" can be sampled.
+- **Traceability.** Each numbered statement should trace upward to a framework requirement and downward to a control, an owner, and (eventually) evidence. That chain is what makes an audit a formality rather than a fire drill (see [03-compliance-basics](03-compliance-basics.md)).
+
+## Governing the Exceptions
+
+The exception process is the part of governance that actually gets exercised, and the part most often improvised. Govern it explicitly:
+
+```text
+1. REQUEST      The requester states which policy statement or standard cannot be met,
+                on which assets, for how long, and why.
+2. ASSESS       Security states the risk in business terms and proposes compensating
+                controls (see the exception fields in ../labs/risk-exception-writeup.md).
+3. DECIDE       The risk owner named in the delegation-of-authority table accepts or
+                rejects the residual risk. The engineer does not accept their own risk.
+4. TIME-BOX     Every exception has an expiry date. Renewal is a new decision, not an
+                automatic extension.
+5. MONITOR      Exceptions are counted, reported and reviewed with the other risks.
+                A rising exception count is a strategy finding, not an administrative one.
+6. CLOSE        When the underlying issue is fixed, the exception closes with the
+                remediation evidence attached.
+```
+
+The metric to watch is not the number of exceptions but their **age distribution**: a cluster of exceptions renewed for the third time is a project that has been avoided for two years, and it belongs on the risk committee's agenda rather than in a spreadsheet.
+
 ## Common Mistakes & Tips
 
 - **Policies written by one person and never approved** — an unapproved policy has no authority. Route drafts through legal, HR, and the affected business owners, then to the CISO/board for sign-off.
@@ -147,6 +235,11 @@ The same data serves different audiences: technical detail for the security team
 - **CISO without board access** — if the CISO reports only through the CIO, resource conflicts are rarely escalated. Establish an independent reporting line.
 - **Tip**: publish policies in a central, version-controlled location with effective dates and an owner named on each document.
 - **Tip**: rehearse one board-quality metric pack per quarter so that when an incident happens, the reporting muscle already exists.
+- **Reporting a finding without an ask.** A board paper that ends in "we will monitor" produces no decision and returns next quarter. End each item with the decision you want.
+- **Assuming decision rights instead of writing them down.** Without a delegation-of-authority table, risk gets accepted by whoever is most senior in the room, and no one is accountable afterwards.
+- **Exceptions managed in email.** An exception that is not in a register with an expiry date is an undocumented, permanent policy deviation. Register it, count it, review it.
+- **Documents without a control block.** A policy with no owner, version, approval date, or review date will fail its first audit regardless of how good its content is.
+- **Tip**: number every policy statement so that exceptions, findings, and audit samples can cite "statement 4.3" instead of "the part about MFA".
 
 ## Checklist / Self-Test
 
@@ -158,6 +251,11 @@ The same data serves different audiences: technical detail for the security team
 - [ ] I can draft a SMART security objective tied to a business goal.
 - [ ] I can build a 6–8 KPI executive scorecard and define one metric's source, formula, and owner.
 - [ ] I can explain why outcome metrics matter more than activity metrics in board reporting.
+- [ ] I can rewrite a technical finding as a board line with a named business exposure and a specific ask.
+- [ ] I can draft a delegation-of-authority table naming who decides policy, exceptions, emergency changes, and risk acceptance.
+- [ ] I can produce a policy document control block with owner, version, approval, and review dates, and map it to at least one framework requirement.
+- [ ] I can describe the six steps of the exception process and explain why the engineer must not accept their own risk.
+- [ ] I can explain what the age distribution of open exceptions tells you that their count does not.
 
 ## Further Resources
 

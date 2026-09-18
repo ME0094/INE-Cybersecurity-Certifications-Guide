@@ -53,9 +53,18 @@ eSOC/
 │   ├── 01-monitoring.md
 │   ├── 02-detection.md
 │   ├── 03-investigation.md
-│   └── 04-response.md
+│   ├── 04-response.md
+│   ├── 05-use-cases-and-tuning.md
+│   ├── 06-threat-intel-and-enrichment.md
+│   ├── 07-soc-metrics.md
+│   └── 08-shift-handover-and-case-notes.md
 ├── tools/                     <- Tooling you will operate
 │   ├── siem-tools.md
+│   ├── query-languages.md
+│   ├── edr-and-endpoint-telemetry.md
+│   ├── enrichment-and-ti-tools.md
+│   ├── case-management.md
+│   ├── automation-and-soar.md
 │   └── detection-rules/
 │       ├── sigma-rules/
 │       │   ├── .gitkeep
@@ -64,16 +73,18 @@ eSOC/
 │           ├── .gitkeep
 │           └── yara-example.yar
 ├── labs/                      <- Build it, break it, detect it
-│   └── soc-scenarios.md
+│   ├── soc-scenarios.md
+│   ├── sigma-rule-tuning.md
+│   └── anomalous-logon-investigation.md
 └── cheatsheets/               <- Quick reference for the desk
     └── alert-triage-guide.md
 ```
 
 Suggested order of attack:
 
-1. **Read the methodology files** (`methodology/01` → `04`) to learn the vocabulary and the analyst's mental model. Take notes as you go.
-2. **Study the tooling files** (`tools/siem-tools.md`, then the example Sigma and YARA rules) with the official docs open in another tab.
-3. **Build the lab** described in `labs/soc-scenarios.md` and run every drill until the expected outcomes match reality.
+1. **Read the methodology files** (`methodology/01` → `08`) to learn the vocabulary and the analyst's mental model. Take notes as you go. Phases 5–8 carry on past the day-one loop: [05-use-cases-and-tuning](methodology/05-use-cases-and-tuning.md) is about keeping a rule alive — its lifecycle, the tuning backlog, the quarterly review; [06-threat-intel-and-enrichment](methodology/06-threat-intel-and-enrichment.md) is using threat intelligence in triage honestly — confidence, freshness, provenance; [07-soc-metrics](methodology/07-soc-metrics.md) defines the measures that describe SOC performance and how the same numbers get misread; [08-shift-handover-and-case-notes](methodology/08-shift-handover-and-case-notes.md) covers the handover note, the case note, and the open action register.
+2. **Study the tooling files**, starting with [siem-tools](tools/siem-tools.md) (install a platform, query it, diagnose it), then [query-languages](tools/query-languages.md) (KQL, SPL, EQL and ES|QL side by side, and the syntax traps that quietly return nothing), [edr-and-endpoint-telemetry](tools/edr-and-endpoint-telemetry.md) (reading a process tree, what the console can act on, where EDR coverage ends), [enrichment-and-ti-tools](tools/enrichment-and-ti-tools.md) (MISP, VirusTotal, Shodan, reputation and ownership lookups), [case-management](tools/case-management.md) (TheHive and Cortex: cases, tasks, observables, templates) and [automation-and-soar](tools/automation-and-soar.md) (what to automate, what must stay human, and how a playbook is structured) — with the example Sigma and YARA rules and the official docs open in another tab.
+3. **Build the lab** described in [soc-scenarios](labs/soc-scenarios.md) and run every drill until the expected outcomes match reality, then work the two deeper labs: [sigma-rule-tuning](labs/sigma-rule-tuning.md) follows one case from the triage observation to a tuned, validated Sigma rule, and [anomalous-logon-investigation](labs/anomalous-logon-investigation.md) works an impossible-travel alert and a valid-credential logon across `4624`/`4625`/`4648`/`4672`.
 4. **Print or keep open** the `cheatsheets/alert-triage-guide.md` and use it to triage every alert you generate in the lab — practice the template until it is reflex.
 5. Return to the official INE course to fill any gaps; treat these notes as revision, not as the source of truth.
 
@@ -100,7 +111,7 @@ Repeat the drill week whenever you feel rusty — this is a skill certification,
 
 ## Module Checklist
 
-- [ ] Read all four methodology files and summarize each in my own words.
+- [ ] Read all eight methodology files and summarize each in my own words.
 - [ ] Understand the tier-1 SOC analyst role across monitoring, detection, investigation, and response — and can explain the difference between a SIEM, an EDR, and a SOAR out loud.
 - [ ] Can name at least five Windows Event IDs relevant to SOC work and what each means.
 - [ ] Have a working lab (Elastic Stack or Wazuh) with logs flowing from at least one endpoint.

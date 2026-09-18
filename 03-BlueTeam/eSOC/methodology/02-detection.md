@@ -104,9 +104,10 @@ Detect when an identity behaves out of character. Classic patterns:
 - Service accounts logging on interactively (type 2/10) or at 3 a.m. from a workstation.
 - Kerberoasting indicators: many TGS requests (Event 4769) with RC4 encryption from one account.
 
-Rule logic snippet (single user, many source IPs + success later = possible brute force):
+Rule logic snippet — again pseudocode for a backend correlation, not a valid Sigma rule (no `timeframe`, no `count()` in Sigma; and the field names below are ECS-style `event.code`, which only exist if your pipeline defines them):
 
 ```yaml
+# NOT VALID SIGMA — the backend does the aggregation
 detection:
   selection_fail:
     event.code: 4625
@@ -115,6 +116,8 @@ detection:
   timeframe: 30m
   condition: selection_fail | count() by user.name > 10 and selection_success by user.name
 ```
+
+The honest version of this detection is a **threshold rule in the platform**: group failed logons by account and source over a window, alert when the count crosses the baseline, and add the success event as correlated context rather than as a second condition. In Splunk that is a `stats`/`where` pair; in Sentinel it is `summarize ... by Account, IpAddress`; in Elastic Security it is a threshold rule on the same fields.
 
 ### Beaconing
 
@@ -181,6 +184,155 @@ Low volume, never confirms       -> investigate data source, then retire
 High volume, never confirms      -> likely bad threshold or broken parse
 ```
 
+## The Detection Lifecycle, Stage by Stage
+
+A detection is a small product with a lifecycle. Each stage has an entry condition, a concrete artifact, and an exit condition — without the artifact, the stage did not happen.
+
+| Stage | Entry condition | Artifact you must be able to show | Exit condition |
+|---|---|---|---|
+| 1. Hypothesis | A behaviour worth detecting, from threat intel, an incident, a hunt, or an ATT&CK gap | One sentence: *"An adversary doing X on asset class Y produces Z in source S"* | The behaviour is observable in data you actually collect |
+| 2. Data mapping | The hypothesis names a source | Field list and a sample raw event proving the fields exist and are populated | Every field the logic needs is present, with a known type and case |
+| 3. Rule authoring | Fields confirmed | The rule file (Sigma preferred), with MITRE tag, level, and reference | Rule is syntactically valid and readable by another analyst |
+| 4. Validation (positive) | Rule exists | Evidence that the behaviour was reproduced and the rule fired with the expected fields | True positive confirmed against generated activity |
+| 5. Validation (negative) | Positive case passes | Evidence of a run over a normal period with the alert count recorded | False-positive rate is known and acceptable — not "zero because nobody looked" |
+| 6. Tuning | Known false positives | Each exclusion with a reason, a scope, and an expiry or review date | The rule survives a busy week without owning the queue |
+| 7. Operation | Rule deployed | Owner, severity, playbook link, and expected volume | Alerts are acknowledged and triaged like everything else |
+| 8. Review / retire | Recurring calendar trigger, or a data-source change | Decision recorded: keep, change, or retire — with the numbers behind it | The rule set stays smaller than or equal to the useful set |
+
+> The stage analysts skip is **5**. A rule validated only against the activity that inspired it has an unknown false-positive rate, and an unknown rate becomes someone else's night shift. "It fired when I tested it" is half a validation.
+
+## From a Case to a Rule (Worked Example)
+
+This is the path a detection follows after a real triage, and it is the exact path the laboratory in `../labs/sigma-rule-tuning.md` walks through. The case: a user reported a document that asked them to "enable content"; the endpoint showed Word spawning a script host, which downloaded a file with `certutil`.
+
+**Step 1 — Write the behaviour, not the sample.** The malware hash will change; the parent–child relationship is the durable part. *"An Office application spawning a scripting or download utility as a child process"* — that is the hypothesis, and it covers the whole family rather than one sample.
+
+**Step 2 — Confirm the data.** Process creation with command lines is required. Check one raw event for the fields the rule will use: the child image path, the parent image path, the command line, the user. If `ParentImage` is empty on your collector, the rule cannot work as written and the real fix is upstream.
+
+**Step 3 — Write the rule.** Narrow on the parent (Office products), narrow on the child (script hosts and download utilities), and keep the exclusions explicit:
+
+```yaml
+title: Office Application Spawning a Script or Download Utility
+id: 2f2a5c31-9a7e-4b0d-8c15-7d3f1b9e4a62
+status: experimental
+description: |
+  Detects a Microsoft Office process creating a child process that is a
+  scripting host or a download utility. Typical of a malicious macro that
+  survives the "enable content" prompt.
+references:
+  - https://attack.mitre.org/techniques/T1204/002/
+  - https://attack.mitre.org/techniques/T1218/
+author: SOC detection engineering (study example)
+date: 2025/06/01
+tags:
+  - attack.execution
+  - attack.t1204.002
+  - attack.t1218
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '\winword.exe'
+      - '\excel.exe'
+      - '\powerpnt.exe'
+      - '\outlook.exe'
+      - '\msaccess.exe'
+  selection_child:
+    Image|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+      - '\cmd.exe'
+      - '\wscript.exe'
+      - '\cscript.exe'
+      - '\mshta.exe'
+      - '\rundll32.exe'
+      - '\regsvr32.exe'
+      - '\certutil.exe'
+      - '\bitsadmin.exe'
+      - '\curl.exe'
+  filter_known_addin:
+    ParentImage|endswith: '\ACME-DocTools.exe'   # signed document add-in, confirmed benign 2025-06-01
+    Image|endswith: '\cmd.exe'
+  condition: selection_parent and selection_child and not filter_known_addin
+falsepositives:
+  - Document-management or ERP add-ins that shell out to a helper process
+  - Software installers launched from a document viewer
+level: high
+```
+
+Two properties make that filter defensible, and both are easy to get wrong. It names **a specific known-good binary path**, not a location: an exclusion such as `CommandLine|contains: '\AppData\Local\Temp\'` would remove the detection exactly where macros stage their payloads, which is the blind spot the rule exists to close. And it carries **a comment with the date and the reason**, so the next analyst can re-review it instead of guessing. A rule that needs weekly allowlist edits is a process problem, not a tuning problem — if the exclusions keep growing, the real defect is upstream (an unsigned add-in, an untagged asset class, or a missing field).
+
+**Step 4 — Convert and deploy.** Getting the rule into your back end is a conversion step, not a rewrite:
+
+```bash
+# Syntax check and conversion. NOT EXECUTED while writing this note:
+# the Sigma CLI is not installed on the machine that produced this document.
+sigma check office-spawns-script-host.yml
+sigma convert -t es-qs  office-spawns-script-host.yml
+sigma convert -t splunk office-spawns-script-host.yml
+sigma convert -t kusto  office-spawns-script-host.yml
+```
+
+**Step 5 — Validate both directions.** Reproduce the positive case in the lab (the drill in `../labs/sigma-rule-tuning.md` does exactly this) and record the alert count over a quiet period. Only then does the rule have a known error rate.
+
+**Step 6 — Hand it over.** A rule without an owner, a severity, and a line in the triage playbook is an orphan. Write the one-paragraph playbook into the rule's PR description: what the analyst should check first, what a benign explanation looks like, and when to escalate.
+
+## Suppression Without Blind Spots
+
+Noise reduction is where good detections go to die quietly. Order the techniques from least to most dangerous, and always know which one you are applying.
+
+| Technique | What it does | Blind spot it creates | Guardrail |
+|---|---|---|---|
+| **Threshold** (N events in T minutes) | Turns a flood into one alert | A single, deliberate event no longer alerts | Keep a second, low-volume rule for the *rare* variant of the same behaviour |
+| **Deduplication** (one alert per key per window) | Collapses 5 000 alerts into one with a count | The count must be read: "one alert, 4 812 events" is not the same as one event | Always surface the event count in the alert body |
+| **Field-scoped exclusion** (this binary, this signer, this account) | Removes a known-benign actor precisely | The excluded identity can later be abused (allowlisted binary as a LOLBin) | Narrow by *path plus signer*, never by name alone; review quarterly |
+| **Time-scoped suppression** (this host, this change window) | Silences planned activity | Everything else on that host is silenced too, including the attack | Expiry timestamp in the suppression itself, and a case reference explaining it |
+| **Global suppression** (this rule, everywhere) | Makes the queue clean | Total loss of detection, usually permanent, usually undocumented | Only as a temporary measure with an owner and a date; prefer disabling the rule, which is at least visible |
+| **Disable** | Removes the rule | Total loss, but *visible* in the rule list and in coverage reporting | Legitimate outcome for a rule that never confirms; record it as a coverage decision |
+
+Three habits keep suppression honest:
+
+1. **Every exclusion gets a reason, an owner, and an expiry.** A comment in the rule file is the minimum: `# excluded 2025-06-01 by A.Tier1 - ACME backup agent signs its binaries; re-review 2025-09-01`.
+2. **Test the exclusion, not just the rule.** After narrowing, re-run the original true-positive case and confirm it still fires. An exclusion that swallows your positive case has converted a detection into a placebo.
+3. **Prefer fixing upstream.** If the noise comes from a parser field, a missing asset tag, or a deployment, fix that. A rule that needs weekly allowlist edits is a process defect wearing a detection costume.
+
+## False-Positive Classification and the Right Fix
+
+"False positive" is a category, not a diagnosis. Classify before you patch, because the correct fix depends on the class.
+
+| Class | Typical example | Correct fix | Wrong fix |
+|---|---|---|---|
+| **Parser artifact** | `process.name` empty or truncated, so the rule matches nothing or everything | Fix the pipeline mapping, then re-test | Regex inside the rule to compensate |
+| **Legitimate administrative tooling** | Your patch-management product runs encoded PowerShell nightly | Narrow exclusion on path **and** signer, documented and dated | Raising the threshold until the abuse case also stops alerting |
+| **Business process** | Finance runs a bulk account-provisioning script each month-end | Scheduled suppression tied to the change calendar, with a case reference | Disabling the rule |
+| **Threshold too tight** | 3 failed logons in 5 minutes alerts on ordinary typos | Widen the window or raise the count using real baseline data | Excluding the user who complained |
+| **Missing context** | The rule cannot tell a service account from a human, so it alerts on both | Add the context (account type, asset tag) as an enrichment field, then filter on it | Telling analysts to "just close it with a reason" |
+| **Environmental change** | A new application introduced, or a subnet was re-IP'd | Re-baseline and update the exclusions as part of the change | Treating each new alert as a one-off |
+| **Genuine detection gap in the rule's logic** | It fires on the benign variant of a technique but not the malicious one | Rewrite the logic around the behaviour | Declaring the technique undetectable |
+
+> A false positive that is closed without a class and a reason is a wasted detection improvement. The reason text *is* the tuning input; without it, the next analyst re-derives the same conclusion from nothing.
+
+## YARA in the SOC: Where It Earns Its Place
+
+YARA matches patterns in *files and memory*, not in log streams, so it answers a different question from Sigma: not "did this event happen?" but "does this artifact exist here?".
+
+| Use in a SOC | What it gives you | What it costs |
+|---|---|---|
+| Scanning files collected from an investigation | Rapid family attribution and a way to name what you are looking at | Only as good as the rule; strings cannot see intent |
+| Memory scanning (through a tool that supports it) | Catches decoded payloads and injected content that never hit disk | Requires a memory acquisition path and analyst time to triage hits |
+| Retro-hunting an artifact store | Applies today's intelligence to yesterday's evidence — the main reason to keep samples and quarantine archives | Storage and a scanning budget |
+| Triage of email attachments and downloads | Fast pre-filtering before deeper dynamic analysis | Attachments must be extracted to a scannable form first |
+
+Rules of thumb that keep YARA useful instead of noisy:
+
+- **Tighten the condition, not the strings.** Removing a distinctive string to reduce hits removes the detection. Counting how many strings must match (`3 of ($s*)`), requiring the file type (`pe.is_pe`, `uint16(0) == 0x5A4D`), or requiring a size or offset constraint are the correct tightening moves.
+- **Test both directions every time you change a condition:** the sample that should match, and a folder of ordinary files that should not. "No match on `notepad.exe`" is a weak negative test — use dozens of real documents and binaries from your own environment.
+- **Version your rules and say who verified them.** A community rule copied without testing is a hypothesis about someone else's environment.
+- **Scan cost is real.** Wide-open string sets over a large file share produce both false positives and hours of I/O. Scope by path and by file type before you scope by string.
+- **A match is a lead, not a verdict.** A text file containing credential-tool strings is a note someone saved; the same strings inside a signed-looking PE that also makes network connections is a different conversation. The laboratory in `../labs/sigma-rule-tuning.md` and the examples in `../tools/detection-rules/` both walk this distinction.
+
 ## Common Mistakes & Tips
 
 - **Mistake:** writing a rule against raw log text and celebrating when it fires once. *Tip:* build on normalized fields; re-test after any parser change.
@@ -189,6 +341,11 @@ High volume, never confirms      -> likely bad threshold or broken parse
 - **Mistake:** trusting Sigma/YARA rules copied from the internet without testing them against your own environment's noise. *Tip:* treat community rules as candidates, then validate and tune.
 - **Mistake:** detecting only the endpoint layer. *Tip:* the same technique (e.g., credential dumping) should produce detections from multiple layers: endpoint, network, and auth.
 - **Mistake:** never retiring rules. *Tip:* schedule a quarterly detection review — coverage grows by pruning, not only by adding.
+- **Mistake:** shipping a rule that was only validated against the activity that inspired it. *Tip:* a positive test proves it can fire; only a run over normal data tells you how often it will.
+- **Mistake:** excluding a *location* instead of an *identity*. *Tip:* filter on a specific signed binary path with a dated comment, never on `\Temp\`, `\ProgramData\`, or another directory attackers favour.
+- **Mistake:** adding suppressions with no owner and no expiry. *Tip:* every exclusion carries "who, when, why, re-review date"; a suppression nobody owns is a permanent blind spot.
+- **Mistake:** tightening a YARA rule by deleting strings. *Tip:* tighten the condition (count required strings, require the file type) and keep the distinctive strings.
+- **Mistake:** writing aggregation logic inside a Sigma rule. *Tip:* Sigma describes one event; counting, thresholds, and sequences are backend features — put the correlation in the platform and keep the Sigma rule as the unit of detection content.
 
 ## Checklist / Self-Test
 
@@ -200,6 +357,12 @@ High volume, never confirms      -> likely bad threshold or broken parse
 - [ ] I can name the correct fix order when a rule is noisy (parser → allowlist → threshold).
 - [ ] I can describe the lifecycle of one detection from hypothesis to retirement.
 - [ ] I can map one of my organization's detection rules to its MITRE ATT&CK technique(s).
+- [ ] I can write a rule that uses `selection_*` blocks plus one documented `filter_*`, and explain why the filter names an identity rather than a directory.
+- [ ] I can say which stages of the detection lifecycle have an artifact in my repo, and which ones I have skipped.
+- [ ] I can name the correct fix for a parser artifact, a noisy threshold, and a scheduled business process.
+- [ ] I can list five noise-reduction techniques and the blind spot each one creates.
+- [ ] I have run a YARA rule against both a positive sample and a folder of ordinary files, and I know why `notepad.exe` alone is a weak negative test.
+- [ ] I can explain why `timeframe` and `count()` do not belong in a Sigma rule, and where that logic goes instead.
 
 ## Further Resources
 

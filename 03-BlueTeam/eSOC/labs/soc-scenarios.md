@@ -92,7 +92,7 @@ event.code : 4625 | top 10 user.name by count
 - **Steps:** create a plain text file containing several Mimikatz-style strings; run your rule:
 
 ```bash
-yara ../../tools/detection-rules/yara-rules/yara-example.yar suspicious.txt
+yara ../tools/detection-rules/yara-rules/yara-example.yar suspicious.txt
 ```
 
 - **Expected outcome:** the rule matches the file and prints the rule name. Then scan a normal file (e.g., `notepad.exe`) — no match, because it is a PE without those strings.

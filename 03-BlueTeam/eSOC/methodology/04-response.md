@@ -64,7 +64,7 @@ Goal: stop an attacker who is using stolen credentials.
 - Revoke sessions and tokens: force logoff, revoke Kerberos tickets (reset the account password / `Revoke-AzureADUserAllRefreshToken` equivalent), kill active VPN sessions.
 - Watch for **re-enablement**: if the account re-activates, an attacker with higher privilege is controlling it — escalate immediately.
 
-Disable plus revoke, PowerShell concept:
+Disable plus revoke, PowerShell concept. This is a shape to adapt, not a runbook: the commands were **not executed while writing this note**, and all of them change production state, so they belong in a playbook with a named approver:
 
 ```powershell
 # Confirm the account and reason BEFORE running (two-person rule where possible)
@@ -150,6 +150,99 @@ TIME (UTC)   ACTION                             OWNER      STATUS
 02:50        Monitoring for related IPs          A. Tier1   active
 ```
 
+## Containment Decision Table
+
+Every containment action trades one risk for another. Choose deliberately, and know which trade you are making before you touch anything.
+
+| Action | Stops | Costs you | Reversible? | Approval | Prefer it when |
+|---|---|---|---|---|---|
+| EDR network isolation | C2, lateral movement, exfiltration from that host | Nothing permanent; the host keeps running for evidence | Yes, instantly | Playbook or on-call lead | Default first move for a compromised endpoint |
+| Switch-port disable / firewall block | All network I/O from the host | Remote management and remote collection | Yes, with console or network access | Playbook or network owner | No EDR agent, or the agent is untrusted |
+| Cable pull / Wi-Fi disable | Network access | Remote visibility, and volatile state if the host sleeps | Physically trivial, operationally disruptive | On-site resources | Physical access is available and remote options failed |
+| Account disable | Reuse of the stolen credential | Business process stops; the user may need to be paged | Yes | Playbook or identity owner | Credential confirmed or strongly suspected compromised |
+| Password reset + session revoke | Live Kerberos tickets, refresh tokens, VPN sessions | User disruption, helpdesk load | Yes (a new credential is issued) | Identity owner | Account confirmed compromised — do it *together with* the disable |
+| Block destination (IP/domain) at egress | Beaconing to that destination | Other destinations stay reachable; a legitimate service may break | Yes | Playbook | The destination is confirmed malicious and the host is not isolated yet |
+| Kill process / quarantine file | The running implant | Volatile evidence, and the attacker learns you are watching | No — process state is gone | IR, normally not tier 1 | A destructive process is actively encrypting or exfiltrating |
+| Power off | Everything, including encryption in progress | All volatile evidence: memory, connections, logged-on sessions | No | Incident commander | Only when destruction is active and isolation is unavailable |
+
+> Two rules keep this table usable: **contain the network before the power** (isolation preserves evidence, power-off destroys it), and **never leave the account live while you isolate the host** (if the credential was stolen, the host is not the only door).
+
+## Playbook Anatomy — and How to Read One Under Pressure
+
+A playbook is not a script; it is a decision document with a fixed shape. Learn to find these five parts in the first ten seconds, because during a live incident you will not read it end to end:
+
+1. **Trigger** — which alert or condition starts this playbook, and at what severity.
+2. **Pre-checks** — what must be true before acting: authorization, asset criticality, whether the action is reversible.
+3. **Actions** — numbered, with the exact console or command and who performs each one.
+4. **Verification** — how you confirm the action *took effect*. Isolation that silently failed is worse than no isolation, because you now believe you are contained.
+5. **Rollback and handoff** — how to undo it, and what to write in the case when you stop.
+
+The two most common tier-1 actions, expanded into that shape. Adapt them to your own tools and authority; nothing here was executed while writing this note.
+
+**Playbook A — Isolate a compromised endpoint**
+
+```text
+TRIGGER        High/critical alert confirmed as a true positive on a managed endpoint.
+PRE-CHECKS     Authorization per policy?  Asset criticality known (DC, hypervisor host,
+               clinical device)?  Does a production service run on it?  Can the EDR still
+               reach the host after isolation to keep collecting?
+ACTIONS        1. Open the case; note the UTC start time.
+               2. Capture volatile context if authorized and possible: logged-on users,
+                  active network connections, running processes (read-only collection).
+               3. Trigger EDR isolation. Do NOT log in with privileged credentials.
+               4. Notify the on-call lead and the asset owner.
+VERIFICATION   Isolation shows as active in the console; a test connection to the host
+               fails from your workstation; the agent is still checking in and still
+               delivering telemetry.
+ROLLBACK       Unisolate only with IR approval and a recorded reason.
+HANDOFF        Case note: what was isolated, when, why, evidence collected, ownership
+               transferred to IR, and what monitoring continues.
+```
+
+**Playbook B — Disable a compromised account**
+
+```text
+TRIGGER        Confirmed or strongly suspected credential compromise.
+PRE-CHECKS     Is it a service account (what breaks when it stops working)?  Who is the
+               identity owner?  Is there a break-glass dependency on this account?
+ACTIONS        1. Disable the account in the identity provider.
+               2. Reset the password and revoke sessions/refresh tokens; kill VPN sessions.
+               3. Check for a second path: other accounts from the same source IP, new
+                  sessions on the same host, new mail rules or application consents.
+               4. Notify the identity owner and the user's manager per the plan.
+VERIFICATION   Authentication attempts by the account now fail; no new sessions appear in
+               the IdP/AD; no re-enable event. A re-enable, or a new session, means a
+               higher-privileged actor is present - escalate immediately.
+ROLLBACK       Re-enable only through the identity owner, with the case reference.
+HANDOFF        Case note: who disabled what, when, which sessions were revoked, what
+               service impact exists, and what remains unexplained.
+```
+
+## What Tier 1 Collects: Evidence Actions and Their Risks
+
+Tier 1 preserves evidence; it does not perform forensics. The distinction matters because most useful-looking commands also *change* something.
+
+| Action | What it gives you | Evidence risk | Notes |
+|---|---|---|---|
+| Export the affected event channels (for example `wevtutil epl <channel> <file>`) | A copy of the raw logs for the window, usable offline | None, if you write to a new file on a share you control | Confirm in your own lab that the export leaves the live log intact before relying on it |
+| SIEM export of the timeline and the raw matched events | The canonical timeline with platform timestamps | None | Do it early — retention windows may not cover the investigation |
+| Hash a file you must copy (`Get-FileHash`, `sha256sum`) | Integrity of the artifact, and a value to pivot on | None | Record the hash in the case immediately: the hash *is* the identity of the artifact |
+| `netstat -ano` / `Get-NetTCPConnection` on the live host | Which process owned which connection right then | None, but it captures only the present instant | Only if the playbook allows touching the host at all; assume the attacker can see you |
+| Registry export of a suspicious key (`reg export`) | A faithful copy of the configuration that achieved persistence | None, if exported to a new file | Safer than transcribing the key by hand |
+| Running an AV scan or "cleaning" the machine | Peace of mind | **Destructive** — it modifies the system and can delete the evidence | Never tier 1, and never before IR says so |
+| Rebooting the host | A temporarily quiet endpoint | **Destructive** — loses volatile evidence and may trigger the payload's persistence | Only with IR approval |
+
+The chain-of-custody rules above apply to every row: whoever collects gives the artifact an identity (a hash), a location, a time (UTC), and a name. An artifact without those four attributes is not evidence; it is a copy of something.
+
+## Post-Incident: The Tier-1 Contribution
+
+Response ends, learning is optional, and the learning is what makes the next shift shorter. Two contributions belong specifically to the analyst who worked the alert:
+
+- **Detection feedback.** Which alert fired, when, and would a *different* rule have caught the activity earlier? The distance between "when the attacker acted" and "when the alert fired" is a detection requirement you are uniquely placed to write down. Hand it to the detection owner together with the query that would have found it (see `05-use-cases-and-tuning.md`).
+- **Process feedback.** What slowed the response: a playbook step that did not match reality, an approval that took forty minutes, a log that was never collected, an escalation contact who was unreachable, a query you had to rebuild from memory. These are the inputs to a lessons-learned review, and the reason your queries belong verbatim in the case.
+
+Also worth writing once, while it is fresh: **what you would do differently**, phrased as a process change rather than self-criticism. "I should have checked the other account from the same source IP before isolating" becomes a checklist item; "I was too slow" changes nothing.
+
 ## Common Mistakes & Tips
 
 - **Mistake:** using the domain admin account to investigate the compromised host. *Tip:* assume the attacker watches; use separate low-privilege or dedicated credentials.
@@ -158,6 +251,11 @@ TIME (UTC)   ACTION                             OWNER      STATUS
 - **Mistake:** containing one host and stopping. *Tip:* always hunt for related hosts/accounts sharing the same indicators.
 - **Mistake:** unapproved or undocumented actions. *Tip:* every containment step needs approval, a timestamp, and a note in the case.
 - **Mistake:** solo heroics and silence. *Tip:* notify early, escalate early, and let the playbook and the team carry the response.
+- **Mistake:** choosing containment by habit instead of by trade-off. *Tip:* state what the action stops, what it costs, and whether it is reversible before you perform it.
+- **Mistake:** isolating a host and assuming it worked. *Tip:* verify the isolation state from a second viewpoint; unverified containment is a belief, not a control.
+- **Mistake:** leaving the compromised account active while the host is isolated. *Tip:* if the credential is stolen, the host was only one of the doors.
+- **Mistake:** asking for forgiveness after an unapproved action. *Tip:* approval is part of the action; if the playbook does not cover it, escalate the decision instead of making it.
+- **Mistake:** going straight to power-off because it feels decisive. *Tip:* power-off is the only containment that destroys the evidence you are about to need — isolate the network, keep the host alive.
 
 ## Checklist / Self-Test
 
@@ -169,6 +267,11 @@ TIME (UTC)   ACTION                             OWNER      STATUS
 - [ ] My escalation package contains summary, scope, timeline, actions taken, and open questions.
 - [ ] I communicate through approved channels only and follow the playbook.
 - [ ] I post timestamped notes during the response, not vague recollections after.
+- [ ] I can name five containment actions with their cost, reversibility, and required approval.
+- [ ] I can find the trigger, pre-checks, actions, verification, and rollback of a playbook I have never read before.
+- [ ] I verify that an isolation or disable actually took effect, from a second viewpoint.
+- [ ] I know which evidence actions are read-only and which ones destroy evidence.
+- [ ] I have written what I would do differently as a process change, not as self-criticism.
 
 ## Further Resources
 
