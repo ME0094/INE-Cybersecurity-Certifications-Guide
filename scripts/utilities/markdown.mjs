@@ -34,13 +34,23 @@ export function stripFences(text) {
 // that is what GitHub does: `## Common Mistakes & Tips` resolves as
 // `#common-mistakes--tips`, and collapsing the run would both reject the real anchor and
 // accept one that does not exist.
+//
+// Underscores are the second trap. GitHub renders the heading first and slugs the text, so a
+// `_` used as an emphasis marker disappears while an intraword one survives: `## _Note_`
+// becomes `note`, but `## foo_bar` becomes `foo_bar`. Stripping every `_` (what this did until
+// 19 Sep 2026) silently produced `foobar` and would have rejected the real anchor. So only a
+// *pair* of underscore runs that can open and close emphasis is removed — one at a word
+// boundary followed by non-space, and a later one not followed by a word character.
+// The approximation is deliberate: it does not implement CommonMark's full emphasis rules, and
+// `check-links.mjs` states that a heading it cannot slug exactly is reported, never repaired.
 export function slugify(heading) {
   return heading
     .trim()
     .toLowerCase()
-    .replace(/[`*_~]/g, '')
+    .replace(/[`*~]/g, '')
+    .replace(/(^|[\s\p{P}])_{1,2}(?=\S)(.*?)(?<=\S)_{1,2}(?![\p{L}\p{N}])/gu, '$1$2')
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .replace(/[^\p{L}\p{N}\s_-]/gu, '')
     .trim()
     .replace(/\s/g, '-');
 }

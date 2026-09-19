@@ -119,7 +119,7 @@ carries no deprecation mark, but current AV engines fingerprint the well-known o
 Check what your version ships:
 
 ```bash
-msfvenom -l encoders      # usually a small set these days
+msfvenom -l encoders      # what your build ships; master carries 57, 24 of them under x86
 msfvenom -l payloads | grep windows
 ```
 

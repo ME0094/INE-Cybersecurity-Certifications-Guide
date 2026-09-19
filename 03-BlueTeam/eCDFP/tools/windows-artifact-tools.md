@@ -412,7 +412,7 @@ kape.exe --msource C:\Evidence\collect --module <ModuleName> --mdest C:\Evidence
 ## Further Resources
 
 - Eric Zimmerman's forensic tools — downloads, release notes and per-tool documentation: ericzimmerman.github.io.
-- KAPE — project repository and documentation (targets, modules, and the current switch set): github.com/EricZimmerman/KAPE and ericzimmerman.github.io/KapeDocs.
+- KAPE — the definition repository (targets and modules) is github.com/EricZimmerman/KapeFiles, and the current switch set is documented at ericzimmerman.github.io/KapeDocs.
 - The Sleuth Kit — `fls`, `icat`, `istat`, `tsk_recover` and the rest of the extraction toolkit: sleuthkit.org.
 - RegRipper — an alternative, plugin-based offline registry parser worth cross-checking RECmd against: github.com/keydet89/RegRipper3.0.
 - libyal libraries (`libesedb`, `libevtx`, `libregf`, `libfsntfs`) — the underlying parsers many tools build on, and a cross-platform route to the same artefacts: github.com/libyal.
@@ -429,4 +429,7 @@ kape.exe --msource C:\Evidence\collect --module <ModuleName> --mdest C:\Evidence
 > pages (KapeDocs, fetched 2026-09-19) and whose `longFlags` list contains no `--help`; the same
 > catalogue records `--tsource`, `--target`, `--tdest`, `--msource`, `--module` and `--mdest`,
 > which section 15 uses. Section 15's own pointer to `gKAPE` as the way to discover switches is
-> the documented route and is what the example now says.
+> the documented route and is what the example now says. The KAPE link under Further Resources
+> was repointed on the same date: `github.com/EricZimmerman/KAPE` answers **HTTP 404** while
+> `github.com/EricZimmerman/KapeFiles` and `ericzimmerman.github.io/KapeDocs` answer **200**, so
+> the entry now names the definition repository that exists.

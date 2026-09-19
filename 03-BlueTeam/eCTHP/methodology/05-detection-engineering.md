@@ -320,7 +320,8 @@ Two habits keep this honest:
 > reports *"No backends installed"*, so the conversion lines remain a shape to run where a backend
 > exists. **Not executed:** the KQL and SPL translations and the atomic tests — no SIEM and no
 > Atomic Red Team installation here — so the three expressions were compared by reading, not by
-> running, and the 95 % figure is a rhetorical marker, not a measured boundary.
+> running, and the sentence in the body is deliberately a marker rather than a measured boundary:
+> it now says "the high nineties" and tells you to set that floor from your own baseline.
 
 ## Further Resources
 

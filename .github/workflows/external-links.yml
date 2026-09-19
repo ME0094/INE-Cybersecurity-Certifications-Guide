@@ -3,7 +3,8 @@ name: external-links
 # Weekly sweep of the *external* URLs referenced by the guides (INE product pages,
 # standards documents, tool sites). Kept separate from docs-check on purpose: a vendor
 # site being down, rate-limiting us, or moving a page should not block a pull request.
-# The checker tolerates 403/429 (bot protection) and reports everything else.
+# The checker tolerates 403/429 (bot protection), identifies itself with a User-Agent and
+# retries once, because a sweep that calls a live page dead is a sweep nobody reads.
 
 on:
   schedule:

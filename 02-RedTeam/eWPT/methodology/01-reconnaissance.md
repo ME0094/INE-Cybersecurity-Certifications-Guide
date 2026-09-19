@@ -114,9 +114,10 @@ Crawling finds what is linked; content discovery finds what is **not** linked: a
 
 - `/usr/share/seclists/Discovery/Web-Content/` from SecLists is the standard source.
 - Use `raft-large-directories.txt` or `raft-medium-directories.txt` for general paths.
-- For technology-specific discovery, use `CommonBackdoors-PHP.fuzz.txt` (the other
-  languages ship their own file in the same folder) or CMS lists such as
-  `CMS/wp-themes.fuzz.txt` and `CMS/Drupal.txt`.
+- For technology-specific discovery, use
+  `Programming-Language-Specific/CommonBackdoors-PHP.fuzz.txt` (the other languages ship their
+  own file in that same subfolder) or CMS lists such as `CMS/wp-themes.fuzz.txt` and
+  `CMS/Drupal.txt`.
 
 ### Fuzzing with ffuf or gobuster
 
@@ -204,8 +205,13 @@ Reconnaissance produces hundreds of small facts; the difference between a good a
 > **Verification:** executed against ffuf 2.1.0-dev, Gobuster 3.6 and WhatWeb 0.5.5 on 2026-09-19
 > against a local listener: ffuf returned the test wordlist's three entries, WhatWeb fingerprinted
 > `HTTPServer[BaseHTTP/0.6 Python/3.12.3]` and `gobuster dir` refused to run because the lab
-> answered 200 for a non-existent path. The SecLists paths were re-checked upstream: `CMS/wp-themes.fuzz.txt`,
-> `CMS/Drupal.txt` and `CommonBackdoors-PHP.fuzz.txt` exist, `directory-list-2.3-medium.txt` 404s.
+> answered 200 for a non-existent path. The SecLists paths were re-checked upstream on the same
+> date: `CMS/wp-themes.fuzz.txt`, `CMS/Drupal.txt` and
+> `Programming-Language-Specific/CommonBackdoors-PHP.fuzz.txt` all answer HTTP 200, while
+> `directory-list-2.3-medium.txt` 404s. One correction in this pass: the backdoor wordlist was
+> cited without its `Programming-Language-Specific/` subfolder, and the bare name 404s — the
+> sentence above now carries the full path, because a wordlist path that does not resolve is a
+> command the reader cannot run.
 
 ## Further Resources
 

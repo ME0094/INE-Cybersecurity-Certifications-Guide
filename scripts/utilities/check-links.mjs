@@ -11,6 +11,12 @@
 // Exit codes: 0 = clean, 1 = broken links or anchors found, 2 = usage/IO error.
 // Dependencies: none (Node stdlib only). Fenced code blocks are ignored so that a
 // command shown inside a code sample is never mistaken for a link.
+//
+// The external sweep identifies itself with a normal User-Agent and retries a URL once after a
+// network failure. Both exist because of measured false reports on 19 Sep 2026: `nvd.nist.gov`
+// answers 403/503 to a client that does not look like a browser while serving the page to one
+// that does, and a slow host can time out on the first attempt and answer on the second. A
+// sweep that calls a live page dead is a sweep whose findings get ignored.
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname, resolve, relative, sep } from 'node:path';
@@ -140,6 +146,10 @@ function isUnroutable(url) {
   // them would keep the weekly job red for a reason that is not rot.
   if (/\.(example|invalid|test|internal)$/.test(host)) return true;
   if (/(^|\.)example\.(com|net|org)$/.test(host)) return true;
+  // OIDC Core 1.0 §5.1 uses `http://example.info/claims/groups` as its example of a claim name
+  // that is *not* registered — the federation note quotes it as a shape, not as a service, and
+  // the host has never answered. Same reasoning as the RFC 2606 names above.
+  if (host === 'example.info' || host.endsWith('.example.info')) return true;
   // A wildcard bind address is not a server: `http://0.0.0.0:8180` comes from a lab log.
   if (host === '0.0.0.0' || host === '::') return true;
   if (host === '::1' || host.startsWith('fe80:')) return true;
@@ -156,16 +166,39 @@ function isUnroutable(url) {
   );
 }
 
-async function checkExternalUrl(url) {
+// A plain, honest User-Agent. Bot filters treat an unidentified client as a scraper and answer
+// 403 (NVD) or drop the connection; identifying the check as a link checker for a public
+// repository is both more accurate and more likely to be served.
+const USER_AGENT =
+  'INE-Cybersecurity-Certifications-Guide-link-check/1.0 (+https://github.com/ME0094/INE-Cybersecurity-Certifications-Guide)';
+const REQUEST_HEADERS = { 'User-Agent': USER_AGENT, Accept: 'text/html,application/xhtml+xml,*/*;q=0.8' };
+
+async function fetchOnce(url, method) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
+  const timer = setTimeout(() => controller.abort(), 20000);
   try {
-    let res = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: controller.signal });
+    return await fetch(url, { method, redirect: 'follow', headers: REQUEST_HEADERS, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function checkExternalUrl(url) {
+  const attempt = async () => {
+    let res = await fetchOnce(url, 'HEAD');
     // A 4xx/5xx from HEAD says nothing on its own: many hosts answer 404 to HEAD while
     // serving the page to GET (PortSwigger, for one). Any failure is retried as a real
     // request before the link is called dead.
-    if (res.status >= 400) {
-      res = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
+    if (res.status >= 400) res = await fetchOnce(url, 'GET');
+    return res;
+  };
+  try {
+    let res;
+    try {
+      res = await attempt();
+    } catch {
+      // One retry on a network error: a slow host is not a dead link.
+      res = await attempt();
     }
     // 403/429 usually mean bot protection, not a dead link: report, do not fail.
     if (res.status >= 400 && res.status !== 403 && res.status !== 429 && res.status !== 999) {
@@ -174,8 +207,6 @@ async function checkExternalUrl(url) {
     return null;
   } catch (err) {
     return `no response (${err.name === 'AbortError' ? 'timeout' : err.message})`;
-  } finally {
-    clearTimeout(timer);
   }
 }
 
