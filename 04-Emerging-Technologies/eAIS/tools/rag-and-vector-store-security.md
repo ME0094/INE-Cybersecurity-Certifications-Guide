@@ -384,7 +384,7 @@ execution of this plan.
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — includes the vector-and-embedding and sensitive-information-disclosure entries.
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — reference guidance on LLM application and data risks.
 - [MITRE ATLAS](https://atlas.mitre.org/) — adversarial techniques relevant to retrieval and corpus manipulation.
-- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1 (Generative AI Profile)](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — governance framing for data and lifecycle controls.
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1 (Generative AI Profile)](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — governance framing for data and lifecycle controls.
 - [Promptfoo](https://github.com/promptfoo/promptfoo), [DeepEval](https://github.com/confident-ai/deepeval), [Giskard](https://github.com/Giskard-AI/giskard) — harnesses for turning the test plan in §9 into repeatable cases (see `evaluation-and-guardrails.md`).
 - [Microsoft PyRIT](https://github.com/microsoft/PyRIT) and [garak](https://github.com/NVIDIA/garak) — attack generation for the injection and leakage cases above.
 - [INE Security — eAIS (AI Systems Security Specialist)](https://ine.com/security/certifications/eais-certification) — the official certification page.

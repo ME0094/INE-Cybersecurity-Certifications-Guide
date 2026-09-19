@@ -301,7 +301,7 @@ nothing more — see `offensive-scanners.md` for how each tool feeds this pipeli
 - [Promptfoo](https://github.com/promptfoo/promptfoo)
 - [TextAttack (QData)](https://github.com/QData/TextAttack)
 - [NVIDIA NeMo Guardrails](https://github.com/NVIDIA/NeMo-Guardrails)
-- [NIST AI 600-1 — Generative AI Profile of the AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1)
+- [NIST AI 600-1 — Generative AI Profile of the AI Risk Management Framework](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf)
 - OWASP GenAI Security Project — the project that maintains the LLM Top 10 above; use its
   current guidance when mapping findings: https://owasp.org/www-project-top-10-for-large-language-model-applications/
 - [INE Security — eAIS (AI Systems Security Specialist) official certification page](https://ine.com/security/certifications/eais-certification)

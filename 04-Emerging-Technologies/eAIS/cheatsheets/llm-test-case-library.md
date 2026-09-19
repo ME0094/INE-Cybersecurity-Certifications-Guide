@@ -271,7 +271,7 @@ The library feeds the release gate: freeze the corpus version, run the full set 
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) and the [OWASP GenAI Security Project](https://genai.owasp.org/) — risk vocabulary the families map onto.
 - [MITRE ATLAS](https://atlas.mitre.org/) — adversarial technique landscape for AI systems.
-- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — measurement and governance framing for these results.
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — measurement and governance framing for these results.
 - [garak](https://github.com/NVIDIA/garak), [Microsoft PyRIT](https://github.com/microsoft/PyRIT), [Promptfoo](https://github.com/promptfoo/promptfoo), [TextAttack](https://github.com/QData/TextAttack) — verify current probes, subcommands and flags in each project's own documentation.
 - [attack-to-control-mapping.md](attack-to-control-mapping.md) — the controls these cases are meant to prove.
 - [../labs/llm-testing.md](../labs/llm-testing.md) — the local lab, the fictional marker and the runner pattern the library assumes.

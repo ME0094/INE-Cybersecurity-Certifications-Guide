@@ -293,7 +293,7 @@ Remove the container when finished so no throwaway credentials linger.
 > above is worded as "an alias on its way out" rather than "no longer works": the audit that
 > prompted this change asserted the latter, and the measurement does not support it. The
 > server banner was `Keycloak 26.1.0 on JVM (powered by Quarkus 3.15.2) started in 24.676s.
-> Listening on: http://0.0.0.0:8180`, and the discovery document returned
+> Listening on: http://localhost:8180`, and the discovery document returned
 > `"issuer":"http://localhost:8180/realms/master"` with
 > `"jwks_uri":"http://localhost:8180/realms/master/protocol/openid-connect/certs"`.
 >

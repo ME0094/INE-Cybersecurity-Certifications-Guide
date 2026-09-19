@@ -409,7 +409,7 @@ matters — rather than to enable a rail that everyone will disable later.
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — guidance and reference material for LLM application security.
 - [MITRE ATLAS](https://atlas.mitre.org/) — techniques and mitigations, useful as shared vocabulary in evaluation reports.
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) — how measurement and monitoring fit into lifecycle risk management.
-- [NIST AI 600-1 — Generative AI Profile](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — risk guidance specific to generative AI systems.
+- [NIST AI 600-1 — Generative AI Profile](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — risk guidance specific to generative AI systems.
 - [Promptfoo](https://github.com/promptfoo/promptfoo) — declarative evaluation and red-team CLI; confirm the current config schema.
 - [DeepEval](https://github.com/confident-ai/deepeval) — code-first evaluation metrics that run inside a test runner.
 - [Giskard](https://github.com/Giskard-AI/giskard) — testing and scanning for ML and LLM applications.

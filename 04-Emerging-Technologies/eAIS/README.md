@@ -221,5 +221,5 @@ already know web/application security and only need the AI-specific material.
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/)
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
-- [NIST AI 600-1 — Generative AI Profile of the AI RMF](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1)
+- [NIST AI 600-1 — Generative AI Profile of the AI RMF](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf)
 - [INE Security — eAIS (AI Systems Security Specialist) official certification page](https://ine.com/security/certifications/eais-certification)

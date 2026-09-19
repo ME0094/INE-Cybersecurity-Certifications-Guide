@@ -347,7 +347,7 @@ This phase supplies the concepts and decisions; the commands, procedures, and co
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — guidance and threat material for generative-AI applications, including data-handling concerns.
 - [MITRE ATLAS](https://atlas.mitre.org/) — adversarial techniques for AI systems, useful for mapping leakage paths to attacker behaviour.
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) — the GOVERN / MAP / MEASURE / MANAGE structure used for the inventory in this file.
-- [NIST AI 600-1 — Generative AI Profile](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — generative-AI-specific risk guidance, including data privacy.
+- [NIST AI 600-1 — Generative AI Profile](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — generative-AI-specific risk guidance, including data privacy.
 - [garak](https://github.com/NVIDIA/garak) — LLM vulnerability scanner with leakage-oriented probes; verify current probe names with `garak --help`.
 - [Promptfoo](https://github.com/promptfoo/promptfoo) — declarative evaluation and red-team runs, suitable for executing a probe manifest; confirm current subcommands with `promptfoo --help`.
 - [INE Security — eAIS (AI Systems Security Specialist) official certification page](https://ine.com/security/certifications/eais-certification) — the credential this module supports.

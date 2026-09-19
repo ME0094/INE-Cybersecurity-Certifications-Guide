@@ -431,7 +431,7 @@ Three things make this a finding rather than a scare: a probe set someone can re
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — LLM02 Sensitive Information Disclosure, LLM08 Vector and Embedding Weaknesses.
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — guidance on RAG and agent security.
 - [MITRE ATLAS](https://atlas.mitre.org/) — techniques for data and retrieval access abuse.
-- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — governance framing for data-handling findings.
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — governance framing for data-handling findings.
 - [Flask](https://flask.palletsprojects.com/) and [Ollama](https://ollama.com/) — the endpoint and the local model this lab target uses.
 - [garak](https://github.com/NVIDIA/garak) and [Promptfoo](https://github.com/promptfoo/promptfoo) — automate the probe set once the manual passes are understood.
 

@@ -349,7 +349,7 @@ This phase supplies the decisions and the records; commands, procedures, and com
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — guidance library behind those categories, useful when drafting acceptable-use rules.
 - [MITRE ATLAS](https://atlas.mitre.org/) — adversarial technique landscape for AI systems, for threat-informed gate requirements.
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) — the govern / map / measure / manage structure this phase maps onto.
-- [NIST AI 600-1 — Generative AI Profile](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — the profile that tailors the framework to generative-AI systems.
+- [NIST AI 600-1 — Generative AI Profile](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — the profile that tailors the framework to generative-AI systems.
 - **ISO/IEC 42001:2023**, *Information technology — Artificial intelligence — Management system* — the certifiable management-system standard whose evidence set overlaps this phase's artefacts. Cite it by number and year; the standard is not freely downloadable.
 - [Regulation (EU) 2024/1689 (the EU AI Act), consolidated text on EUR-Lex](https://eur-lex.europa.eu/eli/reg/2024/1689/oj) — Article 113 is the staged-application article quoted above; Article 5 is the prohibitions. Read the regulation, not a summary of it, and take scoping questions to your legal function.
 - [INE Security — eAIS (AI Systems Security Specialist) official certification page](https://ine.com/security/certifications/eais-certification) — the credential this module supports.

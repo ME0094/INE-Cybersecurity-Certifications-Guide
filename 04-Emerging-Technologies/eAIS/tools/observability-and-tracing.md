@@ -322,7 +322,7 @@ test-case library, the verdict data behind any guardrail claim, and the observat
 - OWASP GenAI Security Project — https://genai.owasp.org/ (guidance on logging, monitoring and incident handling for generative AI systems).
 - MITRE ATLAS — https://atlas.mitre.org/ (the technique vocabulary to attach to detections, so a rule and a report name the same behaviour).
 - NIST AI Risk Management Framework — https://www.nist.gov/itl/ai-risk-management-framework (measurement and monitoring as risk-management functions).
-- NIST AI 600-1, Generative AI Profile — https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1 (risk categories to keep in view when deciding what to record and retain).
+- NIST AI 600-1, Generative AI Profile — https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf (risk categories to keep in view when deciding what to record and retain).
 - Your own tracing or evaluation stack's documentation — the field names, exporters and sampling controls you can actually rely on in your deployment.
 - INE Security — eAIS (AI Systems Security Specialist) — https://ine.com/security/certifications/eais-certification
 

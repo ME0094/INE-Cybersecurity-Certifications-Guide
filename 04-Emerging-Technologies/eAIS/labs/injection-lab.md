@@ -475,7 +475,7 @@ Three things make this a finding rather than an anecdote: a case file someone el
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — LLM01:2025 Prompt Injection and the rest of the 2025 set.
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — guidance and threat material for generative AI applications.
 - [MITRE ATLAS](https://atlas.mitre.org/) — adversarial techniques. The indirect delivery mode this lab exercises is `AML.T0051.001` (*Indirect*), a sub-technique of `AML.T0051` (*LLM Prompt Injection*); there is no technique called "Indirect Prompt Injection".
-- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — the governance frame your findings should fit.
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — the governance frame your findings should fit.
 - [garak](https://github.com/NVIDIA/garak), [Microsoft PyRIT](https://github.com/microsoft/PyRIT), [Promptfoo](https://github.com/promptfoo/promptfoo) — widen and automate the case list once the manual drills are understood.
 - [guardrails](https://github.com/guardrails-ai/guardrails) — the validation layer your Drill 6 control resembles.
 - [Ollama](https://ollama.com/) and [Flask](https://flask.palletsprojects.com/) — the local model runner and web framework this target is built on.

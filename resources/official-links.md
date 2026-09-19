@@ -39,7 +39,12 @@
   cloud tracks live at `/certifications/networking` and `/certifications/cloud`). Use it to
   check whether a certification still exists and to reach its page.
   Note: `https://ine.com/security/certifications` — the URL this repository used before
-  18 September 2026 — returns **404**. The security hub is <https://ine.com/security>.
+  18 September 2026 — returns **404**, and this is *only* true of the bare index: the twelve
+  product pages that hang off the same prefix all answer **200** (both facts re-checked page by
+  page on 19 September 2026; the twelve pages are the `…/security/certifications/<slug>-certification`
+  links listed below). So the rule is not "that prefix is dead" but "that prefix has no index".
+  Link a product page directly, and link <https://ine.com/security> or
+  <https://ine.com/certifications> when you need a hub that resolves.
 - **Digital certificates and badges** — https://certs.ine.com
   General entry point to look up and verify issued digital certificates and badges after
   you pass an exam. (Account-related flows live behind this entry point.) The badge page is
@@ -168,12 +173,14 @@
 - Official page: **https://ine.com/security/certifications/eiama-certification**
   Dedicated product page (verified).
 - Version note: **launched 26 August 2026** as a vendor-neutral IAM certification.
-- Naming note: INE's own **launch announcement** calls it *"Certified Identity & Access
-  Management Associate (eIAMA)"*, while the **product page** and issued badges say
-  *"Certified Identity & Access Management Technologist (eIAMA)"*. Where the two disagree the
-  product page governs, and that is the wording this repository uses. An earlier version of
-  this module called it *"Identity and Access Management Architect"*, which was wrong in a
-  different way: it is not an architect-level credential.
+- Naming note: the **product page** and issued badges say *"Certified Identity & Access
+  Management Technologist (eIAMA)"*, and that is the wording this repository uses.
+  An earlier revision of this entry also claimed that INE's launch announcement called it
+  *"Certified Identity & Access Management **Associate**"*. **That claim has been removed: no
+  source in this repository's own checks supported it**, and it should not be reinstated
+  without a quotation and a link to the page it came from. Where a credential's title is at
+  issue, the product page and the issued badge are what this repository treats as governing —
+  read them rather than a summary, including this one.
 - Why it helps: direct access to the IAM syllabus (identity lifecycle, authentication,
   authorization, zero trust, federation).
 - Note: if the page ever 404s, fall back to the catalogue **https://ine.com/certifications**.

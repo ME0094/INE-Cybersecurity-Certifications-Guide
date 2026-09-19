@@ -150,7 +150,7 @@ A suggested 4–6 week plan (adjust to your pace):
 - NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) — https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - NIST SP 800-86, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - MITRE ATT&CK — https://attack.mitre.org/
-- CISA Incident Response resources — https://www.cisa.gov/resources-tools/resources/incident-response
+- CISA Incident Response resources — https://www.cisa.gov/topics/cyber-threats-and-advisories
 
 ---
 

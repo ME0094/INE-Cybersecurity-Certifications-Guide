@@ -353,7 +353,7 @@ This phase defines the corpus, the metrics, the cadence, and the closure rule. T
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — threat material and guidance for generative-AI applications and their evaluation.
 - [MITRE ATLAS](https://atlas.mitre.org/) — adversarial techniques for AI systems, useful as a source of families and cases.
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) — the MEASURE and MANAGE functions that the metrics, cadence, and sign-off record implement.
-- [NIST AI 600-1 — Generative AI Profile](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — generative-AI-specific risk guidance to align corpus families with.
+- [NIST AI 600-1 — Generative AI Profile](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — generative-AI-specific risk guidance to align corpus families with.
 - [Promptfoo](https://github.com/promptfoo/promptfoo) — declarative evaluation and red-team runs in CI; confirm current subcommands with `promptfoo --help`.
 - [garak](https://github.com/NVIDIA/garak) — probe-based LLM scanning for a first-pass family sweep; confirm probe names with `garak --help`.
 - [Microsoft PyRIT](https://github.com/microsoft/PyRIT) — orchestrating and scoring attack campaigns as reproducible code.

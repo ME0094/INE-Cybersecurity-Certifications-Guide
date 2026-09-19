@@ -229,7 +229,7 @@ vulnerability by itself (see `tools/burp-setup.md`).
 > `struct`), so it cannot run on a simulator; the Android APK of the same level
 > decodes with apktool 2.7.0 to `package="owasp.mstg.uncrackable1"`. The MASVS
 > categories and every control ID quoted here were taken from
-> <https://mas.owasp.org/MASVS/controls/> (eight categories, 24 controls). The
+> <https://mas.owasp.org/MASVS/> (eight categories, 24 controls). The
 > `frida` line was corrected against `frida-tools` main (see `tools/android-tools.md`);
 > `frida` itself is not installed, so no device command was executed.
 

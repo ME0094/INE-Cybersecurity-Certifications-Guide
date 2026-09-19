@@ -284,5 +284,5 @@ retrieve(query, k, acl_filter = <predicate derived from the authenticated caller
 - OWASP GenAI Security Project — https://genai.owasp.org/
 - MITRE ATLAS (Adversarial Threat Landscape for Artificial-Intelligence Systems) — https://atlas.mitre.org/
 - NIST AI Risk Management Framework — https://www.nist.gov/itl/ai-risk-management-framework
-- NIST AI 600-1, *Generative AI Profile* — https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1
-- OWASP Machine Learning Security Top 10 — https://owasp.org/www-project-machine-learning-security-top-10/
+- NIST AI 600-1, *Generative AI Profile* — https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf
+- OWASP Machine Learning Security Top 10 — https://mltop10.info/

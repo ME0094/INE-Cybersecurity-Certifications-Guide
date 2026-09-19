@@ -389,7 +389,7 @@ A usable poisoning finding names the **ingest gate** rather than the payload, qu
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — the training-data and vector/embedding weakness entries this lab exercises.
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — the wider guidance set behind those entries.
 - [MITRE ATLAS](https://atlas.mitre.org/) — poisoning techniques, in the vocabulary your findings should use.
-- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — provenance and data governance expectations for a retrieval corpus.
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — provenance and data governance expectations for a retrieval corpus.
 - [Safetensors documentation](https://huggingface.co/docs/safetensors/index) — the no-code-execution format referenced in the provenance section.
 - Poisoning mechanics this lab deliberately does not repeat — [../methodology/03-model-poisoning.md](../methodology/03-model-poisoning.md).
 - Local model, runner and labelling rubric — [llm-testing.md](./llm-testing.md); retriever-side concepts ([phase 07 of this module](../methodology/07-privacy-and-data-leakage.md)) and defensive controls — [../methodology/05-defensive-controls.md](../methodology/05-defensive-controls.md).

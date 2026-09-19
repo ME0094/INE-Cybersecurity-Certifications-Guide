@@ -591,7 +591,7 @@ is a token bill.
   current guidance when mapping findings: https://owasp.org/www-project-top-10-for-large-language-model-applications/
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/)
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
-- [NIST AI 600-1 — Generative AI Profile of the AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1)
+- [NIST AI 600-1 — Generative AI Profile of the AI Risk Management Framework](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf)
 - [INE Security — eAIS (AI Systems Security Specialist) official certification page](https://ine.com/security/certifications/eais-certification)
 - In-repo: `ai-testing-tools.md` (categories and tool selection), `../labs/llm-testing.md` (the
   local lab and drills), `../cheatsheets/ai-attack-vectors.md` (the case pool), and

@@ -460,7 +460,7 @@ Three things make such a finding usable: it names the **enforcement point** rath
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — excessive agency, unbounded consumption and the injection entries these drills exercise.
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — the wider guidance set behind those entries.
 - [MITRE ATLAS](https://atlas.mitre.org/) — technique vocabulary for the findings you write.
-- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — where tool-permission inventory belongs in a governance story.
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — where tool-permission inventory belongs in a governance story.
 - [Microsoft PyRIT](https://github.com/microsoft/PyRIT) and [garak](https://github.com/NVIDIA/garak) — automated orchestration and agent/plugin abuse probes, for when the manual drills stop surprising you.
 - Local model setup and the runner this lab reuses — [llm-testing.md](./llm-testing.md).
 - Agent and tool security concepts behind these drills — [../methodology/06-agent-and-tool-security.md](../methodology/06-agent-and-tool-security.md).
@@ -469,13 +469,14 @@ Three things make such a finding usable: it names the **enforcement point** rath
 
 > **Verification:** the `runner.py` above and the 7-case battery were extracted **verbatim
 > from this file** and executed on **2026-09-19** under Ubuntu 24.04 / Python 3.12.3 against a
-> standard-library stand-in for the Flask `/agent` loop (Flask is not installed on the writing
-> machine; the stand-in serves the same `{"task","user"}` → `{"answer","steps"}` contract on
-> `127.0.0.1:5000`). `python3 runner.py battery.jsonl --repeats 5 --out results5.jsonl`
-> produced 35 rows — one per case per repeat — each carrying `id`, `drill`, `run`, `task`,
-> `user`, `answer`, `steps`, `latency_ms`, `status` and an empty `label`, which is what Drills
-> 5 and 6 score from. The defect it replaces was reproduced too: [llm-testing.md](./llm-testing.md)'s
-> runner, pointed at this battery as the lab previously instructed, dies with
-> `KeyError: 'prompt'` on its first line of work, before any request reaches the endpoint —
-> that battery carries `task`, and the `/agent` endpoint answers with `answer`, not `reply`.
-> `python3 -m py_compile runner.py` passed.
+> `/agent` route served by **real Flask 3.1.3** with **requests 2.34.2**, implementing the
+> documented `{"task","user"}` → `{"answer","steps"}` contract on `127.0.0.1:5000`. (The
+> runner only needs that boundary; the five-tool loop behind it is yours to build, and no local
+> model exists on the writing machine.) `python3 runner.py battery.jsonl --repeats 5 --out
+> results5.jsonl` produced 35 rows — one per case per repeat — each carrying `id`, `drill`,
+> `run`, `task`, `user`, `answer`, `steps`, `latency_ms`, `status` and an empty `label`, which
+> is what Drills 5 and 6 score from. The defect it replaces was reproduced too:
+> [llm-testing.md](./llm-testing.md)'s runner, pointed at this battery as the lab previously
+> instructed, dies with `KeyError: 'prompt'` on its first line of work, before any request
+> reaches the endpoint — that battery carries `task`, and the `/agent` endpoint answers with
+> `answer`, not `reply`. `python3 -m py_compile runner.py` passed.

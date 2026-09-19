@@ -260,5 +260,5 @@ The most common outcome of a first injection test is nothing. Before concluding 
 - OWASP GenAI Security Project — https://genai.owasp.org/
 - MITRE ATLAS (adversarial techniques; the injection technique is *LLM Prompt Injection*, `AML.T0051`, with `AML.T0051.001` *Indirect* as the sub-technique — not a technique of its own) — https://atlas.mitre.org/
 - NIST AI Risk Management Framework — https://www.nist.gov/itl/ai-risk-management-framework
-- NIST AI 600-1, *Generative AI Profile* — https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1
+- NIST AI 600-1, *Generative AI Profile* — https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf
 - OWASP Cheat Sheet Series (LLM-related cheat sheets) — https://cheatsheetseries.owasp.org/

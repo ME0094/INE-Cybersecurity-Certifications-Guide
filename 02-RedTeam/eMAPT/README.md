@@ -172,7 +172,7 @@ adb shell pm list packages -3   # test apps present?
 
 > **Verification:** the MASVS category names and control IDs quoted in this
 > module were read from the primary source on 2026-09-19 —
-> <https://mas.owasp.org/MASVS/controls/> lists eight categories
+> <https://mas.owasp.org/MASVS/> lists eight categories
 > (`MASVS-STORAGE`, `MASVS-CRYPTO`, `MASVS-AUTH`, `MASVS-NETWORK`,
 > `MASVS-PLATFORM`, `MASVS-CODE`, `MASVS-RESILIENCE`, `MASVS-PRIVACY`) and 24
 > controls. The iOS platform split was checked against the MASTG UnCrackable

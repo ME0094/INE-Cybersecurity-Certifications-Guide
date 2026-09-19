@@ -49,9 +49,12 @@
 - **The Mobile Application Hacker's Handbook** — Dominic Chell, Tyrone Erasmus, Shaun Colley
   and Ollie Whitehouse (Wiley). Why it helps: a thorough reference
   on Android and iOS assessment fundamentals — traffic, storage, and app logic.
-- **OWASP Mobile Security Testing Guide (MSTG)** — free public project. Why it helps:
-  current, practical testing recipes for mobile apps that stay closer to modern Android/iOS
-  than most books.
+- **OWASP Mobile Application Security Testing Guide (MASTG)** — free public project, under the
+  OWASP **Mobile Application Security (MAS)** umbrella. Why it helps: current, practical
+  testing recipes for mobile apps that stay closer to modern Android/iOS than most books.
+  Note the name: the *testing guide* is **MASTG**, not "MSTG" — MSTG was the older title, and
+  the companion document that is still called a "standard" is **MASVS** (Mobile Application
+  Security Verification Standard). Guides that say "OWASP MSTG" are citing a superseded name.
 
 ## Blue team: SOC analysis and incident response (eSOC · eCIR)
 
@@ -112,8 +115,18 @@
 These are public, freely downloadable documents — prefer the authoritative source over
 third-party summaries:
 
-- **NIST SP 800-61 Rev. 2 — Computer Security Incident Handling Guide**. Why it helps:
-  the canonical incident-handling lifecycle used across IR training.
+- **NIST SP 800-61 Rev. 3 — Incident Response Recommendations and Considerations for
+  Cybersecurity Risk Management: A CSF 2.0 Community Profile** (2025). Why it helps: the
+  current revision, and a *different shape* from Rev. 2 — it is a community profile for the NIST
+  Cybersecurity Framework 2.0 and folds incident response into the risk-management lifecycle
+  (govern, identify, protect, detect, respond, recover) rather than presenting a standalone
+  four-phase IR lifecycle. Read it for the governance view and for how response activities map
+  onto CSF functions.
+- **NIST SP 800-61 Rev. 2 — Computer Security Incident Handling Guide** (2012). Why it helps:
+  still the canonical incident-handling *lifecycle* (preparation; detection and analysis;
+  containment, eradication and recovery; post-incident activity) that most IR training and exam
+  syllabi are built on. Cite it with the revision: Rev. 2 and Rev. 3 are not interchangeable,
+  and a bare "SP 800-61" is ambiguous.
 - **NIST SP 800-207 — Zero Trust Architecture**. Why it helps: the reference definition of
   zero trust you will be expected to reason about in architecture questions.
 - **NIST SP 800-115 — Technical Guide to Information Security Testing and Assessment**.
@@ -121,8 +134,8 @@ third-party summaries:
   pentest syllabi.
 - NIST publications are freely downloadable from the NIST Computer Security Resource
   Center portal: **https://csrc.nist.gov/publications** (stable landing page).
-- OWASP projects (Top 10, WSTG, MSTG, LLM Top 10) are freely available from the OWASP
-  homepage: **https://owasp.org** (stable landing page — search each project by name).
+- OWASP projects (Top 10, WSTG, **MASTG**/**MASVS**, LLM Top 10) are freely available from the
+  OWASP homepage: **https://owasp.org** (stable landing page — search each project by name).
 
 ## Common Mistakes & Tips
 
@@ -141,9 +154,21 @@ third-party summaries:
 ## Checklist
 
 - [ ] Map each book/reference to the official syllabus section it supports
-- [ ] Download the free NIST documents (SP 800-61 Rev. 2, SP 800-207, SP 800-115) from https://csrc.nist.gov/publications
-- [ ] Download the OWASP Top 10, WSTG, MSTG, and LLM Top 10 from https://owasp.org
+- [ ] Download the free NIST documents (SP 800-61 Rev. 3, SP 800-207, SP 800-115) from https://csrc.nist.gov/publications
+- [ ] Download the OWASP Top 10, WSTG, MASTG/MASVS, and LLM Top 10 from https://owasp.org
 - [ ] Verify author/publisher and edition of each book before buying
 - [ ] Read one chapter, then reproduce its techniques in the lab the same week
 - [ ] Store your notes in the matching certification module in this repo
 - [ ] Keep this list pruned to works you actually use
+
+> **Verification:** the two corrections above were checked on **2026-09-19** over the network.
+> **MASTG:** `https://mas.owasp.org/MASTG/` returns HTTP 200 with the title *"OWASP MASTG -
+> OWASP Mobile Application Security"*, and the project hub `https://mas.owasp.org/` returns
+> *"OWASP Mobile Application Security"* — the testing guide is MASTG under the MAS umbrella, and
+> the old `owasp.org/www-project-mobile-app-security/` path returns **404**, which is a further
+> reason not to keep citing the old name. **SP 800-61 Rev. 3:** the PDF at
+> `nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r3.pdf` returns HTTP 200, and its
+> embedded document title reads *"Incident Response Recommendations and Considerations for
+> Cybersecurity Risk Management: A CSF 2.0 Community Profile"* — which is the title quoted
+> above and confirms it is a CSF 2.0 community profile rather than a revision of Rev. 2's
+> lifecycle format.

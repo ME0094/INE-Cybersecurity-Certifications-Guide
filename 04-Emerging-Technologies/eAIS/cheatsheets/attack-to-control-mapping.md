@@ -294,7 +294,7 @@ Cost here means effort inside your own lab — a local model on `localhost:11434
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — the risk categories the master table deliberately describes in words rather than IDs.
 - [OWASP GenAI Security Project](https://genai.owasp.org/) — guidance library behind those categories.
 - [MITRE ATLAS](https://atlas.mitre.org/) — adversarial technique landscape for AI systems.
-- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — structure for recording accepted risk and governing the lifecycle.
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — structure for recording accepted risk and governing the lifecycle.
 - [ai-attack-vectors.md](ai-attack-vectors.md) — what each vector is; this sheet assumes it.
 - [llm-test-case-library.md](llm-test-case-library.md) — the case skeletons that make the test column executable.
 - [../methodology/05-defensive-controls.md](../methodology/05-defensive-controls.md) — the layered defense model these controls come from.

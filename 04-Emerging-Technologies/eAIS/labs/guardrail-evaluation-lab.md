@@ -915,7 +915,7 @@ the easiest way to mislead yourself and your reader at once.
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — the failure categories a guardrail is expected to address; the OWASP GenAI Security Project hosts the surrounding guidance.
 - [MITRE ATLAS — Adversarial Threat Landscape for Artificial-Intelligence Systems](https://atlas.mitre.org/) — a vocabulary for describing what your control does and does not cover.
-- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1 — Generative AI Profile](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — where measurement and monitoring sit in lifecycle risk management.
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1 — Generative AI Profile](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) — where measurement and monitoring sit in lifecycle risk management.
 - [garak (NVIDIA) — LLM vulnerability scanner](https://github.com/NVIDIA/garak) — first-pass probing of a model endpoint; complements, and does not replace, your own sets.
 - [Microsoft PyRIT](https://github.com/microsoft/PyRIT) and [Promptfoo](https://github.com/promptfoo/promptfoo) — orchestrated, scored attack campaigns you can re-run as a regression suite.
 - [NVIDIA NeMo Guardrails](https://github.com/NVIDIA/NeMo-Guardrails) — the input/output/dialog/retrieval rail concept this lab deliberately does not implement.
