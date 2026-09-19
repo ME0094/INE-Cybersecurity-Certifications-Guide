@@ -160,7 +160,9 @@ Use one list, not two.
 # to a relative folder: a capture on the investigated host contaminates the case.
 $EV = 'E:\evidence\case-014'
 New-Item -ItemType Directory -Force -Path $EV | Out-Null
-Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ" | Out-File "$EV\start-time.txt"
+# A literal "Z" in a format string is a character, not a conversion: it stamps a LOCAL
+# time as if it were UTC. Convert first, then format.
+(Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ") | Out-File "$EV\start-time.txt"
 Get-NetTCPConnection -State Established | Export-Csv "$EV\connections.csv"
 Get-Process | Select-Object Id, ProcessName, Path, StartTime |
   Export-Csv "$EV\processes.csv" -NoTypeInformation

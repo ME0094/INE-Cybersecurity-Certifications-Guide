@@ -84,9 +84,17 @@ msf6 > sessions -l
 - **Steps:**
 
 ```bash
-# 1. Login to DVWA and keep the session cookie
-curl -s -c dvwa.cookies -d "username=admin&password=password&Login=Login" \
+# 1. Login to DVWA and keep the session cookie.
+# DVWA protects its login form with a CSRF token: POSTing the credentials alone is
+# rejected (login.php calls checkToken() on user_token). Fetch the form, take the
+# token from it, then post the credentials with the same cookie jar.
+curl -s -c dvwa.cookies http://192.168.56.102/dvwa/login.php -o dvwa-login.html
+TOKEN=$(grep -o "name='user_token' value='[^']*'" dvwa-login.html | cut -d"'" -f4)
+curl -s -b dvwa.cookies -c dvwa.cookies \
+     -d "username=admin&password=password&Login=Login&user_token=$TOKEN" \
      http://192.168.56.102/dvwa/login.php
+# If your DVWA build has CSRF disabled the token is empty and the second call still works;
+# if it fails, do the login in the browser and copy the PHPSESSID cookie into the jar.
 
 # 2. Verify command injection works (look for ping output in the response)
 curl -s -b dvwa.cookies \
@@ -211,6 +219,12 @@ Chain the scenarios into one full run: recon (S1) → exploit (S2 or S4) → pos
 - [ ] I can re-run every scenario after a clean snapshot **without** opening this file.
 - [ ] I keep per-scenario notes with commands, outputs, and credentials.
 - [ ] I never attacked anything outside my own lab network.
+
+> **Verification:** the DVWA login sequence in Scenario 3 was corrected on 2026-09-19 against
+> DVWA's own source: `login.php` calls `checkToken($_REQUEST['user_token'], …)` and emits
+> `tokenField()`, so posting the credentials without the token is rejected. Not executed
+> against a running instance here — a local lab is yours to build, and the note in the step
+> says what to do when your build has CSRF disabled.
 
 ## Further Resources
 
