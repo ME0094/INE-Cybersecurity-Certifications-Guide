@@ -42,6 +42,20 @@ const READER_ARTIFACTS = new Set(['answer-key.md', 'env.md', 'notes.md', 'notes.
 // meaning anything. Keep this list short, and only for URLs the guides name as broken.
 const EXPECTED_DEAD = new Set(['https://ine.com/security/certifications']);
 
+// URLs a GitHub runner cannot reach but a reader can. Measured on 19 Sep 2026, when the weekly
+// job went red on exactly these five while the same run from a residential connection was clean:
+// exploit-db answers **502** and `nvd.nist.gov` **503** to a datacenter IP range, and `crt.sh`
+// drops the connection outright. They are listed per URL rather than per host, so a *new* URL on
+// those hosts is still checked, and the count is printed on every run — a skip that nobody can
+// see is a blind spot, a skip with a number and a reason is a limitation.
+const UNREACHABLE_FROM_CI = new Set([
+  'https://www.exploit-db.com/',
+  'https://www.exploit-db.com/searchsploit',
+  'https://nvd.nist.gov/',
+  'https://crt.sh',
+  'https://crt.sh/',
+]);
+
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
@@ -224,6 +238,7 @@ let anchors = 0;
 let bareChecked = 0;
 let skippedLocal = 0;
 let skippedDead = 0;
+let skippedBlocked = 0;
 
 for (const file of files) {
   const raw = readFileSync(file, 'utf8');
@@ -248,6 +263,8 @@ for (const file of files) {
           skippedLocal++;
         } else if (EXPECTED_DEAD.has(key)) {
           skippedDead++;
+        } else if (UNREACHABLE_FROM_CI.has(key)) {
+          skippedBlocked++;
         } else if (!external.has(key)) {
           external.set(key, null);
         }
@@ -304,8 +321,8 @@ console.log(
   `check-links: ${files.length} Markdown files, ${checked} relative link(s), ` +
     `${anchors} anchor check(s)` +
     (CHECK_EXTERNAL
-      ? `, ${external.size} external URL(s), ${skippedLocal} lab-local URL(s) and ` +
-        `${skippedDead} known-dead URL(s) skipped`
+      ? `, ${external.size} external URL(s), ${skippedLocal} lab-local URL(s), ` +
+        `${skippedDead} known-dead URL(s) and ${skippedBlocked} URL(s) unreachable from CI skipped`
       : ''),
 );
 if (broken.length > 0) {
