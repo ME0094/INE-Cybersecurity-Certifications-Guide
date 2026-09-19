@@ -83,7 +83,7 @@ All content in this repository is written in **English**.
 
 ## Checks that must pass
 
-Three dependency-free Node scripts verify the things that break in practice. Run them before
+Four dependency-free Node scripts verify the things that break in practice. Run them before
 opening a pull request; CI runs the same commands on every push and pull request
 (`.github/workflows/docs-check.yml`):
 
@@ -91,6 +91,7 @@ opening a pull request; CI runs the same commands on every push and pull request
 $ node scripts/utilities/check-catalog.mjs .
 $ node scripts/utilities/check-links.mjs .
 $ node scripts/utilities/check-commands.mjs .
+$ node scripts/utilities/check-code.mjs .
 ```
 
 - **`check-catalog.mjs`** compares the catalog in `README.md` with what is on disk. It fails
@@ -105,14 +106,21 @@ $ node scripts/utilities/check-commands.mjs .
   against a catalogue extracted from that tool's own documentation
   (`scripts/utilities/tool-specs/*.json`). A catalogue is not a guess: each one records the
   URL it came from, the version and the date. The check reads fenced blocks in shell-ish
-  languages and inline code spans that look like a command — it does **not** read tables of
-  flags, pseudocode, or plugin-specific options, and it does not check flag arity. Those
-  limits are stated at the top of the script and in `AUDIT-2026-09-19.md`.
+  languages, inline code spans that look like a command, and tables of flags when the table's
+  context names exactly one catalogued tool — so a row such as `| -oJ file | JSON |` in a note
+  about nmap is a claim it can test. It does **not** read pseudocode, plugin-specific options or
+  standalone scripts, and it does not check flag arity. Those limits are stated at the top of
+  the script and in `AUDIT-2026-09-19.md`.
+- **`check-code.mjs`** closes the other half of that gap: every fenced block must be closed (an
+  unclosed fence swallows the rest of the document), and every `python` or `js` block, and every
+  `.py`/`.mjs` file, must parse. Nothing is executed — Python is parsed with `ast.parse` and
+  JavaScript with `vm.Script` — and Python blocks are reported as skipped, never as passing, on
+  a machine with no Python 3 on the PATH.
 - **`check-links.mjs . --external`** additionally makes network requests to every external
   URL. It runs weekly in `.github/workflows/external-links.yml` and never on pull requests:
   a vendor site being down should not block your work.
 
-All three exit `0` when clean and `1` when something is wrong, so they work as a pre-commit
+All four exit `0` when clean and `1` when something is wrong, so they work as a pre-commit
 hook or a CI gate without extra tooling. Node 18 or newer is the only requirement.
 
 ### Say how you checked it

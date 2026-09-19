@@ -1,19 +1,19 @@
 name: docs-check
 
-# Guards the three failure modes that actually bit this repository:
+# Guards the four failure modes that actually bit this repository:
 #   1. the catalog in README.md drifting away from what is on disk (a moved or renamed
 #      module that no table links to, or a table row pointing at a folder that is gone);
 #   2. a relative link or an in-repo anchor that no longer resolves;
 #   3. a command in a guide that cannot run, because the flag, subcommand or plugin
-#      does not exist.
-# The first two are cheap structural checks. The third compares every command line against a
-# catalogue downloaded from each tool's own documentation (scripts/utilities/tool-specs).
-# It reads fenced blocks in shell-ish languages and inline code spans that look like a
-# command; it does not read tables of flags, pseudocode blocks or standalone scripts, and it
-# does not check flag arity — those limits are listed at the top of check-commands.mjs and
-# in AUDIT-2026-09-19.md, which is the pair of audit records this repository keeps.
-# All three are plain Node scripts with no dependencies, so they run anywhere.
-
+#      does not exist;
+#   4. a fenced block that is never closed (one shipped and swallowed the rest of a file)
+#      or a code block or script that does not parse.
+# The third compares every command line against a catalogue downloaded from each tool's own
+# documentation (scripts/utilities/tool-specs); it also checks tables of flags whose context
+# names one tool. The fourth parses every `python` and `js` block and every `.py`/`.mjs` file
+# without executing any of them, using `ast.parse` and `vm.Script`.
+# All four are plain Node scripts with no dependencies, so they run anywhere; the code check
+# uses Python 3 when it is on the PATH and says so when it is not.
 on:
   push:
     branches: [main]
@@ -43,3 +43,6 @@ jobs:
 
       - name: Flags and subcommands exist in the tool's own documentation
         run: node scripts/utilities/check-commands.mjs .
+
+      - name: Code blocks are closed and code parses
+        run: node scripts/utilities/check-code.mjs .

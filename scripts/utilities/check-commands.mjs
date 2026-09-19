@@ -11,7 +11,9 @@
 // What it validates
 //   1. flags      — every -f / --flag token, against the tool's catalogue. Read from
 //                   fenced blocks in shell-ish languages (`bash`, `powershell`, `cmd`,
-//                   `bat`, `ps`, …) and from inline code spans that look like a command.
+//                   `bat`, `ps`, …), from inline code spans that look like a command, and
+//                   from tables of flags when the table's context names exactly one
+//                   catalogued tool.
 //   2. subcommands— the leading verbs of tools that have them (spec.maxPositionals).
 //   3. plugins    — dotted or `!`-prefixed names for tools that dispatch on them
 //                   (Volatility plugins, KAPE modules).
@@ -22,12 +24,15 @@
 //     catalogues do not carry yet. Stated rather than implied.
 //   - It does not judge semantics: a real flag used for the wrong purpose is invisible.
 //   - It never invents a catalogue. A tool with no spec file is reported as uncovered.
-//   - It does not read tables of flags. A cell such as `-oJ` in a Markdown table is not a
-//     command line and is not guessed at; that shape has to be caught by a human.
+//   - It cannot see an invented flag that begins with a real one: `-oJ` is read as `-o` with
+//     the value `J` attached, because the same rule is what accepts `-T4` and `-p80`. Real
+//     nmap silently treats `-oJ file` as `-o J` and writes a file called `J`, which is exactly
+//     why that row was wrong; the checker's prefix rule cannot tell the two apart, and saying
+//     so is better than tightening it into false reports on `-sC` and friends.
 //   - It does not read pseudocode or non-shell fences (`yaml`, `json`, `sql`, `python`),
 //     standalone `.py`/`.js` files, or plugin options (`--pid`, `--dump`), which belong to
-//     the plugin rather than to the tool and are not in any catalogue. AUDIT-2026-09-19.md
-//     lists what these blind spots let through.
+//     the plugin rather than to the tool and are not in any catalogue. `check-code.mjs` covers
+//     the unclosed-fence and does-not-parse classes; AUDIT-2026-09-19.md lists what remains.
 //   - `--help`, `-h`, `--version` and friends are accepted for every tool: catalogues are
 //     extracted from documentation pages that mention them only in prose, so their absence
 //     there is not evidence that the flag is missing.
@@ -158,6 +163,56 @@ function commandsIn(file) {
     }
     out.push({ text: trimmed, line: i + 1 });
   }
+  return out;
+}
+
+// A table of flags is not a command line, but it is still a claim: `| -oJ file | JSON |` in a
+// note about nmap says the flag exists, and that defect shipped here once. The tool is taken
+// from the table's own context — the file name, the nearest heading, the three lines before
+// the table and the row itself — and the cells are checked only when exactly one catalogued
+// tool is named there. A table that names two tools (a comparison) or none is left alone:
+// guessing which column belongs to which tool is how a checker invents defects.
+function flagsInTables(file) {
+  const out = [];
+  const stem = file.split(/[\\/]/).pop().replace(/\.md$/i, '').replace(/-/g, ' ').toLowerCase();
+  const names = [...specs.keys()];
+  const lines = readFileSync(file, 'utf8').split('\n');
+  let inFence = false;
+  let heading = '';
+  let context = [];
+  lines.forEach((line, index) => {
+    if (/^\s*```/.test(line)) {
+      inFence = !inFence;
+      context = [];
+      return;
+    }
+    if (inFence) return;
+    const h = line.match(/^#{2,4}\s+(.*)$/);
+    if (h) {
+      heading = h[1];
+      context = [];
+      return;
+    }
+    if (!/^\s*\|/.test(line)) {
+      if (line.trim()) context.push(line.trim());
+      return;
+    }
+    const cells = line.split('|').map((c) => c.trim()).filter(Boolean);
+    const hay = [...context.slice(-3), heading, ...cells, stem].join(' ').toLowerCase();
+    const found = new Set();
+    for (const name of names) {
+      const re = new RegExp(`(^|[^a-z0-9-])${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z0-9-]|$)`);
+      if (re.test(hay)) found.add(specs.get(name));
+    }
+    context = [];
+    if (found.size !== 1) return;
+    if (line.includes('<!-- check-commands: ignore -->')) return;
+    const spec = [...found][0];
+    for (const cell of cells) {
+      const m = cell.match(/^`?(-{1,2}[A-Za-z][A-Za-z0-9-]*)(?:\s+[^`]*)?`?$/);
+      if (m) out.push({ flag: m[1], line: index + 1, spec, tool: spec.tool });
+    }
+  });
   return out;
 }
 
@@ -298,6 +353,7 @@ let commandLines = 0;
 let checkedLines = 0;
 let filesWithCommands = 0;
 let filesWithRecord = 0;
+let tableCells = 0;
 const missingRecord = [];
 
 // A verification record says what was actually done with the examples in a file:
@@ -312,6 +368,16 @@ for (const file of walk(ROOT).sort()) {
   const rel = relative(ROOT, file).split(sep).join('/');
   const source = readFileSync(file, 'utf8');
   const hasRecord = RECORD.test(source);
+  // Tables of flags: same catalogue, different shape. See flagsInTables().
+  for (const cell of flagsInTables(file)) {
+    tableCells++;
+    for (const f of validateFlags([cell.flag], cell.spec)) {
+      problems.push(
+        `${rel}:${cell.line} — ${cell.tool}: unknown flag ${f} in a flag table ` +
+          `(catalogue: ${cell.spec.provenance?.source ?? 'unknown'})`,
+      );
+    }
+  }
   let fileCommands = 0;
   for (const { text, line } of commandsIn(file)) {
     commandLines++;
@@ -355,7 +421,8 @@ for (const file of walk(ROOT).sort()) {
 console.log(
   `check-commands: ${specFileCount} catalogue(s) covering ${specs.size} tool name(s) ` +
     `including aliases, ${commandLines} command line(s) seen, ` +
-    `${checkedLines} checked against a catalogue, ${uncovered.size} tool(s) uncovered`,
+    `${checkedLines} checked against a catalogue, ${tableCells} flag-table cell(s) checked, ` +
+    `${uncovered.size} tool(s) uncovered`,
 );
 if (filesWithCommands > 0) {
   const pct = Math.round((filesWithRecord / filesWithCommands) * 100);

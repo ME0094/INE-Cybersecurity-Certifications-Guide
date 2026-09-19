@@ -224,14 +224,15 @@ standards-driven certification whose content is protocols rather than procedures
 deepest are eAIS, eCDFP and eCTHP. Each module's own README states what it covers, and its
 checklist tells you what you should be able to produce before moving on.
 
-Three automated checks keep the repository from rotting, and they run on every push to `main`
-and on every pull request (`.github/workflows/docs-check.yml`); a fourth sweep runs weekly,
+Four automated checks keep the repository from rotting, and they run on every push to `main`
+and on every pull request (`.github/workflows/docs-check.yml`); a fifth sweep runs weekly,
 checks external links and deliberately ignores the lab-local URLs the guides tell the reader
-to open at home:
+to open at home, plus the ones the repository cites because they are dead:
 
 - [x] Catalog matches the repository — no module on disk that `README.md` does not link, no table row pointing at a folder that moved, no note that is orphaned from its module index
 - [x] Every relative link, in-repo anchor and promised path resolves
-- [x] Every flag, subcommand and plugin name in the guides exists in a catalogue extracted from the tool's own documentation (what that check cannot see is stated in its header and in `AUDIT-2026-09-19.md`)
+- [x] Every flag, subcommand and plugin name in the guides exists in a catalogue extracted from the tool's own documentation, including tables of flags (what that check cannot see is stated in its header and in `AUDIT-2026-09-19.md`)
+- [x] Every fenced code block is closed, and every `python`/`js` block and `.py`/`.mjs` file parses (`check-code.mjs`, which never executes them)
 - [x] Catalog, names, areas and version notes verified against INE's own pages (19 Sep 2026)
 
 What this repository deliberately does **not** contain, and why:
