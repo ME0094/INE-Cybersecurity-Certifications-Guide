@@ -1,0 +1,36 @@
+{
+  "tool": "gobuster",
+  "aliases": [
+    "gobuster"
+  ],
+  "provenance": {
+    "source": "https://raw.githubusercontent.com/OJ/gobuster/master/README.md",
+    "version": "master (README; la fuente no declara version)",
+    "fetched": "2026-09-19",
+    "note": "Flag names extracted mechanically from the tool's own documentation. Extraction is deliberately over-inclusive."
+  },
+  "longFlags": [
+    "--append-domain",
+    "--debug",
+    "--help",
+    "--rm"
+  ],
+  "shortFlags": [
+    "-H",
+    "-c",
+    "-d",
+    "-do",
+    "-it",
+    "-l",
+    "-o",
+    "-q",
+    "-r",
+    "-s",
+    "-t",
+    "-u",
+    "-v",
+    "-w",
+    "-x"
+  ],
+  "subcommands": null
+}

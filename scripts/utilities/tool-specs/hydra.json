@@ -1,0 +1,53 @@
+{
+  "tool": "hydra",
+  "aliases": [
+    "hydra"
+  ],
+  "provenance": {
+    "source": "https://raw.githubusercontent.com/vanhauser-thc/thc-hydra/master/hydra.c",
+    "version": "master (hydra.c; la fuente no declara version)",
+    "fetched": "2026-09-19",
+    "note": "Flag names extracted mechanically from the tool's own documentation. Extraction is deliberately over-inclusive."
+  },
+  "longFlags": [
+    "--pos"
+  ],
+  "shortFlags": [
+    "-C",
+    "-D",
+    "-F",
+    "-I",
+    "-K",
+    "-L",
+    "-M",
+    "-O",
+    "-P",
+    "-Pp",
+    "-R",
+    "-S",
+    "-T",
+    "-U",
+    "-V",
+    "-W",
+    "-b",
+    "-c",
+    "-d",
+    "-e",
+    "-f",
+    "-h",
+    "-l",
+    "-m",
+    "-o",
+    "-p",
+    "-q",
+    "-r",
+    "-s",
+    "-t",
+    "-u",
+    "-v",
+    "-w",
+    "-x",
+    "-y"
+  ],
+  "subcommands": null
+}
