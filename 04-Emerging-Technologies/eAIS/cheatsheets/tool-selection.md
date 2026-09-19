@@ -7,9 +7,9 @@
 > constraints. Every command shape here is *syntax to confirm against your own version's `--help`* — no version,
 > flag or product feature is asserted in this sheet.
 
-> **Nothing here was executed.** No command, scan or query in this file was executed while writing it: this
-> machine has no AI application to test, no scanner installed, and no API keys. The command lines are shapes to
-> adapt and confirm against your own version's documentation, not captured output.
+> **Nothing in this file was executed.** No command, scan or query here is captured output: the environment
+> where this sheet was written had no AI application to test, no scanner installed and no API keys. The command
+> lines are shapes to adapt and confirm against your own version's documentation.
 
 ## How to read this sheet
 
