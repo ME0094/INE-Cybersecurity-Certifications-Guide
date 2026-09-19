@@ -1,0 +1,28 @@
+{
+  "tool": "mmls",
+  "aliases": [
+    "mmls"
+  ],
+  "provenance": {
+    "source": "https://manpages.debian.org/trixie/sleuthkit/mmls.1.en.html",
+    "version": "4.12.1+dfsg-3 (Debian trixie)",
+    "fetched": "2026-09-19",
+    "note": "Flag names extracted mechanically from the tool's own documentation. Extraction is deliberately over-inclusive."
+  },
+  "longFlags": [],
+  "shortFlags": [
+    "-A",
+    "-B",
+    "-M",
+    "-V",
+    "-a",
+    "-b",
+    "-i",
+    "-m",
+    "-o",
+    "-r",
+    "-t",
+    "-v"
+  ],
+  "subcommands": null
+}

@@ -1,0 +1,33 @@
+{
+  "tool": "scalpel",
+  "aliases": [
+    "scalpel"
+  ],
+  "provenance": {
+    "source": "https://manpages.debian.org/bookworm/scalpel/scalpel.1.en.html",
+    "version": "1.60 (Debian bookworm, scalpel 1.60-10)",
+    "fetched": "2026-09-19",
+    "note": "Flag names extracted mechanically from the tool's own documentation. Extraction is deliberately over-inclusive."
+  },
+  "longFlags": [],
+  "shortFlags": [
+    "-O",
+    "-V",
+    "-b",
+    "-c",
+    "-d",
+    "-h",
+    "-i",
+    "-m",
+    "-n",
+    "-o",
+    "-p",
+    "-q",
+    "-r",
+    "-s",
+    "-t",
+    "-u",
+    "-v"
+  ],
+  "subcommands": null
+}

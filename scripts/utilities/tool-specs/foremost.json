@@ -1,0 +1,35 @@
+{
+  "tool": "foremost",
+  "aliases": [
+    "foremost"
+  ],
+  "provenance": {
+    "source": "https://manpages.debian.org/bookworm/foremost/foremost.8.en.html",
+    "version": "1.5.7 (Debian bookworm, foremost 1.5.7-11+b2)",
+    "fetched": "2026-09-19",
+    "note": "Flag names extracted mechanically from the tool's own documentation. Extraction is deliberately over-inclusive."
+  },
+  "longFlags": [],
+  "shortFlags": [
+    "-Q",
+    "-T",
+    "-V",
+    "-a",
+    "-av",
+    "-b",
+    "-c",
+    "-d",
+    "-h",
+    "-i",
+    "-k",
+    "-o",
+    "-q",
+    "-s",
+    "-t",
+    "-v",
+    "-vd",
+    "-vqwQT",
+    "-w"
+  ],
+  "subcommands": null
+}

@@ -1,0 +1,67 @@
+{
+  "tool": "pinfo",
+  "aliases": [
+    "pinfo",
+    "pinfo.py"
+  ],
+  "provenance": {
+    "source": "https://raw.githubusercontent.com/log2timeline/plaso/20191203/tests/cli/tools.py",
+    "sources": [
+      "https://raw.githubusercontent.com/log2timeline/plaso/20191203/tests/cli/tools.py",
+      "https://raw.githubusercontent.com/log2timeline/plaso/1.5.1/tests/cli/tools.py",
+      "https://plaso.readthedocs.io/en/latest/sources/Troubleshooting.html"
+    ],
+    "version": "plaso 20191203 (tests/cli/tools.py) | plaso 1.5.1 (tests/cli/tools.py) | plaso docs latest (20260720)",
+    "fetched": "2026-09-19",
+    "method": "fetch-tool-spec.mjs run once per source URL; the resulting longFlags/shortFlags arrays were unioned mechanically by a merge script. Not one flag was typed by hand.",
+    "summary": "Usage of pinfo.py: inspection of a plaso storage file.",
+    "note": "Flag names extracted mechanically from the plaso project's own sources (repository code, its CLI test help dumps, and its official documentation). Every source passed the generator's 12-flag minimum on its own. Extraction is deliberately over-inclusive; the catalogue is permissive by design.",
+    "parts": [
+      {
+        "source": "https://raw.githubusercontent.com/log2timeline/plaso/20191203/tests/cli/tools.py",
+        "version": "plaso 20191203 (tests/cli/tools.py)",
+        "longFlags": 7,
+        "shortFlags": 5
+      },
+      {
+        "source": "https://raw.githubusercontent.com/log2timeline/plaso/1.5.1/tests/cli/tools.py",
+        "version": "plaso 1.5.1 (tests/cli/tools.py)",
+        "longFlags": 7,
+        "shortFlags": 5
+      },
+      {
+        "source": "https://plaso.readthedocs.io/en/latest/sources/Troubleshooting.html",
+        "version": "plaso docs latest (20260720)",
+        "longFlags": 9,
+        "shortFlags": 3
+      }
+    ]
+  },
+  "longFlags": [
+    "--args",
+    "--data",
+    "--debug",
+    "--ex",
+    "--help",
+    "--log-file",
+    "--no-auto-recurse",
+    "--process",
+    "--quiet",
+    "--single-process",
+    "--storage-file",
+    "--timezone",
+    "--troubles",
+    "--version",
+    "--zone"
+  ],
+  "shortFlags": [
+    "-V",
+    "-d",
+    "-ef",
+    "-h",
+    "-p",
+    "-q",
+    "-z"
+  ],
+  "subcommands": null
+}

@@ -1,0 +1,152 @@
+{
+  "tool": "psort",
+  "aliases": [
+    "psort",
+    "psort.py"
+  ],
+  "provenance": {
+    "source": "https://plaso.readthedocs.io/en/latest/sources/user/Using-psort.html",
+    "sources": [
+      "https://plaso.readthedocs.io/en/latest/sources/user/Using-psort.html",
+      "https://raw.githubusercontent.com/log2timeline/plaso/20191203/docs/sources/user/Using-psort.md",
+      "https://raw.githubusercontent.com/log2timeline/plaso/1.5.1/tools/psort_test.py",
+      "https://plaso.readthedocs.io/en/latest/sources/user/Analysis-plugin-nsrlsvr.html"
+    ],
+    "version": "plaso docs latest (20260720) | plaso 20191203 (docs/sources/user/Using-psort.md) | plaso 1.5.1 (tools/psort_test.py) | plaso docs latest (20260720)",
+    "fetched": "2026-09-19",
+    "method": "fetch-tool-spec.mjs run once per source URL; the resulting longFlags/shortFlags arrays were unioned mechanically by a merge script. Not one flag was typed by hand for the documented parts.",
+    "binaryProbe": {
+      "date": "2026-09-19",
+      "command": "psort --help",
+      "version": "plaso - psort version 20260720",
+      "why": "The documentation-derived parts were missing flags that the installed release accepts - `--output-format list` works and printed the output-module list, while a citation of it was reported as unknown. These flags were added from the binary's own help output, which is the same rule the rest of the file follows: the tool is the authority.",
+      "addedLongFlags": [
+        "--custom",
+        "--debug",
+        "--dynamic",
+        "--include",
+        "--logfile",
+        "--output",
+        "--output-format",
+        "--output_format",
+        "--process",
+        "--profiler",
+        "--profilers",
+        "--profiling",
+        "--quiet",
+        "--status",
+        "--storage_file",
+        "--temporary",
+        "--troubles",
+        "--unattended",
+        "--use",
+        "--version",
+        "--worker",
+        "--write"
+      ],
+      "addedShortFlags": [
+        "-u",
+        "-V"
+      ]
+    },
+    "summary": "Usage of psort.py: sorting, filtering and export of a plaso storage file.",
+    "note": "Flag names extracted mechanically from the plaso project's own sources (repository code, its CLI test help dumps, and its official documentation). Every source passed the generator's 12-flag minimum on its own. Extraction is deliberately over-inclusive; the catalogue is permissive by design.",
+    "parts": [
+      {
+        "source": "https://plaso.readthedocs.io/en/latest/sources/user/Using-psort.html",
+        "version": "plaso docs latest (20260720)",
+        "longFlags": 10,
+        "shortFlags": 6
+      },
+      {
+        "source": "https://raw.githubusercontent.com/log2timeline/plaso/20191203/docs/sources/user/Using-psort.md",
+        "version": "plaso 20191203 (docs/sources/user/Using-psort.md)",
+        "longFlags": 10,
+        "shortFlags": 6
+      },
+      {
+        "source": "https://raw.githubusercontent.com/log2timeline/plaso/1.5.1/tools/psort_test.py",
+        "version": "plaso 1.5.1 (tools/psort_test.py)",
+        "longFlags": 24,
+        "shortFlags": 0
+      },
+      {
+        "source": "https://plaso.readthedocs.io/en/latest/sources/user/Analysis-plugin-nsrlsvr.html",
+        "version": "plaso docs latest (20260720)",
+        "longFlags": 7,
+        "shortFlags": 6
+      }
+    ]
+  },
+  "longFlags": [
+    "--additional",
+    "--analysis",
+    "--custom",
+    "--data",
+    "--debug",
+    "--disable",
+    "--disable-zeromq",
+    "--dynamic",
+    "--fields",
+    "--hashers",
+    "--help",
+    "--include",
+    "--language",
+    "--logfile",
+    "--nsrlsvr",
+    "--nsrlsvr-hash",
+    "--nsrlsvr-host",
+    "--nsrlsvr-port",
+    "--output",
+    "--output-format",
+    "--output-time-zone",
+    "--output_format",
+    "--output_time_zone",
+    "--process",
+    "--profiler",
+    "--profilers",
+    "--profiling",
+    "--quiet",
+    "--slice",
+    "--slice-size",
+    "--slicer",
+    "--status",
+    "--storage-file",
+    "--storage_file",
+    "--tagging",
+    "--tagging-file",
+    "--temporary",
+    "--troubles",
+    "--unattended",
+    "--use",
+    "--version",
+    "--viper",
+    "--viper-hash",
+    "--viper-host",
+    "--viper-port",
+    "--viper-protocol",
+    "--virustotal",
+    "--virustotal-api-key",
+    "--virustotal-free-rate-limit",
+    "--virustotal-hash",
+    "--windows-services-output",
+    "--worker",
+    "--write"
+  ],
+  "shortFlags": [
+    "-V",
+    "-a",
+    "-d",
+    "-f",
+    "-h",
+    "-k",
+    "-o",
+    "-p",
+    "-q",
+    "-s",
+    "-u",
+    "-w",
+    "-z"
+  ],
+  "subcommands": null
+}

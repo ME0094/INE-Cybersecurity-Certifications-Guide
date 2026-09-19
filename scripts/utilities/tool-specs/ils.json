@@ -1,0 +1,36 @@
+{
+  "tool": "ils",
+  "aliases": [
+    "ils"
+  ],
+  "provenance": {
+    "source": "https://manpages.debian.org/trixie/sleuthkit/ils.1.en.html",
+    "version": "4.12.1+dfsg-3 (Debian trixie)",
+    "fetched": "2026-09-19",
+    "note": "Flag names extracted mechanically from the tool's own documentation. Extraction is deliberately over-inclusive."
+  },
+  "longFlags": [],
+  "shortFlags": [
+    "-A",
+    "-L",
+    "-LZ",
+    "-O",
+    "-V",
+    "-Z",
+    "-a",
+    "-aL",
+    "-b",
+    "-e",
+    "-f",
+    "-i",
+    "-l",
+    "-m",
+    "-o",
+    "-p",
+    "-r",
+    "-s",
+    "-v",
+    "-z"
+  ],
+  "subcommands": null
+}

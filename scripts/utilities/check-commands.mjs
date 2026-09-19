@@ -9,7 +9,9 @@
 // They are visible to a tool's own `--help`.
 //
 // What it validates
-//   1. flags      — every -f / --flag token, against the tool's catalogue.
+//   1. flags      — every -f / --flag token, against the tool's catalogue. Read from
+//                   fenced blocks in shell-ish languages (`bash`, `powershell`, `cmd`,
+//                   `bat`, `ps`, …) and from inline code spans that look like a command.
 //   2. subcommands— the leading verbs of tools that have them (spec.maxPositionals).
 //   3. plugins    — dotted or `!`-prefixed names for tools that dispatch on them
 //                   (Volatility plugins, KAPE modules).
@@ -20,6 +22,15 @@
 //     catalogues do not carry yet. Stated rather than implied.
 //   - It does not judge semantics: a real flag used for the wrong purpose is invisible.
 //   - It never invents a catalogue. A tool with no spec file is reported as uncovered.
+//   - It does not read tables of flags. A cell such as `-oJ` in a Markdown table is not a
+//     command line and is not guessed at; that shape has to be caught by a human.
+//   - It does not read pseudocode or non-shell fences (`yaml`, `json`, `sql`, `python`),
+//     standalone `.py`/`.js` files, or plugin options (`--pid`, `--dump`), which belong to
+//     the plugin rather than to the tool and are not in any catalogue. AUDIT-2026-09-19.md
+//     lists what these blind spots let through.
+//   - `--help`, `-h`, `--version` and friends are accepted for every tool: catalogues are
+//     extracted from documentation pages that mention them only in prose, so their absence
+//     there is not evidence that the flag is missing.
 //
 // Design rule: the catalogue errs toward *permissive*, because a false positive makes the
 // checker untrustworthy and an untrusted checker gets switched off. Missed detections are
@@ -47,23 +58,44 @@ const REQUIRE_RECORD = flagsOn.has('--require-verification');
 
 const IGNORED_DIRS = new Set(['.git', 'node_modules', '.vscode', 'dist', 'build']);
 
+// Audit records quote broken commands on purpose ("this flag does not exist"), so
+// validating them would turn a documented defect into a permanent red check.
+const AUDIT_RECORD = /^AUDIT-\d{4}-\d{2}-\d{2}\.md$/;
+
 // ── catalogues ────────────────────────────────────────────────────────────────────────
+let specFileCount = 0;
+
 function loadSpecs() {
   if (!existsSync(SPEC_DIR)) return new Map();
   const byAlias = new Map();
   for (const file of readdirSync(SPEC_DIR)) {
     if (!file.endsWith('.json')) continue;
     const spec = JSON.parse(readFileSync(join(SPEC_DIR, file), 'utf8'));
-    for (const alias of spec.aliases ?? [spec.tool]) byAlias.set(alias.toLowerCase(), spec);
-    byAlias.set(spec.tool.toLowerCase(), spec);
+    specFileCount++;
+    // Flag names are compared case-insensitively on purpose. SharpHound documents `-l, --Loop`
+    // and the guides write `--loop`; CommandLineParser accepts both, and flag names are
+    // case-insensitive in most of these tools. Being permissive here is the design rule: a
+    // missed detection is acceptable, a false report is not.
+    byAlias.set(String(spec.tool).toLowerCase(), spec);
+    for (const alias of spec.aliases ?? []) byAlias.set(String(alias).toLowerCase(), spec);
   }
   return byAlias;
+}
+
+// A shell line is often several commands joined by a pipe or a logical operator, and each
+// one has its own tool. Validating the whole line against its first tool attributes `-A4`
+// from `| grep -A4` to `oscap`: four false reports in one run, all of them mine.
+function splitPipeline(text) {
+  return text
+    .split(/\s*(?:&&|\|\||[|;])\s*/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 // ── markdown ──────────────────────────────────────────────────────────────────────────
 // Only fenced blocks that plausibly hold shell commands are read; a YAML rule or an HTTP
 // transcript is not a command line and must not be guessed at.
-const SHELL_LANGS = new Set(['', 'bash', 'sh', 'shell', 'console', 'powershell', 'ps1', 'cmd', 'dos', 'text', 'plaintext', 'zsh']);
+const SHELL_LANGS = new Set(['', 'bash', 'sh', 'shell', 'console', 'powershell', 'ps1', 'ps', 'cmd', 'cmd.exe', 'bat', 'dos', 'text', 'plaintext', 'zsh']);
 
 function commandsIn(file) {
   const lines = readFileSync(file, 'utf8').split('\n');
@@ -86,7 +118,28 @@ function commandsIn(file) {
       buffer = null;
       continue;
     }
-    if (!inFence || !SHELL_LANGS.has(info)) continue;
+    if (!inFence) {
+      // Inline code spans outside fences are commands the reader can paste too —
+      // `frida -U -f com.example.app -l unpin.js --no-pause` inside prose was a
+      // real defect this check used to miss. Table rows are skipped on purpose:
+      // the guides use them for side-by-side comparisons, and a row labelled
+      // "Volatility 2 equivalent" legitimately shows `--profile`, which is not a
+      // Volatility 3 flag. Only spans that start with a word followed by more
+      // text are considered, and toolOf() still requires a flag or a path.
+      // A line may quote a *wrong* invocation on purpose, to say that it fails. Mark it with
+      // `<!-- check-commands: ignore -->` and the span is left alone: a checker that cannot
+      // tell a warning from a recommendation punishes the guide for documenting its own
+      // defects, and that is how a check gets switched off.
+      if (line.includes('<!-- check-commands: ignore -->')) continue;
+      if (line.trimStart().startsWith('|')) continue;
+      for (const m of line.matchAll(/`([^`\n]+)`/g)) {
+        const candidate = m[1].trim();
+        if (!/^[A-Za-z][\w.-]*\s+\S/.test(candidate)) continue;
+        out.push({ text: candidate, line: i + 1, inline: true });
+      }
+      continue;
+    }
+    if (!SHELL_LANGS.has(info)) continue;
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
     // A line ending in a shell continuation is joined with the next one.
@@ -148,17 +201,20 @@ function looksLikeValue(token) {
 }
 
 function validateFlags(tokens, spec) {
-  const long = new Set(spec.longFlags ?? []);
-  const short = new Set(spec.shortFlags ?? []);
+  const long = new Set((spec.longFlags ?? []).map((f) => f.toLowerCase()));
+  const short = new Set((spec.shortFlags ?? []).map((f) => f.toLowerCase()));
+  // Conventions every CLI shares, whatever its own documentation page lists.
+  const universal = new Set(['--help', '-h', '--version', '-V', '-?']);
   const unknown = [];
   for (const raw of tokens) {
-    const bare = raw.replace(/^["'(]+|["'),;]+$/g, '');
+    const bare = raw.replace(/^["'(]+|["'),;]+$/g, '').toLowerCase();
     if (!bare.startsWith('-') || bare === '-' || bare === '--') continue;
     if (bare.includes('<') || bare.includes('$')) continue; // placeholder
     // `--level=3`, `--file-read=/etc/passwd`, `--script=default`: the value is glued to the
     // flag with `=`, so the flag is the stem. Missed this on the first full run and produced
     // sixteen false reports; the checker was wrong, not the guides.
     const token = bare.startsWith('--') && bare.includes('=') ? bare.slice(0, bare.indexOf('=')) : bare;
+    if (universal.has(token)) continue;
     if (long.has(token) || short.has(token)) continue;
     // `-T4`, `-p80`: a known short flag with its value attached.
     if (/^-[A-Za-z]/.test(token) && !token.startsWith('--')) {
@@ -181,7 +237,22 @@ function validatePositionals(tokens, spec) {
   const subs = spec.subcommands;
   if (!Array.isArray(subs) || subs.length === 0) return problems;
   const known = new Set(subs.map((s) => String(s).toLowerCase()));
-  const words = tokens.filter((t) => !t.startsWith('-') && !looksLikeValue(t));
+  // Flags that take a value, recorded per tool in the catalogue. The token after one of
+  // them is that value — `velociraptor -r Windows.System.Pslist` names an artifact, not a
+  // subcommand — and no help page lets a generator infer arity, so the list is data.
+  const valued = new Set((spec.valueFlags ?? []).map((f) => f.toLowerCase()));
+  const words = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+    if (token.startsWith('-')) {
+      const stem = token.startsWith('--') && token.includes('=')
+        ? token.slice(0, token.indexOf('='))
+        : token;
+      if (valued.has(stem.toLowerCase()) && !token.includes('=')) i += 1; // consume its value
+      continue;
+    }
+    if (!looksLikeValue(token)) words.push(token);
+  }
 
   if (spec.dottedPositionals) {
     for (const t of words) {
@@ -202,7 +273,7 @@ function walk(dir, out = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
       if (!IGNORED_DIRS.has(entry.name)) walk(join(dir, entry.name), out);
-    } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.md')) {
+    } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.md') && !AUDIT_RECORD.test(entry.name)) {
       out.push(join(dir, entry.name));
     }
   }
@@ -245,14 +316,24 @@ for (const file of walk(ROOT).sort()) {
   for (const { text, line } of commandsIn(file)) {
     commandLines++;
     fileCommands++;
-    const found = toolOf(text, specs);
+    const found = splitPipeline(text)
+      .map((segment) => toolOf(segment, specs))
+      .find((f) => f !== null);
     if (!found) continue;
     if (!found.spec) {
       uncovered.set(found.tool, (uncovered.get(found.tool) ?? 0) + 1);
       continue;
     }
     checkedLines++;
-    const badFlags = validateFlags(found.tokens, found.spec);
+    // For a tool that dispatches on plugins, the options *after* the plugin belong to that
+    // plugin, not to the tool: `vol -f mem.raw windows.memmap --pid 1 --dump` uses `--pid` and
+    // `--dump` from memmap, which no global catalogue can list. Checking them produced sixty
+    // false reports and buried the two real ones (`windows.memdump`, `windows.yarascan`).
+    const pluginAt = Array.isArray(found.spec.subcommands)
+      ? found.tokens.findIndex((t) => /^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)+$/.test(t) || /^![A-Za-z0-9_]+$/.test(t))
+      : -1;
+    const flagsToCheck = pluginAt > 0 ? found.tokens.slice(0, pluginAt) : found.tokens;
+    const badFlags = validateFlags(flagsToCheck, found.spec);
     const badSubs = validatePositionals(found.tokens, found.spec);
     for (const f of badFlags) {
       problems.push(`${rel}:${line} — ${found.tool}: unknown flag ${f} (catalogue: ${found.spec.provenance?.source ?? 'unknown'})`);
@@ -272,7 +353,8 @@ for (const file of walk(ROOT).sort()) {
 }
 
 console.log(
-  `check-commands: ${specs.size} catalogues, ${commandLines} command line(s) seen, ` +
+  `check-commands: ${specFileCount} catalogue(s) covering ${specs.size} tool name(s) ` +
+    `including aliases, ${commandLines} command line(s) seen, ` +
     `${checkedLines} checked against a catalogue, ${uncovered.size} tool(s) uncovered`,
 );
 if (filesWithCommands > 0) {

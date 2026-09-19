@@ -1,0 +1,120 @@
+{
+  "tool": "log2timeline",
+  "aliases": [
+    "log2timeline",
+    "log2timeline.py"
+  ],
+  "provenance": {
+    "source": "https://raw.githubusercontent.com/log2timeline/plaso/20191203/tests/cli/tools.py",
+    "sources": [
+      "https://raw.githubusercontent.com/log2timeline/plaso/20191203/tests/cli/tools.py",
+      "https://raw.githubusercontent.com/log2timeline/plaso/main/tests/cli/extraction_tool.py",
+      "https://raw.githubusercontent.com/log2timeline/plaso/main/tests/cli/storage_media_tool.py",
+      "https://plaso.readthedocs.io/en/latest/sources/Troubleshooting.html",
+      "https://raw.githubusercontent.com/log2timeline/plaso/20191203/docs/sources/user/Using-log2timeline.md"
+    ],
+    "version": "plaso 20191203 (tests/cli/tools.py) | plaso main (tests/cli/extraction_tool.py) | plaso main (tests/cli/storage_media_tool.py) | plaso docs latest (20260720) | plaso 20191203 (docs/sources/user/Using-log2timeline.md)",
+    "fetched": "2026-09-19",
+    "method": "fetch-tool-spec.mjs run once per source URL; the resulting longFlags/shortFlags arrays were unioned mechanically by a merge script. Not one flag was typed by hand.",
+    "summary": "Usage of log2timeline.py: collection into a plaso storage file.",
+    "note": "Flag names extracted mechanically from the plaso project's own sources (repository code, its CLI test help dumps, and its official documentation). Every source passed the generator's 12-flag minimum on its own. Extraction is deliberately over-inclusive; the catalogue is permissive by design.",
+    "parts": [
+      {
+        "source": "https://raw.githubusercontent.com/log2timeline/plaso/20191203/tests/cli/tools.py",
+        "version": "plaso 20191203 (tests/cli/tools.py)",
+        "longFlags": 7,
+        "shortFlags": 5
+      },
+      {
+        "source": "https://raw.githubusercontent.com/log2timeline/plaso/main/tests/cli/extraction_tool.py",
+        "version": "plaso main (tests/cli/extraction_tool.py)",
+        "longFlags": 23,
+        "shortFlags": 1
+      },
+      {
+        "source": "https://raw.githubusercontent.com/log2timeline/plaso/main/tests/cli/storage_media_tool.py",
+        "version": "plaso main (tests/cli/storage_media_tool.py)",
+        "longFlags": 12,
+        "shortFlags": 0
+      },
+      {
+        "source": "https://plaso.readthedocs.io/en/latest/sources/Troubleshooting.html",
+        "version": "plaso docs latest (20260720)",
+        "longFlags": 9,
+        "shortFlags": 3
+      },
+      {
+        "source": "https://raw.githubusercontent.com/log2timeline/plaso/20191203/docs/sources/user/Using-log2timeline.md",
+        "version": "plaso 20191203 (docs/sources/user/Using-log2timeline.md)",
+        "longFlags": 10,
+        "shortFlags": 6
+      }
+    ]
+  },
+  "longFlags": [
+    "--args",
+    "--bs",
+    "--buffer",
+    "--buffer-size",
+    "--codepage",
+    "--credential",
+    "--data",
+    "--debug",
+    "--ex",
+    "--help",
+    "--info",
+    "--language",
+    "--log-file",
+    "--logfile",
+    "--no",
+    "--no-auto-recurse",
+    "--no-extract-winevt-resources",
+    "--no-vss",
+    "--partition",
+    "--partitions",
+    "--process",
+    "--process-memory-limit",
+    "--profile",
+    "--profiling",
+    "--queue",
+    "--queue-size",
+    "--quiet",
+    "--sector",
+    "--sector-size",
+    "--show",
+    "--single",
+    "--single-process",
+    "--status",
+    "--storage-file",
+    "--temporary",
+    "--temporary-directory",
+    "--timezone",
+    "--troubles",
+    "--version",
+    "--vfs",
+    "--vfs-back-end",
+    "--volume",
+    "--volumes",
+    "--vss",
+    "--vss-only",
+    "--vss-stores",
+    "--worker",
+    "--worker-memory-limit",
+    "--worker-timeout",
+    "--workers",
+    "--zone"
+  ],
+  "shortFlags": [
+    "-V",
+    "-a",
+    "-d",
+    "-ef",
+    "-f",
+    "-h",
+    "-p",
+    "-q",
+    "-u",
+    "-z"
+  ],
+  "subcommands": null
+}

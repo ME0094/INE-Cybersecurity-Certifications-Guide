@@ -1,0 +1,46 @@
+{
+  "tool": "lynis",
+  "aliases": [
+    "lynis"
+  ],
+  "provenance": {
+    "source": "https://manpages.debian.org/bookworm/lynis/lynis.8.en.html",
+    "version": "lynis 3.0.x man page (Debian bookworm mirror of lynis.8)",
+    "fetched": "2026-09-19",
+    "note": "Flag names extracted mechanically from the tool's own documentation. Extraction is deliberately over-inclusive."
+  },
+  "longFlags": [
+    "--auditor",
+    "--cronjob",
+    "--debug",
+    "--developer",
+    "--forensics",
+    "--help",
+    "--logfile",
+    "--man",
+    "--no-colors",
+    "--no-log",
+    "--no-plugins",
+    "--pentest",
+    "--plugin-dir",
+    "--profile",
+    "--quick",
+    "--quiet",
+    "--report-file",
+    "--reverse-colors",
+    "--rootdir",
+    "--tests",
+    "--tests-from-category",
+    "--tests-from-group",
+    "--upload",
+    "--use-cwd",
+    "--verbose",
+    "--wait",
+    "--warnings-only"
+  ],
+  "shortFlags": [
+    "-Q",
+    "-q"
+  ],
+  "subcommands": null
+}

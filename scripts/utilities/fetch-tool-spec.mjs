@@ -27,14 +27,24 @@ function arg(name, fallback = null) {
   const i = args.indexOf(`--${name}`);
   return i >= 0 && args[i + 1] ? args[i + 1] : fallback;
 }
+// Repeatable: some tools split their options across files (frida-tools keeps `-U -f -H` in
+// application.py and `-l -P` in repl.py), so one source is never the whole catalogue.
+function allArgs(name) {
+  const out = [];
+  for (let i = 0; i < args.length - 1; i++) {
+    if (args[i] === `--${name}`) out.push(args[i + 1]);
+  }
+  return out;
+}
 
 const tool = arg('tool');
-const url = arg('url');
+const urls = allArgs('url');
+const url = urls[0];
 const version = arg('version', 'unspecified');
 const aliases = (arg('aliases') ?? tool ?? '').split(',').map((s) => s.trim()).filter(Boolean);
 const subcommandsFromUrl = arg('subcommands-from-url');
-if (!tool || !url) {
-  console.error('usage: fetch-tool-spec.mjs --tool <name> --url <docs-url> [--aliases a,b] [--version x] [--subcommands-from-url url]');
+if (!tool || urls.length === 0) {
+  console.error('usage: fetch-tool-spec.mjs --tool <name> --url <docs-url> [--url <more>] [--aliases a,b] [--version x] [--subcommands-from-url url]');
   process.exit(2);
 }
 
@@ -73,29 +83,42 @@ function toText(body) {
     .replace(/\s+/g, ' ');
 }
 
-const page = await get(url);
-if (page.status === 0 || page.status >= 400) {
-  console.error(`could not fetch ${url} (${page.status || 'no response'})`);
-  process.exit(1);
-}
-const text = toText(page.body);
-
-// Flags as they appear in a manual: -sS, --script, -T<0-5> (the placeholder is trimmed).
 const longFlags = new Set();
 const shortFlags = new Set();
-for (const m of text.matchAll(/(^|[\s(,])(--[A-Za-z][A-Za-z0-9-]{1,40})/g)) longFlags.add(m[2]);
-for (const m of text.matchAll(/(^|[\s(,])(-[A-Za-z][A-Za-z0-9]{0,5})(?=[\s,)<\/|]|$)/g)) {
-  if (m[2].startsWith('--')) continue;
-  shortFlags.add(m[2]);
+const ok = [];
+const failed = [];
+// argparse writes `parser.add_argument("-H", "--host", …)`: the long option is preceded by a
+// quote, not by a space. Requiring whitespace there is why frida's catalogue came out with
+// six flags and had to be abandoned. Quotes count as delimiters now.
+for (const source of urls) {
+  const page = await get(source);
+  if (page.status === 0 || page.status >= 400) {
+    // With several sources, one dead URL must not sink the catalogue: record it and carry on.
+    failed.push(`${source} (${page.status || 'no response'})`);
+    continue;
+  }
+  ok.push(source);
+  const text = toText(page.body);
+  for (const m of text.matchAll(/(^|[\s(,'"])(--[A-Za-z][A-Za-z0-9-]{1,40})/g)) longFlags.add(m[2]);
+  // Single-dash options are matched up to 20 characters, not 7. Tools such as nikto use
+  // single-dash long options (`-Display`, `-Plugins`, `-Cgidirs`), and a cap of seven made
+  // them impossible to catalogue — which meant the real flag got reported as unknown, the one
+  // failure this design refuses. Over-extraction is the safe direction.
+  for (const m of text.matchAll(/(^|[\s(,'"])(-[A-Za-z][A-Za-z0-9]{0,19})(?=[\s,)<\/|'"]|$)/g)) {
+    if (m[2].startsWith('--')) continue;
+    shortFlags.add(m[2]);
+  }
+  // A manual lists `-T<0-5>` or `-p <port ranges>`; keep the bare stem as well.
+  for (const m of text.matchAll(/(^|[\s(,'"])(-[A-Za-z][A-Za-z0-9]{0,5})(?=[<\[])/g)) shortFlags.add(m[2]);
 }
-// A manual lists `-T<0-5>` or `-p <port ranges>`; keep the bare stem as well.
-for (const m of text.matchAll(/(^|[\s(,])(-[A-Za-z][A-Za-z0-9]{0,5})(?=[<\[])/g)) shortFlags.add(m[2]);
 
 const spec = {
   tool,
   aliases: aliases.length > 0 ? aliases : [tool],
   provenance: {
     source: url,
+    sources: ok,
+    failedSources: failed,
     version,
     fetched: new Date().toISOString().slice(0, 10),
     note: 'Flag names extracted mechanically from the tool\'s own documentation. Extraction is deliberately over-inclusive.',

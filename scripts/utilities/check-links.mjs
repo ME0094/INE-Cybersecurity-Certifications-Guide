@@ -30,6 +30,12 @@ const IGNORED_DIRS = new Set(['.git', 'node_modules', '.vscode', 'dist', 'build'
 // They are not promises made by this repository, so they must not fail the check.
 const READER_ARTIFACTS = new Set(['answer-key.md', 'env.md', 'notes.md', 'notes.txt']);
 
+// URLs the repository quotes *because* they are dead: the note in CONTRIBUTING.md and
+// resources/official-links.md that tells the reader "this one returns 404, do not link it".
+// Checking them would keep the weekly sweep red on purpose, which is how a red job stops
+// meaning anything. Keep this list short, and only for URLs the guides name as broken.
+const EXPECTED_DEAD = new Set(['https://ine.com/security/certifications']);
+
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
@@ -129,6 +135,13 @@ function isUnroutable(url) {
   }
   if (!host.includes('.')) return true; // single label: lab, dvwa, collector…
   if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) return true;
+  // RFC 2606 / RFC 6761 reserved names. The guides use them deliberately — `https://app.example.com`
+  // means "your target", `https://trusted.example/` means "your IdP" — so failing the sweep on
+  // them would keep the weekly job red for a reason that is not rot.
+  if (/\.(example|invalid|test|internal)$/.test(host)) return true;
+  if (/(^|\.)example\.(com|net|org)$/.test(host)) return true;
+  // A wildcard bind address is not a server: `http://0.0.0.0:8180` comes from a lab log.
+  if (host === '0.0.0.0' || host === '::') return true;
   if (host === '::1' || host.startsWith('fe80:')) return true;
   const m = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
   if (!m) return false;
@@ -179,6 +192,7 @@ let checked = 0;
 let anchors = 0;
 let bareChecked = 0;
 let skippedLocal = 0;
+let skippedDead = 0;
 
 for (const file of files) {
   const raw = readFileSync(file, 'utf8');
@@ -201,6 +215,8 @@ for (const file of files) {
         const key = target.replace(/[.,;]$/, '');
         if (isUnroutable(key)) {
           skippedLocal++;
+        } else if (EXPECTED_DEAD.has(key)) {
+          skippedDead++;
         } else if (!external.has(key)) {
           external.set(key, null);
         }
@@ -257,7 +273,8 @@ console.log(
   `check-links: ${files.length} Markdown files, ${checked} relative link(s), ` +
     `${anchors} anchor check(s)` +
     (CHECK_EXTERNAL
-      ? `, ${external.size} external URL(s), ${skippedLocal} lab-local URL(s) skipped`
+      ? `, ${external.size} external URL(s), ${skippedLocal} lab-local URL(s) and ` +
+        `${skippedDead} known-dead URL(s) skipped`
       : ''),
 );
 if (broken.length > 0) {

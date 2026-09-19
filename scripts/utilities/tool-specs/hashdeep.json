@@ -1,0 +1,45 @@
+{
+  "tool": "hashdeep",
+  "aliases": [
+    "hashdeep"
+  ],
+  "provenance": {
+    "source": "https://manpages.debian.org/bookworm/hashdeep/hashdeep.1.en.html",
+    "version": "4.4 (Debian bookworm, hashdeep 4.4-7.1+b1)",
+    "fetched": "2026-09-19",
+    "note": "Flag names extracted mechanically from the tool's own documentation. Extraction is deliberately over-inclusive."
+  },
+  "longFlags": [],
+  "shortFlags": [
+    "-E",
+    "-F",
+    "-Fb",
+    "-Fm",
+    "-Fu",
+    "-M",
+    "-V",
+    "-X",
+    "-a",
+    "-b",
+    "-c",
+    "-d",
+    "-e",
+    "-f",
+    "-h",
+    "-i",
+    "-j0",
+    "-jnn",
+    "-k",
+    "-l",
+    "-m",
+    "-o",
+    "-p",
+    "-r",
+    "-s",
+    "-u",
+    "-v",
+    "-w",
+    "-x"
+  ],
+  "subcommands": null
+}

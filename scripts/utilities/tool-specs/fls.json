@@ -1,0 +1,33 @@
+{
+  "tool": "fls",
+  "aliases": [
+    "fls"
+  ],
+  "provenance": {
+    "source": "https://manpages.debian.org/trixie/sleuthkit/fls.1.en.html",
+    "version": "4.12.1+dfsg-3 (Debian trixie)",
+    "fetched": "2026-09-19",
+    "note": "Flag names extracted mechanically from the tool's own documentation. Extraction is deliberately over-inclusive."
+  },
+  "longFlags": [],
+  "shortFlags": [
+    "-D",
+    "-F",
+    "-V",
+    "-a",
+    "-b",
+    "-d",
+    "-f",
+    "-i",
+    "-l",
+    "-m",
+    "-o",
+    "-p",
+    "-r",
+    "-s",
+    "-u",
+    "-v",
+    "-z"
+  ],
+  "subcommands": null
+}
