@@ -31,7 +31,7 @@ These are not optional formalities. A hunting range is an offensive-capability l
 
 ## 3. Topology
 
-A five-node range is enough for every exercise in `hunting-exercises.md`, and small enough to snapshot and rebuild:
+A four-node range is enough for every exercise in `hunting-exercises.md` — two victims, a collector, and an optional attacker — and small enough to snapshot and rebuild:
 
 ```text
                     ┌──────────────────────────────────────────────┐
@@ -365,7 +365,7 @@ Full rebuild (when the range is beyond reverting, or you want a clean-room check
 - **Only forwarding the Security log.** Service installs (`7045`) arrive in System, task changes in TaskScheduler Operational, PowerShell in its own channel. Configure the whole set or document the gap.
 - **A channel that wrapped before you collected it.** Small default log sizes on a lab VM lose data within days. Increase channel sizes and forward continuously.
 - **Emulation without a record.** If you do not log what you ran and when, you cannot tell whether your hunt found the technique or noise — and you cannot score your own hunt.
-- **A range that is too big to rebuild.** Five nodes you can rebuild in five minutes beat fifteen you are afraid to touch.
+- **A range that is too big to rebuild.** Four nodes you can rebuild in five minutes beat fifteen you are afraid to touch.
 - **Forgetting the ethics line.** Every session: is this my system or is this authorized, in writing, for this window? If the answer is not an immediate yes, stop.
 
 ## Checklist / Self-Test

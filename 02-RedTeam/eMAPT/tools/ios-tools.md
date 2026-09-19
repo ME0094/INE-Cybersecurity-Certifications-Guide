@@ -85,9 +85,13 @@ Objective-C keeps rich runtime metadata (class names, methods, properties).
 surface quickly. It only works on **decrypted**, non-stripped Objective-C
 binaries.
 
+**Platform:** `class-dump` and `otool` are macOS tools (the Xcode command-line
+tools provide `otool`); they are not available on a Linux/Windows host. From a
+non-Mac host, read the same metadata with Ghidra, or run the dump on a Mac.
+
 ```bash
-class-dump -H Payload/Example.app/Example -o headers/    # old objc apps
-# Alternative tools: class-dump-swift, or 'otool -ov' for a quick look
+class-dump -H Payload/Example.app/Example -o headers/    # old objc apps (macOS)
+# Alternative tools: class-dump-swift, or 'otool -ov' for a quick look (macOS)
 otool -ov Payload/Example.app/Example | head -80
 ```
 
@@ -195,9 +199,16 @@ host, or an authorized remote lab.
 - [ ] My lab notes record which devices/apps I am authorized to test
 - [ ] I know the current jailbreak options and which iOS versions they support
 
+> **Verification:** unverified syntax references — not run. This lab has no macOS
+> host, so `class-dump`, `otool`, Xcode and `simctl` were not executed; the
+> platform split above is Apple/tool vendor documentation
+> (<https://developer.apple.com/documentation/>, 2026-09-19). The one executed
+> check in this file's scope is the crackme's build platform: the MASTG
+> UnCrackable-Level1 IPA ships `iphoneos` device slices only.
+
 ## Further Resources
 
-- OWASP MASTG iOS testing guide — https://owasp.org/www-project-mobile-security-testing-guide/
+- OWASP MASTG iOS testing guide — https://mas.owasp.org/MASTG/
 - Frida — https://frida.re/docs/
 - frida-ios-dump — https://github.com/AloneMonkey/frida-ios-dump
 - Ghidra — https://ghidra-sre.org/

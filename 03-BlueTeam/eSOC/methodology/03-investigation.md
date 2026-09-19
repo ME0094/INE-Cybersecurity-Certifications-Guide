@@ -64,6 +64,8 @@ Enrichment adds outside and internal context that raw events lack.
 - **User context:** department, role, travel history, VPN usage, whether the account is a service account. A developer logging on from a hotel in another country reads differently than a service account doing the same.
 - **Historical sighting:** has this hash/IP/user triggered anything else in the last 90 days? One-off vs repeat pattern changes the verdict.
 
+> ⚖️ **Privacy and proportionality (read before you enrich a person).** Enrichment that describes a *human being* — travel history, hours, location, department — is personal-data processing, and it needs a documented purpose (detecting and investigating security incidents), an authorization (written policy or a named approver, plus any works-council or union agreement your jurisdiction requires), and proportionality: the least intrusive data that answers *this* question. Prefer account-role and asset attributes over personal attributes, and state the window you are searching instead of asking for "everything about this user". Apply a retention limit to what you pull in, keep HR and travel context to what a specific documented question needs (and get it through the owner of that data, not through a query), and **never** write into the case note anything that is not evidence: no medical, family, religious, union or private-travel detail, and no personal data of users who turned out to be uninvolved.
+
 Enrichment lookup flow for an unknown source IP:
 
 ```text
@@ -93,14 +95,14 @@ Timeline fragment (Windows-oriented). This is a *constructed illustration of the
 ```text
 2025-06-01 02:11:14Z  4625  failed logon x6, user: j.doe, src: 198.51.100.9
 2025-06-01 02:12:01Z  4624  SUCCESS logon, user: j.doe, type 3, src: 198.51.100.9
-2025-06-01 02:12:40Z  4688  powershell.exe -enc <base64>  (parent: svchost.exe)
+2025-06-01 02:12:40Z  4688  powershell.exe -enc <base64>  (parent: svchost.exe = task/WMI launch)
 2025-06-01 02:13:05Z  sysmon 3  powershell.exe -> TCP 203.0.113.77:443  [C2?]
 2025-06-01 02:14:22Z  4698  scheduled task "UpdaterSvc" created by j.doe  [persistence]
 ```
 
 Build it in the SIEM (timeline view / time-boxed search) and paste the ordered result into your case notes — the artifact *is* the deliverable.
 
-Note where the illustration is already misleading, because that is the skill: a `4688` whose parent is `svchost.exe` is *itself* a finding (service-hosted execution), and a logon at 02:11 with `type 3` after six failures from a public address is not routine. A timeline is not a list of events; it is a list of events **you have annotated with what each one implies**.
+Note where the illustration is already misleading, because that is the skill: a `4688` whose parent is `svchost.exe` is **not** a finding on its own — `svchost.exe` is the ordinary parent of whatever Task Scheduler and WMI launch, so treating that parent as suspicious would queue the entire estate. What is worth explaining here is the child's *arguments*: an encoded PowerShell command is the anomaly, and the question is whether a scheduled task, a WMI subscription or a management agent on this host legitimately runs it (gate 3 is where that gets decided, and gate 4 is where the payload gets decoded). A logon at 02:11 with `type 3` after six failures from a public address, by contrast, is not routine. A timeline is not a list of events; it is a list of events **you have annotated with what each one implies**.
 
 ## Correlating Indicators
 
@@ -113,9 +115,18 @@ An indicator alone is weak; correlated indicators are evidence. Treat this as hy
 
 Scoping query concept (everything touching one user in 48 hours):
 
-```lucene
+```text
+# Kibana Lucene syntax - the filter half. Lucene has no aggregation either, so
+# the "group by" is a separate step, not a clause of this query.
 user.name:"j.doe" AND @timestamp:[now-2d TO now]
-| stats count by event.category, host.name, source.ip
+```
+
+```esql
+// The counting half, in the same Kibana search bar (ES|QL, Elastic 8.11+)
+FROM logs-*
+| WHERE user.name == "j.doe" AND @timestamp >= NOW() - 2 days
+| STATS events = COUNT(*) BY event.category, host.name, source.ip
+| SORT events DESC
 ```
 
 If the same indicator touches a second host, your scope just doubled — update the case and the escalation threshold immediately.
@@ -209,7 +220,7 @@ An indicator is weak because it is *single*. Correlation means turning one artif
 | `process.name` / `process.parent.name` | Is this parent–child pair normal in this environment? | `process.parent.name : "winword.exe" and process.name : *` |
 | File hash | Where else has this file been seen — on disk and in the SIEM? | `file.hash.sha256 : "<hash>"` and a YARA scan over collected samples |
 | Domain / URL | Who else resolved or requested it? | `dns.question.name : "<domain>" or url.full : *<domain>*` |
-| Scheduled task / service name | What created it, and does it exist elsewhere? | `event.code : ("4698" or "7045") and winlog.event_data.TaskName : *UpdaterSvc*` |
+| Scheduled task / service name | What created it, and does it exist elsewhere? | `(event.code : 4698 and winlog.event_data.TaskName : *UpdaterSvc*) or (event.code : 7045 and winlog.event_data.ServiceName : *UpdaterSvc*)` |
 
 ```spl
 # Splunk equivalent of "scope one user across every source class"
@@ -292,8 +303,9 @@ Escalating is not handing over the problem; it is handing over *a documented sta
 ## Further Resources
 
 - MITRE ATT&CK — kill-chain framing and technique context for analysis: https://attack.mitre.org
-- NIST SP 800-61 — Computer Security Incident Handling Guide (triage & escalation context): https://csrc.nist.gov/pubs/sp/800/61/r3/final
+- NIST SP 800-61 Rev. 3 — *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile* (triage & escalation context): https://csrc.nist.gov/pubs/sp/800/61/r3/final
+  - The phased incident-response lifecycle this module's *Preparation → Detection and Analysis → Containment, Eradication and Recovery → Post-Incident Activity* framing comes from is the **Rev. 2** lifecycle (SP 800-61 Rev. 2, *Computer Security Incident Handling Guide*, withdrawn); Rev. 3 replaces the linear phases with a CSF 2.0-based profile and no longer uses that four-phase model. The phases here are used as vocabulary, not as a claim that Rev. 3 defines them.
 - AlienVault OTX (open threat intelligence): https://otx.alienvault.com
 - VirusTotal (file/IP/domain reputation): https://www.virustotal.com
 - MISP (open-source threat intelligence platform): https://www.misp-project.org
-- CISA — incident response and analysis guidance: https://www.cisa.gov/resources-tools/resources/incident-response-guidelines
+- CISA — Federal Government Cybersecurity Incident and Vulnerability Response Playbooks: https://www.cisa.gov/sites/default/files/publications/Federal_Government_Cybersecurity_Incident_and_Vulnerability_Response_Playbooks_508C.pdf

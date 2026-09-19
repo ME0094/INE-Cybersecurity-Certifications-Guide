@@ -11,10 +11,16 @@ your only original.
 ## Before You Start: Order of Operations
 
 1. **Identify** the evidence you must preserve (running system, disk, logs, memory).
-2. **Isolate** — disconnect from the network only when it will not destroy volatile data you still need.
-3. **Capture volatile data first** (memory, running processes), then disk, then logs.
-4. **Hash everything** at capture time and record hashes in your case notes.
-5. **Work from copies** on a dedicated analyst machine, never the original media.
+2. **Capture volatile state first** — memory, running processes, network connections, logged-on
+   sessions. This is the only step that must happen before anything else touches the host.
+3. **Isolate** — disconnect from the network once the volatile state you need is captured;
+   isolation itself destroys session and connection evidence.
+4. **Collect disk artefacts** — a triage collector such as KAPE reads files and registry hives
+   from **the investigated system itself** and writes them to external media. That is a disk
+   collection, not a volatile-state capture, and it changes the host, so it comes after step 2.
+5. **Image the disk**, then logs, when the response allows taking the host down.
+6. **Hash everything** at capture time and record hashes in your case notes.
+7. **Work from copies** on a dedicated analyst machine, never the original media.
 
 ## Acquisition: Capturing Disk Evidence
 
@@ -94,20 +100,37 @@ you want) and runs *modules* (parsers that turn them into readable output) witho
 installing anything on the target. It is a directory of reusable definitions:
 
 ```text
-kape.exe --tsource D:\evidence\live   --tdest E:\case\kape-collect --target Windows --tflush
-kape.exe --msource D:\evidence\live   --mdest E:\case\kape-parse   --module !EZ1
+# KAPE runs ON the system under investigation: --tsource is what it reads FROM.
+# 1. Collect: --tdest is where the copied artefacts land. --tflush empties --tdest first,
+#    so never point --tdest (or --tflush) at your evidence medium — use a working disk.
+kape.exe --tsource C: --tdest D:\kape-work\case-014\collect --target Windows --tflush
+
+# 2. Parse: --msource reads what step 1 COLLECTED (not the live system); --mdest is the output.
+kape.exe --msource D:\kape-work\case-014\collect --mdest E:\evidence\case-014\kape-parse --module !EZParser
 ```
 
-- `--tsource/--tdest` — where to read from and write collected targets.
+- `--tsource/--tdest` — where to read targets **from** and where the collected files **land**.
 - `--target Windows` — collect the standard Windows target set (Prefetch, Amcache,
   Shimcache, event logs, SRUM, registry hives, and more).
-- `--msource/--mdest` — where to read collected files and write parsed output.
-- `--module !EZ1` — run the Eric Zimmerman parsing bundle (timeline, prefetch, etc.).
-- `--tflush` — wipe destination folders first for a clean run.
+- `--msource/--mdest` — where to read the **collected** files and where the parsed output is
+  written. `--msource` is the step-1 output, never the live system.
+- `--module !EZParser` — run the Eric Zimmerman parsing bundle (timeline, prefetch, etc.).
+- `--tflush` — wipe the `--tdest` folder first for a clean run. **Never** let it point at your
+  evidence medium: it deletes before it writes.
+
+Two things to keep straight about KAPE:
+
+- **It is a disk-artefact collector, not a volatile-state capture.** It reads files and registry
+  hives. Memory, running processes, and connection state are lost the moment the host changes
+  state, so capture those *before* you run KAPE (see "Order of Operations" above).
+- **It runs on the investigated host.** Every target it reads, and the Prefetch and `$MFT`
+  entries the collector itself creates, land inside the system you are examining. Record the
+  collection time in your case notes so KAPE's own artefacts can be told apart from the
+  attacker's.
 
 Use KAPE to gather artifacts from many hosts in minutes, then analyze the output on your
-own machine. Common practice: run KAPE on a mounted image or a live endpoint, then feed
-the output into timeline tools.
+own machine. Common practice: run KAPE on a mounted image (mounted read-only) or on a live
+endpoint, then feed the output into timeline tools.
 
 ### Velociraptor (Basics)
 
@@ -120,10 +143,19 @@ Language).
 # On the server, list available collection artifacts
 velociraptor artifacts list Windows.KapeFiles.*
 
-# Collect an artifact from the CLI against a client
-velociraptor --config server.config.yaml client collect \
-  --client_id C.xxxx Windows.KapeFiles.Targets
+# Collect an artifact through the server against one client.
+# `artifacts collect` is the real subcommand, and `--client_id` names the client to
+# collect from (it defaults to "server", which collects from the server itself).
+velociraptor --config server.config.yaml artifacts collect \
+  Windows.KapeFiles.Targets --client_id C.xxxx
 ```
+
+- There is **no `client collect` subcommand**. `client` is the agent binary: `velociraptor
+  client ...` starts or manages the service on an endpoint. Collection is `artifacts collect`.
+- `--config server.config.yaml` is what gives the command access to the server's artifact
+  repository and datastore; without it you only see the artifacts compiled into the binary.
+- `-r` (or `--run`) is the shorthand for a *local* collection on the machine you are sitting at:
+  `velociraptor -r Windows.System.Pslist`. It rewrites to `artifacts collect` internally.
 
 Typical responder use: push `Windows.KapeFiles.*` or `Windows.Registry.*` collections to
 suspect hosts, pull results into the server's UI, and pivot from one suspicious file to a
@@ -170,15 +202,24 @@ dump for these. Volatility 3 dropped the "profile" requirement — plugins auto-
 OS.
 
 ```bash
-# Windows memory dump from FTK Imager or DumpIt/winpmem
+# Windows memory dump from FTK Imager or DumpIt/winpmem.
+# Volatility 3 installs the command as `vol` (a pip install also provides `volshell`);
+# `vol --help` prints the plugin list for your build.
 vol -f mem.raw windows.pslist          # running processes
 vol -f mem.raw windows.psscan          # processes incl. terminated/hidden
 vol -f mem.raw windows.cmdline         # command lines of processes
 vol -f mem.raw windows.malfind         # injected / suspicious memory regions
 vol -f mem.raw windows.netscan         # network artifacts from memory
-vol -f mem.raw windows.hivelist        # locate registry hives in memory
-vol -f mem.raw windows.dumpfiles -r shell   # extract files from memory
+vol -f mem.raw windows.registry.hivelist             # locate registry hives in memory
+vol -f mem.raw windows.dumpfiles --filter 'shell'    # dump cached files matching the regex
 ```
+
+> Two names worth internalizing, because both plausible-looking versions fail to run:
+> **`windows.hivelist` does not exist** — the hive plugin sits under the `registry` namespace,
+> so it is `windows.registry.hivelist`. And **`-r` is Volatility's global `--renderer` option**
+> (the output format, e.g. `json` or `csv`), *not* a filter: to restrict `windows.dumpfiles` to
+> files whose name matches a pattern, use `--filter <regex>`, with `--ignore-case` if you want
+> the match to be case-insensitive. Confirm both against `vol --help` on your own install.
 
 Order matters: start with process listings to spot anomalies (odd names, parents,
 locations like `C:\Users\Public\` or `%TEMP%`), confirm with `cmdline`, then use
@@ -210,13 +251,24 @@ locations like `C:\Users\Public\` or `%TEMP%`), confirm with `cmdline`, then use
 - [ ] I can run `windows.pslist`, `windows.cmdline`, and `windows.malfind` on a memory dump.
 - [ ] I maintain a chain-of-custody record with hashes for every exhibit I handle.
 
+> **Verification:** the Volatility 3 plugin names were executed against Volatility 3 Framework
+> 2.28.2 (`vol --help`; `vol -f /dev/null windows.dumpfiles --help`) on 2026-09-19, which is the
+> output `windows.registry.hivelist` and `windows.dumpfiles --filter` come from; the corrected
+> invocation is the one shown above. The Velociraptor invocation was **checked against the
+> vendor's CLI reference** ([`artifacts collect`](https://docs.velociraptor.app/docs/cli/commands/artifacts/),
+> which documents `--client_id`, default `server`) on 2026-09-19 — no Velociraptor binary was
+> available to run it. KAPE was not executed either: `!EZParser` and the `--msource` chaining are
+> unverified syntax references, not observed runs.
+
 ## Further Resources
 
+- NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* — https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) — https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - NIST SP 800-86, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - MITRE ATT&CK (process/behavior reference) — https://attack.mitre.org/
 - plaso / log2timeline documentation — https://plaso.readthedocs.io/
 - Autopsy / The Sleuth Kit — https://www.sleuthkit.org/
 - Volatility 3 (GitHub) — https://github.com/volatilityfoundation/volatility3
-- KAPE (Eric Zimmerman tools) — https://github.com/EricZimmerman/KAPE
+- KAPE (Eric Zimmerman tools; the definitions live in the KapeFiles repository) — https://github.com/EricZimmerman/KapeFiles
 - Velociraptor documentation — https://docs.velociraptor.app/
 - FTK Imager product page (Exterro) — https://www.exterro.com/digital-forensics-software/ftk-imager

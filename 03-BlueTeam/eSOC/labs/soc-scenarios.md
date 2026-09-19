@@ -33,9 +33,13 @@ Minimum useful setup:
 A quick way to confirm collection end-to-end on the Elastic path:
 
 ```powershell
-# From an elevated PowerShell on the Windows endpoint: force a recognizable event
-Write-EventLog -LogName Security -Source Microsoft-Windows-Security-Auditing -EventId 4625 -Message "lab test" 2>$null
-# Better: simply attempt a bad logon (see drill 1) and watch Kibana within ~30 seconds
+# From an elevated PowerShell on the Windows endpoint: generate the event for
+# real by attempting a bad logon (drill 1 uses the same shape). A genuine 4625
+# carries every field the pipeline parses; there is no shortcut that writes a
+# convincing Security event by hand - the Security channel is not writable that
+# way, and a fabricated event would prove nothing about collection anyway.
+net use \\127.0.0.1\IPC$ /user:lab\ghost WrongPass!
+# Then watch Kibana within ~30 seconds
 ```
 
 Then search in Kibana (Discover):
@@ -57,7 +61,7 @@ You do not need real malware to practice detection. Attack *shapes* can be repro
 | Failed-logon spike | 20 rapid bad logons: `net use \\127.0.0.1\IPC$ /user:lab\ghost WrongPass!` in a loop | Event 4625 storms from `127.0.0.1` |
 | New local admin | `net user labadmin P@ssw0rd! /add` then `net localgroup administrators labadmin /add` | Events 4720 + 4732 (if auditing enabled) |
 | Persistence-ish task | `schtasks /create /tn "LabTask" /tr "calc.exe" /sc once /st 23:59` | Sysmon 1 / 4688 showing `schtasks.exe` |
-| Outbound beacon shape | `powershell -c "1..20 | % { Invoke-WebRequest http://10.0.0.10:8080/beacon; Start-Sleep -Seconds 60 }"` | Repeated connections to one IP every ~60 s |
+| Outbound beacon shape | `powershell -c "1..20 \| % { Invoke-WebRequest http://10.0.0.10:8080/beacon; Start-Sleep -Seconds 60 }"` | Repeated connections to one IP every ~60 s |
 
 Always keep a list of what you generated, when, and from which account. That log is the "ground truth" you compare your detections against.
 
@@ -73,10 +77,19 @@ For each drill: read the setup, run it, triage the resulting alert using the tem
 - **Expected outcome:** the SIEM shows a visible cluster of 4625s with a consistent source IP; your aggregation query returns a count well above baseline. Confidence that the pipeline works: **high**.
 
 ```text
-# Kibana KQL
+# Kibana KQL - the filter half. KQL has no pipe and no aggregation: it selects
+# documents, and the "group by" is a second step (see the ES|QL block below, a
+# Discover table, or a dashboard visualization).
 event.code : 4625 and winlog.event_data.SubStatus : "0xC000006A"
-# Group by account + source IP to find the spike
-event.code : 4625 | top 10 user.name by count
+```
+
+```esql
+// The counting half, in the same Kibana search bar (ES|QL, Elastic 8.11+)
+FROM logs-windows.*
+| WHERE event.code == "4625"
+| STATS attempts = COUNT(*) BY user.name, source.ip
+| SORT attempts DESC
+| LIMIT 10
 ```
 
 ### Drill 2 — Encoded PowerShell (Obfuscated Script Shape)
@@ -95,8 +108,8 @@ event.code : 4625 | top 10 user.name by count
 yara ../tools/detection-rules/yara-rules/yara-example.yar suspicious.txt
 ```
 
-- **Expected outcome:** the rule matches the file and prints the rule name. Then scan a normal file (e.g., `notepad.exe`) — no match, because it is a PE without those strings.
-- **Triage angle:** a *text* file matching is low severity (maybe someone saved notes); the *same strings inside a real PE or in memory* would be high severity. YARA identifies; analysts judge.
+- **Expected outcome:** `Suspicious_CredDump_Strings_AnyFile` matches the file and prints the rule name. Its companion `Suspicious_CredDump_Strings_PE` stays silent, because a `.txt` is not a PE — that silence is the lesson of the pair, not a failure of the drill. Then scan a normal file (e.g., `notepad.exe`): neither rule matches, because it carries none of those strings.
+- **Triage angle:** a *text* file matching is low severity (maybe someone saved notes); the *same strings inside a real PE or in memory* would be high severity — which is why the two rules are separate. YARA identifies; analysts judge.
 
 ### Drill 4 — New Local Administrator Account
 
@@ -138,6 +151,10 @@ yara ../tools/detection-rules/yara-rules/yara-example.yar suspicious.txt
 - [ ] I can reproduce the full timeline of a drill from SIEM data alone (what / who / when / where).
 - [ ] I triaged every drill alert using the fill-in template from the alert triage guide.
 - [ ] I shut down or disconnected the lab network when not practicing.
+
+> **Verification:** the YARA pair in `../tools/detection-rules/yara-rules/yara-example.yar` was run with **yara 4.5.0** on **2026-09-19**, against test files created under `/tmp` (nothing was written inside the repository). A harmless `.txt` holding three of the strings matches `Suspicious_CredDump_Strings_AnyFile` and nothing else; the same strings appended to a real PE (`notepad.exe`) match `Suspicious_CredDump_Strings_PE` as well; `notepad.exe` alone and a text file with no such strings match nothing. Under the earlier single-rule version the `.txt` produced **no match at all**.
+>
+> The `Write-EventLog` shortcut that used to appear under *Lab Blueprint* was also executed, on **2026-09-19** on Windows (PowerShell, elevated session), with the redirect removed so the error was visible: `Write-EventLog -LogName Security -Source Microsoft-Windows-Security-Auditing -EventId 4625 -Message "lab test"` writes nothing and reports on stderr, in Spanish because this Windows is localised, `No se pudo abrir la clave del Registro para el registro "Security" del origen "Microsoft-Windows-Security-Auditing".` — *the registry key for the "Security" log could not be opened for that source*. It is a **non-terminating** error, which is exactly why the original `2>$null` made the command look like it had worked. No event was created, and the shortcut has been removed.
 
 ## Further Resources
 

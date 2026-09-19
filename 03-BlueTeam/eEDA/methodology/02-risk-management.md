@@ -42,7 +42,7 @@ Practical identification techniques:
 Asset-centric : start from the asset register -> what can hurt each asset?
 Threat-centric: start from threat actors/campaigns -> what do they target?
 Scenario-based: "what if" workshops (e.g., ransomware on the ERP, cloud key leak)
-Checklist     : control catalogs (CIS, NIST SP 800-53, ISO 27002 Annex A)
+Checklist     : control catalogs (CIS, NIST SP 800-53, ISO/IEC 27001:2022 Annex A)
 ```
 
 Output: a structured list of candidate risks, each with an owner and a clear statement. A well-formed risk statement is specific: "Ransomware encrypts the finance file shares, causing >72h downtime for month-end close," not "cyber attack."
@@ -333,8 +333,8 @@ Two risk classes that behave differently from internal ones, and that administra
 ## Further Resources
 
 - NIST Risk Management Framework overview: https://csrc.nist.gov/projects/risk-management
-- NIST SP 800-37 Rev. 2 (RMF guide): https://csrc.nist.gov/pubs/sp/800/37/r2/upd1/final
+- NIST SP 800-37 Rev. 2 (RMF guide): https://csrc.nist.gov/pubs/sp/800/37/r2/final
 - NIST SP 800-30 (risk assessment guide): https://csrc.nist.gov/pubs/sp/800/30/r1/final
 - ISO 31000 — risk management standard page: https://www.iso.org/iso-31000-risk-management.html
-- The Open Group FAIR standard (intro): https://www.opengroup.org/faq/open-fair-standard
+- The Open Group — Open FAIR (risk analysis standard): https://www.opengroup.org/open-fair
 - ENISA — risk management resources: https://www.enisa.europa.eu

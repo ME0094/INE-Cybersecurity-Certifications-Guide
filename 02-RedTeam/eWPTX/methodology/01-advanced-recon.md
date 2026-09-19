@@ -160,7 +160,9 @@ done
 Interpretation and follow-ups:
 
 - **`.git/` exposed**: `git-dumper` the repository and run `git log -p` —
-  commits often contain credentials and older, vulnerable code.
+  commits often contain credentials and older, vulnerable code. Rate it
+  **high** — the same level `tools/custom-scripts/advanced-scanner.py` assigns to
+  an accessible `.git/config`.
 - **Backups** (`.bak`, `~`, `.zip`, `.sql`, `.tar.gz`, `%7e` dotfiles):
   download and grep for secrets; a DB dump is a critical finding.
 - **Swagger/OpenAPI** (`/swagger-ui.html`, `/v2/api-docs`, `/openapi.json`):
@@ -178,7 +180,8 @@ Content-Type: application/json
 - **`.well-known/`**: `security.txt`, `openid-configuration`, `jwks.json`,
   `assetlinks.json` — reveals federation and OAuth endpoints (feeds phase 4).
 - **robots.txt / sitemap.xml**: still useful; compare with what the crawler
-  found to spot disallowed admin paths.
+  found to spot disallowed admin paths. Their Exposure alone is **low** (the
+  scanner's `paths` check rates them there) — a route list, not a leak.
 
 ## Documenting the attack surface
 
@@ -190,7 +193,7 @@ Stack:       React SPA -> API Gateway -> Node/Express; GraphQL present
 Front line:  Cloudflare (WAF on, rate limit 10 req/min per IP)
 Auth:        OIDC via /auth (PKCE), JWT in localStorage, 2FA optional
 Endpoints:   23 REST + GraphQL; /api/v1 legacy still reachable
-Exposed:     /api/v1/swagger.json (readable), .git on admin.store.*
+Exposed:     /api/v1/swagger.json (readable, info), .git on admin.store.* (high)
 Secrets:     Firebase config w/ public keys only (low)
 Candidate issues: legacy v1 ACL, GraphQL introspection, IDOR on orders
 Next:        phase 2 chaining — v1 IDOR -> admin token in .git history
@@ -236,6 +239,14 @@ appears — exploitation phases are only as good as this map.
       the origin matters.
 - [ ] I maintain one up-to-date attack-surface document per host with
       evidence, scope markings, and candidate next steps.
+
+> **Verification:** the severity levels quoted here were taken from a run of
+> `02-RedTeam/eWPTX/tools/custom-scripts/advanced-scanner.py` on 2026-09-19
+> (Python 3.12.3) against a local server exposing `/.git/config` (200),
+> `robots.txt` (200) and a reflected `Access-Control-Allow-Origin`: `.git/config`
+> is reported `high`, `robots.txt`/`sitemap.xml` `low`, and everything else
+> `info`. The recon commands in this file were not run — no authorized target was
+> available in this lab, so they remain documentation-primary.
 
 ## Further Resources
 

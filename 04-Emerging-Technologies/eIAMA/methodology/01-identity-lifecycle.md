@@ -97,8 +97,11 @@ POST /scim/v2/Users
   "active": true
 }
 
-// Deprovisioning: PATCH "active": false — keeps the identity and audit
-// record but blocks access everywhere the app is connected.
+// Deprovisioning: PATCH "active": false. Per RFC 7643 §4.1.1, `active` is a *boolean*
+// attribute of the account, not a session control: "specifying false ... indicates that
+// the user should be prevented from accessing any resource". It does not by itself end
+// sessions that are already established, nor expire tokens already issued — those are
+// separate steps (see the pitfalls below).
 ```
 
 | Provisioning pattern | Strengths | Weaknesses |

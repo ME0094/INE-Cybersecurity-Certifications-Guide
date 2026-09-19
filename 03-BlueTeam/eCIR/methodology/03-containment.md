@@ -140,28 +140,60 @@ belong in long-term containment:
 ## Preserving Evidence While Containing
 Containment and forensics conflict: isolation often destroys volatile
 evidence. Where the situation allows, capture the most volatile data
-**before** you cut the network. Follow the order of volatility: registers/
-cache, process table, network state, open files, then disk.
+**before** you cut the network. Follow the **order of volatility from RFC 3227,
+*Guidelines for Evidence Collection and Archiving*, §2.1** — most volatile first:
+
+1. Registers, cache
+2. Routing table, ARP cache, process table, kernel statistics, memory
+3. Temporary file systems
+4. Disk
+5. Remote logging and monitoring data relevant to the system in question
+6. Physical configuration, network topology
+
+The eCDFP module carries the same order under the same six headings
+(`../../eCDFP/methodology/01-acquisition.md`), with swap/pagefile spelled out at level 3.
+Use one list, not two.
 
 ```powershell
-# Windows: snapshot volatile state BEFORE isolation
-Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ" | Out-File evidence/start-time.txt
-Get-NetTCPConnection -State Established | Export-Csv evidence/connections.csv
+# Windows: VOLATILE state first — this is what isolation and power-off destroy.
+# Write to the mounted evidence medium with an ABSOLUTE path, never to C:\ and never
+# to a relative folder: a capture on the investigated host contaminates the case.
+$EV = 'E:\evidence\case-014'
+New-Item -ItemType Directory -Force -Path $EV | Out-Null
+Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ" | Out-File "$EV\start-time.txt"
+Get-NetTCPConnection -State Established | Export-Csv "$EV\connections.csv"
 Get-Process | Select-Object Id, ProcessName, Path, StartTime |
-  Export-Csv evidence/processes.csv -NoTypeInformation
+  Export-Csv "$EV\processes.csv" -NoTypeInformation
+```
+
+```powershell
+# Windows: on-disk triage capture — NOT volatile. Read it whenever it is convenient,
+# but capture it before eradication, because cleanup destroys it.
+$EV = 'E:\evidence\case-014'
 Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run' |
-  Out-File evidence/runkeys.txt
+  Out-File "$EV\runkeys.txt"
 # Hash key artifacts (copy to evidence media first, then hash the copy)
 Get-FileHash -Algorithm SHA256 C:\Windows\Temp\sample.dll |
-  Out-File evidence/hashes.txt
+  Out-File "$EV\hashes.txt"
+```
+
+Registry `Run` keys and a file hash are **persisted state, not volatile state**: they survive a
+reboot, so putting them in the volatile block teaches the wrong reflex. Keep the two captures
+separate and label them as such in the case file.
+
+```bash
+# Linux: VOLATILE state first, before cutting the network.
+# Run as root (sudo -i). $EV is an ABSOLUTE path on the mounted evidence medium.
+EV=/mnt/evidence/case-014
+mkdir -p "$EV"
+ss -tunap > "$EV/connections.txt"
+ps -auxf  > "$EV/processes.txt"
 ```
 
 ```bash
-# Linux: capture volatile state before cutting the network
-mkdir -p /evidence && cd /evidence
-ss -tunap > connections.txt
-ps -auxf > processes.txt
-sudo sha256sum /tmp/sample.bin > hashes.txt
+# Linux: on-disk triage capture — NOT volatile, and not on the host's own root filesystem.
+EV=/mnt/evidence/case-014
+sha256sum /tmp/sample.bin > "$EV/hashes.txt"
 ```
 
 Evidence-handling rules while containing:
@@ -220,14 +252,28 @@ and verified:
       password in the correct order with PowerShell.
 - [ ] I can block a C2 IP at the host firewall and explain why IP/domain
       blocking alone is only temporary.
-- [ ] I know the order of volatility and can capture connections, processes,
-      and hashes before isolating a host.
+- [ ] I know the order of volatility (RFC 3227) and can separate volatile capture
+      (connections, processes, memory) from on-disk triage (Run keys, file hashes),
+      and say which of the two isolation destroys.
 - [ ] I can fill in a chain-of-custody log entry and explain why it matters.
 - [ ] I can describe why checking for attacker-created backdoor accounts is
       part of account containment.
+
+> **Verification:** the order of volatility was **checked against RFC 3227, *Guidelines for
+> Evidence Collection and Archiving*, §2.1** (`curl` of the RFC text, HTTP 200 on 2026-09-19) and
+> the six levels above are its wording, not a paraphrase. The NIST SP 800-61 Rev. 3 link was
+> checked with `curl` on 2026-09-19 (HTTP 200). The PowerShell and shell capture blocks are
+> **unverified syntax references — not run**: the paths are illustrative and must be pointed at
+> your own mounted evidence medium before use.
+
 ## Further Resources
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for
+  Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) —
+  https://csrc.nist.gov/pubs/sp/800/61/r3/final
+- RFC 3227, *Guidelines for Evidence Collection and Archiving* (order of volatility) —
+  https://www.rfc-editor.org/rfc/rfc3227
 - NIST SP 800-86, *Guide to Integrating Forensic Techniques into Incident
   Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - MITRE ATT&CK — https://attack.mitre.org (Command and Control and Lateral

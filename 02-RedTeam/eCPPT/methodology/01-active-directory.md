@@ -6,6 +6,17 @@
 
 Inside a network penetration test, Active Directory (AD) is usually the crown jewels: it authenticates users, hosts group policy, and centralizes access. This phase turns a plain "low-privilege workstation" foothold into an understanding of the domain — its structure, its authentication paths, and the misconfigurations that lead to domain compromise. All techniques below must be executed only inside environments you are authorized to test (your own lab, a training range, or a signed engagement).
 
+## Prerequisites — the lab these notes assume
+
+Every concrete value used in this module (`corp.local`, the users `alice`,
+`bob`, `mike`, `svc_sql`, `da.smith`, the hosts `DC01`/`SRV01`/`WS01`, and the
+`10.0.0.0/24` addressing) is defined by the lab built in
+[labs/ad-lab-setup.md](../labs/ad-lab-setup.md) — it is not a public environment
+you can point a tool at. Build that lab first (and take the `02-Lab-Clean`
+snapshot), or substitute your own domain consistently; the technique matters,
+the names do not. The attack chains that exercise these notes are in
+[labs/attack-simulations.md](../labs/attack-simulations.md).
+
 ## Key AD Concepts (from an Attacker's View)
 
 - **Domain vs. forest:** a *domain* is an administrative boundary (one database of objects, one set of policies); a *forest* is the security boundary — one or more domains sharing a common schema, configuration partition, and Global Catalog. Trusts between domains/forests are attack paths only if they are actually used.
@@ -94,7 +105,7 @@ BloodHound answers: "Shortest path to Domain Admins," "users with `GenericAll`/`
 | `GenericAll`/`WriteDACL`/`GenericWrite` on objects | Full object takeover chains | BloodHound edges |
 | Users in privileged groups / nested admin groups | Trivial lateral paths | `Get-DomainGroupMember` recursively |
 | SMB signing disabled, LLMNR/mDNS/NBT-NS on | Credential relay/poisoning | `nmap --script smb2-security-mode`; Responder test |
-| Legacy protocols or no LAPS for local admins | Shared local-admin hashes | check for LAPS attribute `ms-Mcs-AdmPwd` |
+| Legacy protocols or no LAPS for local admins | Shared local-admin hashes | read the LAPS attributes: legacy Microsoft LAPS stores the password in `ms-Mcs-AdmPwd` (+ `ms-Mcs-AdmPwdExpirationTime`); Windows LAPS uses `msLAPS-Password` (cleartext, only when the password is not encrypted) or `msLAPS-EncryptedPassword` (+ `msLAPS-PasswordExpirationTime`). If the object carries `msLAPS-*`, LAPS is Windows LAPS; both sets can coexist during migration, so check both |
 
 ## Common Mistakes & Tips
 
@@ -114,6 +125,8 @@ BloodHound answers: "Shortest path to Domain Admins," "users with `GenericAll`/`
 - [ ] I can reproduce the PowerView commands above and interpret their output.
 - [ ] I can collect data with SharpHound/`bloodhound-python` and run Shortest Path / GenericAll queries.
 - [ ] I can spot at least six AD misconfigurations from enumeration output and say which attack each feeds.
+
+> **Verification:** the LAPS schema attributes were checked against Microsoft Learn, "Windows LAPS schema and rights extensions" (<https://learn.microsoft.com/en-us/windows-server/identity/laps/laps-technical-reference> — `msLAPS-Password` maps to legacy `ms-Mcs-AdmPwd`; `msLAPS-EncryptedPassword` has no legacy equivalent) on 2026-09-19. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

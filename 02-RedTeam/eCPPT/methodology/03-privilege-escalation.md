@@ -6,6 +6,8 @@
 
 Privilege escalation (privesc) turns a limited user into an administrator — on the local host first, then across the domain. In AD-heavy engagements the goal is usually local admin or SYSTEM on one machine to enable credential access and lateral movement (Phases 01–02). This guide is Windows-focused (matching typical eCPPT lab networks) with the key Linux techniques you still need when a rogue Linux box or jump host appears. Everything here assumes an authorized lab environment.
 
+**Prerequisites:** practice these techniques on the hosts and accounts defined in [labs/ad-lab-setup.md](../labs/ad-lab-setup.md) (`corp.local`, `bob`/`mike`/`da.smith`, `SRV01`/`WS01`), then replay them as chains in [labs/attack-simulations.md](../labs/attack-simulations.md).
+
 ## Windows Privesc — Recon First
 
 Automate the boring part, then verify manually — automation output is only a lead, not proof.

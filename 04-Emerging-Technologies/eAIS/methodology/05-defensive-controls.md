@@ -366,6 +366,6 @@ The division of labour in one line each: **methodology** explains and decides, *
 ## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/
-- MITRE ATLAS (Adversarial Threat Landscape for AI Systems) — https://atlas.mitre.org/
+- MITRE ATLAS (Adversarial Threat Landscape for Artificial-Intelligence Systems) — https://atlas.mitre.org/
 - NIST AI Risk Management Framework — https://www.nist.gov/itl/ai-risk-management-framework
 - OWASP Cheat Sheet Series (LLM-related cheat sheets) — https://cheatsheetseries.owasp.org/

@@ -48,12 +48,16 @@ Sigma is an open, generic signature format for log events. Instead of writing on
 Anatomy of a Sigma rule (read these fields fluently):
 
 ```yaml
-title: Rundll32 Internet Connection (Possible C2 or Download Cradle)
+title: Rundll32 Executing a URL Handler (Possible Download Cradle)
 id: 8d4b4f0a-2b3f-4a1e-9c3a-1234567890ab
 status: experimental            # experimental -> stable -> deprecated
-description: Detects rundll32 making an outbound network connection
+description: Detects rundll32.exe launched with a URL-handling DLL export, a way to load remote content without a browser
 logsource:
-  category: process_creation     # which log stream this rule expects
+  # process_creation sees launches only: this category carries no network
+  # fields, so it can never prove a connection happened. Detecting the
+  # connection itself needs a separate rule on network_connection telemetry
+  # (Sysmon 3 / EDR), where CommandLine does not exist.
+  category: process_creation
   product: windows
 detection:
   selection:
@@ -66,10 +70,10 @@ falsepositives:
   - Administrative use of rundll32 to open URLs
 level: medium                    # informational/low/medium/high/critical
 tags:
-  - attack.t1218               # Signed Binary Proxy Execution
+  - attack.t1218               # System Binary Proxy Execution
 ```
 
-When you read a Sigma rule, decode it in four steps: (1) which log source does it expect, (2) which selection fields matter, (3) what does the condition combine, (4) how confident and how critical. A tier-1 analyst also converts or re-implements Sigma rules in their SIEM when the detection team needs coverage fast.
+When you read a Sigma rule, decode it in four steps: (1) which log source does it expect, (2) which selection fields matter, (3) what does the condition combine, (4) how confident and how critical. Step 1 is the one that bounds everything else: a `process_creation` rule cannot observe a network connection, and a `network_connection` rule has no command line, so a title promising the wrong one is a title the logic can never satisfy. A tier-1 analyst also converts or re-implements Sigma rules in their SIEM when the detection team needs coverage fast.
 
 ## YARA — Malware Pattern Matching
 
@@ -124,17 +128,25 @@ The honest version of this detection is a **threshold rule in the platform**: gr
 C2 malware "beacons" home at regular intervals. Look for:
 
 - A host contacting one external IP/domain repeatedly with similar request sizes.
-- Low jitter: intervals tightly clustered around a mean (e.g., every ~60 seconds ± small variance).
+- Low jitter: intervals tightly clustered around a mean (e.g., every ~60 seconds ± small variance) — measured on **raw event timestamps**, never on rounded time buckets, which force every interval to a multiple of the bucket and manufacture the regularity you are trying to test for.
 - Unusual protocols or ports for the traffic (HTTP POST to a site the host never visited).
 
-Elasticsearch-style shape (outbound connections per hour per destination):
+Elasticsearch-style shape — count first, then measure intervals. KQL filters and does not aggregate, so the counting is an ES|QL step:
 
-```lucene
+```text
+# Kibana KQL - the filter half only (no pipe, no aggregation)
 event.category:network AND direction:egress AND destination.ip:*
-| stats count by source.ip, destination.ip
 ```
 
-Investigate regularity with a table of connection timestamps for one destination and compute the deltas — regular gaps plus small payloads are the classic beacon signature.
+```esql
+// ES|QL - connections per source/destination pair, the set worth measuring
+FROM logs-*
+| WHERE event.category == "network" AND direction == "egress"
+| STATS connections = COUNT(*) BY source.ip, destination.ip
+| SORT connections DESC
+```
+
+Investigate regularity on that shortlist by taking the raw timestamps for one destination and computing the deltas between them — regular gaps plus small payloads are the classic beacon signature. Do the arithmetic on the event times themselves; binning the timestamps first destroys the measurement (see `../tools/query-languages.md` for the SPL form of the inter-arrival calculation).
 
 ### LOLBins
 
@@ -267,13 +279,14 @@ Two properties make that filter defensible, and both are easy to get wrong. It n
 **Step 4 — Convert and deploy.** Getting the rule into your back end is a conversion step, not a rewrite:
 
 ```bash
-# Syntax check and conversion. NOT EXECUTED while writing this note:
-# the Sigma CLI is not installed on the machine that produced this document.
+# Syntax check and conversion.
 sigma check office-spawns-script-host.yml
 sigma convert -t es-qs  office-spawns-script-host.yml
 sigma convert -t splunk office-spawns-script-host.yml
 sigma convert -t kusto  office-spawns-script-host.yml
 ```
+
+`sigma check` was run against the rules in this file with **sigma-cli 3.1.0** (see the verification note at the end); `sigma convert` was **not**, because a conversion backend is a separately installed plugin. The conversion lines are the shape to run in an environment that has one.
 
 **Step 5 — Validate both directions.** Reproduce the positive case in the lab (the drill in `../labs/sigma-rule-tuning.md` does exactly this) and record the alert count over a quiet period. Only then does the rule have a known error rate.
 
@@ -363,6 +376,8 @@ Rules of thumb that keep YARA useful instead of noisy:
 - [ ] I can list five noise-reduction techniques and the blind spot each one creates.
 - [ ] I have run a YARA rule against both a positive sample and a folder of ordinary files, and I know why `notepad.exe` alone is a weak negative test.
 - [ ] I can explain why `timeframe` and `count()` do not belong in a Sigma rule, and where that logic goes instead.
+
+> **Verification:** every Sigma rule shown in this file was extracted to `/tmp` (nothing was written inside the repository) and checked with **sigma-cli 3.1.0** on **2026-09-19**: the rundll32 rule above, the encoded-PowerShell selection fragment and the Office-spawns rule from the worked example. All returned `Found 0 errors, 0 condition errors and 0 issues`. Two limits are worth stating: (1) `sigma check` also returned **0 errors for the pre-fix version** of the rundll32 rule — it validates syntax, not the claim a title makes about its logsource, which is why that defect needed a human to find; (2) `sigma convert` could not be exercised, because sigma-cli ships with no backend plugin installed (`sigma list targets` → *"No backends installed"*, and `-t splunk` → *"'splunk' is not one of ."*). The YAML of each rule was additionally parsed with PyYAML 6.0.1.
 
 ## Further Resources
 

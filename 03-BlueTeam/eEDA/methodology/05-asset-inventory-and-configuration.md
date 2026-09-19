@@ -2,7 +2,7 @@
 
 > eEDA · Methodology — Enterprise Defense Administrator
 >
-> Phase 05. Talks about governance, risk, and compliance; this phase is about the raw material all three depend on: knowing what you own, what is installed on it, and what state its configuration is in. It maps to **CIS Critical Security Controls v8 controls 1 (Inventory and Control of Enterprise Assets) and 2 (Inventory and Control of Software Assets)**, and it is the precondition for nearly everything in the later phases.
+> Phase 05 of nine. The first four phases set the direction — governance, risk, compliance, and engineering. This phase is about the raw material all four depend on: knowing what you own, what is installed on it, and what state its configuration is in. It maps to **CIS Critical Security Controls v8 controls 1 (Inventory and Control of Enterprise Assets) and 2 (Inventory and Control of Software Assets)**, and it is the precondition for nearly everything in the later phases.
 
 ## Purpose
 
@@ -153,7 +153,7 @@ foobar2000       | Prohibited  | All endpoints    | any          | CISO        |
 
 Software that inventories consistently miss, and which therefore needs its own check rather than a package count:
 
-- Portable and standalone executables (`Everything` above on a real workstation is exactly this class of tool — useful, unlisted, and installed outside any package manager).
+- Portable and standalone executables — a binary copied into `%USERPROFILE%\Downloads` or `/usr/local/bin` that no installer ever registered, so neither the uninstall keys nor the package database can see it. (The `Everything` row in the list above is *not* that class: it appears precisely because it has an uninstall key. A title in that output is installed by definition; the ones this bullet is about never show up at all.)
 - Browser extensions and IDE plugins.
 - Container images and their layers.
 - Code pulled at runtime by scripts (`pip install`, `npm install`, `curl | bash`).
@@ -175,7 +175,7 @@ Decision table — how the tier changes what you do:
 
 | Decision | T1 | T2 | T3 |
 |---|---|---|---|
-| Patch window for critical severity | 72 hours, emergency change allowed | 14 days | 30 days |
+| Patch window for critical severity | 48 h when actively exploited (emergency change allowed), otherwise 7 days — same figures as the SLA table in [07](07-vulnerability-and-patch-management.md) | 14 days | 30 days |
 | Configuration scan frequency | Daily | Weekly | Monthly |
 | Backup verification | Restore test quarterly | Restore test semi-annually | Annual sample |
 | Change approval | CAB + security review | Standard change process | Standard change process |

@@ -100,6 +100,8 @@ The alert's meaning depends on what this account normally does. Assemble that be
 | Is the source address ours? | Asset inventory, VPN pool range, ASN lookup (`../tools/enrichment-and-ti-tools.md`) | Corporate VPN, hosting provider, consumer ISP and anonymising service are four different findings |
 | Has this address touched other accounts? | `4624`/`4625` by source address | One address, many accounts is a materially larger incident |
 
+> ⚖️ **Privacy and proportionality (this step is where it bites).** A per-account behavioural baseline — sources used, hours, travel — is a record about a person, not just about a logon. Build it only with a documented **purpose** (investigating this alert), an **authorization** (policy or named approver, plus any employee-representation agreement), and **proportionality**: use the shortest window the question needs rather than "180 days" by reflex, aggregate by account **role** where a role-level answer suffices, and apply a **retention** limit to whatever you persist. HR, travel and location context is requested through the owner of that data for a specific written question, never pulled speculatively. And the case note carries only evidence: the account's *behaviour* and the fields that prove it — not medical, family, religious, union or private-travel detail, and nothing about accounts that turned out to be unrelated.
+
 ## Step 3 — Correlate: Queries and What to Look For
 
 Every query below is a shape to adapt. **Run them and read the rows** — no result is quoted here, and none should be trusted until your own data produces it.

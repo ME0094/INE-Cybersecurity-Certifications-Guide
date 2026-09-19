@@ -123,7 +123,7 @@ What this method answers and what it misses:
 
 | Answers | Misses |
 |---|---|
-| Machine-wide installed applications with version and publisher | Portable executables that were never installed (visible in the output above: `Everything`, a standalone tool) |
+| Machine-wide installed applications with version and publisher | Portable executables that were never installed — a binary copied into `%USERPROFILE%\Downloads` or `C:\Tools` has no uninstall key, so it produces no row here. Everything *in* this list is by definition registered: `Everything` above appears because it has an uninstall key pointing at its own `Uninstall.exe` |
 | Both 64-bit and 32-bit installs, if both keys are queried | Per-user installs under `HKCU` — the same query limited to `HKLM` is blind to them |
 | Good enough for an allowlist comparison and a change diff | Browser extensions, IDE plugins, container images, anything installed by a script into a user profile |
 
@@ -206,14 +206,16 @@ WDAGUtilityAccount    False
 
 ### What did not work here, and why it matters
 
-Every CIM-backed cmdlet failed on this workstation, with the same localized message:
+Every CIM-backed cmdlet failed on this workstation. Seven of them returned the same localized message:
 
 ```text
 Get-CimInstance, Get-Volume, Get-NetFirewallProfile, Get-NetTCPConnection,
-Get-ScheduledTask, Get-SmbShare, Get-Disk, Get-HotFix
+Get-ScheduledTask, Get-SmbShare, Get-Disk
   -> El cliente no tenía acceso disponible a un recurso CIM.
      (the CIM client could not access a resource)
 ```
+
+`Get-HotFix` also failed, but with a **different** error — `Acceso denegado` (access denied), a permissions problem on the quick-fix-engineering provider rather than an unreachable CIM resource. Do not fold the two into one diagnosis: a cmdlet that is denied is not the same as a CIM stack that is down, and only the second one tells you the session has no WMI at all.
 
 So patch state (`Get-HotFix`), listening ports (`Get-NetTCPConnection`), firewall profile state (`Get-NetFirewallProfile`) and scheduled tasks (`Get-ScheduledTask`) were **not verifiable in this environment**, and no output for them is shown in this module. The practical lesson is worth more than the commands: build inventory scripts on sources that survive a restricted or degraded session — the registry, the uninstall keys, `wevtutil`, and file-based configuration — and treat the CIM-based commands as convenient when available rather than as the only path. Reading the Security event log content, separately, requires elevation: `Get-WinEvent -LogName Security` fails with `Attempted to perform an unauthorized operation.` on a non-elevated session.
 
@@ -315,11 +317,13 @@ Three classes of software that a package-based diff will never see, and the extr
 - [ ] I can name two software classes a package-based inventory cannot see, with the check that covers each.
 - [ ] I can triage a mismatched inventory count between two sources instead of trusting one.
 
+> **Verification:** PowerShell 7.6.6 (`pwsh`) on Windows, 2026-09-19, elevated session: `Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'` re-read the `Everything 1.4.1.1032 (x64)` row — `Publisher = voidtools`, `UninstallString = C:\Program Files\Everything\Uninstall.exe` — which is why that entry is a registered install and not an example of a portable tool; and `Get-HotFix` returned update data (`KB5126052`, `KB5054156`, `KB5095189`) instead of failing. The failure notes above describe the module's original non-elevated session and are session-dependent, not properties of Windows: the separate `Acceso denegado` message attributed to `Get-HotFix` comes from the 2026-09-19 audit and was not reproducible from an elevated session.
+
 ## Further Resources
 
 - [osquery documentation](https://osquery.readthedocs.io/) — table reference, deployment, and configuration.
 - osquery schema browser — osquery.io/schema (confirm the columns for your version).
-- [Wazuh documentation](https://documentation.wazuh.com/) — open-source agent, inventory and SIEM collection used as the central store in this module's labs.
+- [Wazuh documentation](https://documentation.wazuh.com/) — open-source agent, inventory and SIEM collection; a realistic central store to ship `osqueryd` results to in a production deployment (this module's labs use no central platform).
 - [CIS Controls](https://www.cisecurity.org/controls) — control 1 (Enterprise Assets) and control 2 (Software Assets).
 - [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) — CM-8 (System Component Inventory) and CM-10/CM-11 (software usage and installation restrictions).
 - [ISO/IEC 27001:2022](https://www.iso.org/standard/27001) — Annex A 5.9 (inventory of information and other associated assets).

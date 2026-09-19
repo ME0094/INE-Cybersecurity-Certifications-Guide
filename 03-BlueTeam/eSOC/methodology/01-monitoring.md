@@ -108,22 +108,37 @@ If `event.code` is blank or `user.name` is missing for most events, parsing is b
 A baseline is the *normal* profile of a metric — the thing you compare current activity against.
 
 - **What to baseline:** logon volume and hours, data egress volume per host, DNS query rates, admin command frequency, outbound connection timing (regularity = possible beacon).
-- **How to build it:** aggregate per host/user/asset over 30–90 days, sliced by hour-of-day and day-of-week. Weekends differ from weekdays; month-end differs from mid-month.
+- **How to build it:** aggregate per host/user/asset over 30–90 days, sliced by hour-of-day and day-of-week. Weekends differ from weekdays; month-end differs from mid-month. Where the subject of the baseline is a person, keep the window as short as the question allows and prefer role-level over per-individual aggregation — see the privacy note under Dashboards.
 - **Use in detection:** alert on deviation from baseline rather than a fixed threshold. A service account that logs on 3×/week suddenly logging on 300×/day is far more meaningful than "100 logons" alone.
 - **Keep it current:** re-baseline after major changes (new application rollout, org restructuring). Stale baselines create false positives or false negatives.
 
-Baseline query concept (per-hour logon count by user, Elasticsearch):
+Baseline query concept (per-hour logon count by user): the filter is KQL, which has no aggregation, so the counting is a separate ES|QL statement in the same search bar.
 
-```lucene
+```text
+# Kibana KQL - filters only (no pipe, no aggregation in KQL)
 event.category:authentication AND event.outcome:success
-| stats count by user.name, hour
+```
+
+```esql
+// ES|QL - the counting half (Elastic 8.11+)
+FROM logs-windows.*
+| WHERE event.category == "authentication" AND event.outcome == "success"
+| STATS logons = COUNT(*) BY user.name, BUCKET(@timestamp, 1 hour)
 ```
 
 Anomaly example — outbound connections from a single process to a fixed remote IP at suspiciously regular intervals:
 
-```lucene
+```text
+# Kibana KQL - filters only
 event.category:network AND destination.ip:*
-| stats count, values(destination.ip) by process.name, source.ip
+```
+
+```esql
+// ES|QL - which process/source pairs are chatty enough to be worth measuring
+FROM logs-*
+| WHERE event.category == "network" AND destination.ip IS NOT NULL
+| STATS connections = COUNT(*), destinations = COUNT_DISTINCT(destination.ip) BY process.name, source.ip
+| SORT connections DESC
 ```
 
 ## Alert Design
@@ -184,11 +199,16 @@ Dashboards turn searches into glanceable status. Tier-1 useful boards:
 4. **Network egress:** top talkers, blocked vs allowed, DNS queries to newly registered domains.
 5. **Per-entity view:** one host's or user's full event stream during an investigation.
 
-Dashboard query example (open high-severity alerts by technique):
+> ⚖️ **Privacy and proportionality (dashboards and baselines included).** Panels such as "logons outside business hours", "new account creation" or a per-user baseline are statements about *people*, so they are personal-data processing and need the same three things as any other: a documented **purpose** (security monitoring and incident investigation, written down and communicated), an **authorization** (policy or a named approver, plus any employee-representation agreement that applies to you), and **proportionality** — the shortest window and the coarsest granularity that still answers the question. Baseline by account **role or asset class** rather than by named individual wherever you can, and treat a 180-day per-person behavioural history as a personnel record, not as security telemetry: apply a **retention** limit to it, restrict who can read the board, and keep anything that is not evidence out of case notes and out of shared dashboards — no medical, family, religious, union or private-travel detail, and no exposure of uninvolved users.
 
-```lucene
-alert.severity:high AND alert.status:open
-| top 10 by rule.name, threat.technique.id
+Dashboard query example (open high-severity alerts by technique). This one stays a *panel definition* rather than a query, because the alert documents' field names are platform-specific — confirm them on one real alert before you build the board:
+
+```text
+# Kibana KQL - filters only, as above; KQL cannot do the top-N
+alert.severity : "high" and alert.status : "open"
+# The "top 10 by rule.name, threat.technique.id" is a Dashboard visualization
+# on those two fields (or an ES|QL STATS ... BY in the search bar), not a
+# clause you can append to the query text.
 ```
 
 Rules of thumb: keep fewer than a dozen well-curated panels per board; every panel must answer an operational question; add a "last updated" timestamp panel so stale data is obvious.
@@ -334,7 +354,7 @@ Prioritization discipline for a full queue: work **severity × blast radius × t
 - [ ] I can name the five log classes above and state one high-value question each answers.
 - [ ] I can trace one endpoint event from host to SIEM index and identify where parsing happens.
 - [ ] I can explain why timestamp source, timezone, and NTP discipline matter for correlation.
-- [ ] I can write a Lucene-style query that counts successful logons per user per hour.
+- [ ] I can write the executable pair for "successful logons per user per hour": a KQL filter plus the ES|QL `STATS ... BY` (or the SPL equivalent) that counts it, and I can say why KQL alone cannot.
 - [ ] I understand the difference between hot/warm/cold storage and why retention varies by log type.
 - [ ] I can list three metrics that indicate a detection rule is unhealthy (noise or silence).
 - [ ] I know which of my organization's critical assets are NOT currently sending logs to the SIEM.
@@ -350,5 +370,5 @@ Prioritization discipline for a full queue: work **severity × blast radius × t
 - MITRE ATT&CK — technique and data-source catalog for detection coverage thinking: https://attack.mitre.org
 - Elastic Common Schema (ECS) — field normalization reference: https://www.elastic.co/guide/en/ecs/current/index.html
 - OCSF (Open Cybersecurity Schema Framework): https://schema.ocsf.io
-- NIST SP 800-92 — Guide to Computer Security Log Management: https://csrc.nist.gov/pubs/sp/800/92/upd1/final
+- NIST SP 800-92 — Guide to Computer Security Log Management: https://csrc.nist.gov/pubs/sp/800/92/final
 - Windows Event Log / Sysmon reference (Microsoft Learn, Sysinternals): https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon

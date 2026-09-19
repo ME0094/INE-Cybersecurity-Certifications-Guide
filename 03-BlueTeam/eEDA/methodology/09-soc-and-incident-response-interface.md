@@ -210,4 +210,4 @@ Every containment action breaks something. Know the cost before you are asked to
 - CIS Critical Security Controls v8 — control 8 (Audit Log Management), control 13 (Network Monitoring and Defense), control 17 (Incident Response Management): https://www.cisecurity.org/controls
 - NIST CSF 2.0 — DE (Detect), RS (Respond), and RC (Recover) function outcomes: https://www.nist.gov/cyberframework
 - ISO/IEC 27001:2022 — Annex A 5.24–5.28 (incident management planning, assessment, response, learning, and evidence collection) and A.8.16 (monitoring activities): https://www.iso.org/standard/27001
-- Wazuh documentation — open-source SIEM/log analysis used as the collection platform in the labs: https://documentation.wazuh.com/
+- Wazuh documentation — open-source SIEM/log analysis; a workable collection platform for a real log pipeline, not a component of this module's labs: https://documentation.wazuh.com/

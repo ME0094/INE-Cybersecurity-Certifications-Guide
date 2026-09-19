@@ -192,13 +192,15 @@ meterpreter > portfwd add -L 127.0.0.1 -l 8080 -p 80 -r 192.168.57.10
 ## Checklist / Self-Test
 
 - [ ] I can run every phase from recon to post-exploitation against my lab target.
-- [ ] I can produce and save Nmap output in all formats (`-oA`).
+- [ ] I can produce and save Nmap output in every supported format (`-oA` = `.nmap` + `.gnmap` + `.xml`).
 - [ ] I can enumerate web (nikto/gobuster), SMB (smbclient/enum4linux), and FTP banners.
 - [ ] I can generate a payload with msfvenom and catch it with a matching handler.
 - [ ] I can create both reverse and bind shells with netcat from memory.
 - [ ] I can upgrade a raw shell to a PTY.
 - [ ] I can move a file target→Kali and Kali→target with two different methods.
 - [ ] I can set up an SSH local port forward or SOCKS proxy for pivoting.
+
+> **Verification:** commands checked against `nmap --help` (Nmap 7.94SVN) on 2026-09-19: `-oA <basename>: Output in the three major formats at once`, and the only single formats are `-oN/-oX/-oS/-oG` (no JSON). Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

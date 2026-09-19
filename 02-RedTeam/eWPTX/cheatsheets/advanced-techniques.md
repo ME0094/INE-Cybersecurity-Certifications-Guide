@@ -96,6 +96,14 @@ X
 If the second response is odd/404, parsers disagreed — investigate further.
 ```
 
+`Content-Length: 4` belongs to this **detection** probe on purpose: the front-end
+forwards only `1\r\nA` and the back-end then blocks waiting for the rest of the
+chunked body — a timing oracle, nothing smuggled. A real CL.TE **smuggling**
+payload is the opposite case: the front-end must forward the whole body, so its
+`Content-Length` covers every byte up to and including the last byte of the
+smuggled prefix (the `29` in `methodology/03-bypass-techniques.md`). Do not
+"correct" one count into the other.
+
 Hints: work on HTTP/1.1 keep-alive connections only; test each front-end path; confirm with a benign marker (`X`) before any malicious body. Authorized labs only — smuggling probes are easy to misfire against shared infrastructure.
 
 ## SSRF → internal patterns
@@ -122,7 +130,7 @@ Always ask: does the response come back to me (visible) or only reach the server
 
 Duplicate or crafted parameter names exploit **parser disagreement about the same name**.
 
-- **Duplicate parameters** — WAF checks the first, backend uses the last (or vice versa), or the backend joins all values.
+- **Duplicate parameters** — the WAF validates only one occurrence (typically the first) while the backend reads another (PHP: the last; Java/Node: the first), or the backend joins all values.
 - **Array syntax** — `?id[]=1&id[]=2`; some stacks treat `id` as a list.
 - **Semicolon separators** — ASP.NET-style `?id=1;id=2` or `?debug=false;debug=true`.
 - **Name truncation/overlong keys** — parser cuts the key at a byte, changing which value wins.
@@ -154,6 +162,16 @@ Detect it: send duplicates, reflect both, and observe *which* value drives the d
 - [ ] I can name five localhost-filter bypasses and when redirect-following SSRF applies.
 - [ ] I can explain last-wins vs first-wins parameter pollution with one example per parser behavior.
 - [ ] I can reproduce this entire sheet's structure from memory (topic → vectors → detection → bypass).
+
+> **Verification:** the CL.TE probe's `Content-Length: 4` was checked on
+> 2026-09-19 against PortSwigger's own writing, which documents exactly this
+> request (`Content-Length: 4`, body `1\nA\nX`, 7 bytes) as a **timing** oracle:
+> "the front-end server will forward only part of this request, omitting the X"
+> (<https://portswigger.net/web-security/request-smuggling/finding>). Its CL.TE
+> *confirmation* payload instead declares `Content-Length: 49`, which matches its
+> body byte-for-byte (`printf … | wc -c` → 49). The HPP position statement was
+> aligned with `methodology/03-bypass-techniques.md`, whose payload was fixed to
+> put the attack value last. Nothing was sent to a live target.
 
 ## Further Resources
 

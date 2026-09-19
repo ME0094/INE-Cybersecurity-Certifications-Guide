@@ -14,7 +14,9 @@ Prompt injection (Phase 02) attacks the model at inference time through its inpu
 - **Availability vs. integrity poisoning.** Availability: degrade the model until it is unusable (e.g., garbage training data). Integrity/backdoor: keep normal behavior intact while implanting a hidden behavior the attacker can later activate.
 - **Backdoor.** A specific trigger (a token sequence, an image pattern, a rare word) that flips the model into attacker-chosen behavior; without the trigger the model looks clean.
 
-Poisoning maps to OWASP LLM03/LLM04 (Training Data Poisoning and Model DoS families) in the OWASP Top 10 for LLM Applications and to *Poisoning* techniques in MITRE ATLAS.
+Poisoning maps to **LLM04:2025 Data and Model Poisoning** and **LLM03:2025 Supply Chain** in the OWASP Top 10 for LLM Applications, and to *Poisoning* techniques in MITRE ATLAS.
+
+> **Which edition, and why it is written down.** This module cites the **2025** edition of the OWASP Top 10 for LLM Applications. The 2023 edition used the same numbers for different families — LLM03 was *Training Data Poisoning* and LLM04 was *Model Denial of Service* — so "LLM03/LLM04" without an edition means two different things depending on when it was written, and a reader cannot tell which. Every OWASP LLM citation in this module carries its edition for that reason. The retrieval and embedding family that poisoning also touches is LLM08:2025 Vector and Embedding Weaknesses.
 
 ## Poisoning surface by lifecycle stage
 
@@ -260,7 +262,7 @@ Suspicion is a legitimate state — you will usually not be able to prove a back
 
 ## Further Resources
 
-- OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- OWASP Top 10 for Large Language Model Applications (2025 edition: LLM03:2025 Supply Chain, LLM04:2025 Data and Model Poisoning, LLM08:2025 Vector and Embedding Weaknesses) — https://owasp.org/www-project-top-10-for-large-language-model-applications/
 - MITRE ATLAS (Poisoning techniques) — https://atlas.mitre.org/
 - NIST AI Risk Management Framework — https://www.nist.gov/itl/ai-risk-management-framework
 - Hugging Face Safetensors documentation — https://huggingface.co/docs/safetensors/index

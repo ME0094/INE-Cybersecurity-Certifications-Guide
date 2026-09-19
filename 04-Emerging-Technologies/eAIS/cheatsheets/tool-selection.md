@@ -180,17 +180,15 @@ does *not* cover. One line per decision is enough:
 
 ## Module map — where this file sits
 
-Reading order for the eAIS module, relative to this directory. Linked paths existed in the module tree as this
-file was written; paths shown as plain code belong to the module's intended structure and were not yet present,
-so they are *not* references to existing content.
+Reading order for the eAIS module, relative to this directory. Every path in the table is a link to a file that exists in this checkout.
 
 | Area | Files |
 | --- | --- |
 | Overview | [README.md](../README.md) |
-| Methodology (reading order) | [01-ai-models.md](../methodology/01-ai-models.md), [02-prompt-injection.md](../methodology/02-prompt-injection.md), [03-model-poisoning.md](../methodology/03-model-poisoning.md), [04-adversarial-attacks.md](../methodology/04-adversarial-attacks.md), [05-defensive-controls.md](../methodology/05-defensive-controls.md), [07-privacy-and-data-leakage.md](../methodology/07-privacy-and-data-leakage.md), plus `methodology/06`, `methodology/08` and `methodology/09-ai-governance-and-lifecycle.md` (01–09 in total) |
-| Tools | [ai-testing-tools.md](../tools/ai-testing-tools.md), [evaluation-and-guardrails.md](../tools/evaluation-and-guardrails.md), [observability-and-tracing.md](../tools/observability-and-tracing.md), plus `tools/offensive-scanners.md` and `tools/rag-and-vector-store-security.md` |
-| Labs | [llm-testing.md](../labs/llm-testing.md), [injection-lab.md](../labs/injection-lab.md), [agent-tool-abuse-lab.md](../labs/agent-tool-abuse-lab.md), [guardrail-evaluation-lab.md](../labs/guardrail-evaluation-lab.md), plus `labs/rag-data-leakage-lab.md` and `labs/data-poisoning-lab.md` |
-| Cheatsheets | [ai-attack-vectors.md](ai-attack-vectors.md), [tool-selection.md](tool-selection.md) (this file), plus `cheatsheets/attack-to-control-mapping.md` and `cheatsheets/llm-test-case-library.md` |
+| Methodology (reading order) | [01-ai-models.md](../methodology/01-ai-models.md), [02-prompt-injection.md](../methodology/02-prompt-injection.md), [03-model-poisoning.md](../methodology/03-model-poisoning.md), [04-adversarial-attacks.md](../methodology/04-adversarial-attacks.md), [05-defensive-controls.md](../methodology/05-defensive-controls.md), [06-agent-and-tool-security.md](../methodology/06-agent-and-tool-security.md), [07-privacy-and-data-leakage.md](../methodology/07-privacy-and-data-leakage.md), [08-evaluation-and-continuous-red-teaming.md](../methodology/08-evaluation-and-continuous-red-teaming.md), [09-ai-governance-and-lifecycle.md](../methodology/09-ai-governance-and-lifecycle.md) (01–09 in total) |
+| Tools | [ai-testing-tools.md](../tools/ai-testing-tools.md), [evaluation-and-guardrails.md](../tools/evaluation-and-guardrails.md), [observability-and-tracing.md](../tools/observability-and-tracing.md), [offensive-scanners.md](../tools/offensive-scanners.md), [rag-and-vector-store-security.md](../tools/rag-and-vector-store-security.md) |
+| Labs | [llm-testing.md](../labs/llm-testing.md), [injection-lab.md](../labs/injection-lab.md), [agent-tool-abuse-lab.md](../labs/agent-tool-abuse-lab.md), [guardrail-evaluation-lab.md](../labs/guardrail-evaluation-lab.md), [rag-data-leakage-lab.md](../labs/rag-data-leakage-lab.md), [data-poisoning-lab.md](../labs/data-poisoning-lab.md) |
+| Cheatsheets | [ai-attack-vectors.md](ai-attack-vectors.md), [tool-selection.md](tool-selection.md) (this file), [attack-to-control-mapping.md](attack-to-control-mapping.md), [llm-test-case-library.md](llm-test-case-library.md) |
 
 ## Common Mistakes & Tips
 

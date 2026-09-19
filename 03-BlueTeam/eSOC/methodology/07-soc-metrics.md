@@ -221,9 +221,9 @@ The point of the exercise: three numbers from one dataset tell three different s
 ## Further Resources
 
 - NIST SP 800-61r3 — *Incident Response Recommendations and Considerations for Cybersecurity Risk Management* (response lifecycle framing, April 2025): https://csrc.nist.gov/pubs/sp/800/61/r3/final
-- NIST SP 800-92 — *Guide to Computer Security Log Management* (retention, source validation): https://csrc.nist.gov/pubs/sp/800/92/upd1/final
+- NIST SP 800-92 — *Guide to Computer Security Log Management* (retention, source validation): https://csrc.nist.gov/pubs/sp/800/92/final
 - MITRE ATT&CK Navigator — technique coverage tracking: https://mitre-attack.github.io/attack-navigator/
 - MITRE ATT&CK — data sources and detections, for coverage metrics with evidence behind them: https://attack.mitre.org
 - Elastic Security — detection alert management and rule monitoring: https://www.elastic.co/guide/en/security/current/index.html
-- Wazuh — alert reporting and dashboards: https://documentation.wazuh.com/current/user-manual/manager/alert-reporting.html
+- Wazuh — alert reporting and dashboards: https://documentation.wazuh.com/current/user-manual/manager/alert-management.html
 - FIRST — CVSS for the severity inputs that feed prioritisation decisions: https://www.first.org/cvss/

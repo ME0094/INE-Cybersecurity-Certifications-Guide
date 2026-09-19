@@ -60,10 +60,12 @@ done
 joins/keeps another:
 
 ```http
-GET /login?user=admin&user=administrator&pass=guess HTTP/1.1
+GET /login?user=administrator&user=admin&pass=guess HTTP/1.1
 # Asp.Net joins with comma; PHP keeps the LAST; Java/Node often the FIRST.
-# If the WAF validates user=administrator (clean) but the app uses the last
-# occurrence (user=admin), the filter checked a value the app never used.
+# A WAF that validates the first occurrence sees user=administrator (clean),
+# while PHP authenticates the last one, user=admin — the filter checked a
+# value the app never used. Against a backend that reads the FIRST value,
+# swap the two occurrences instead.
 ```
 
 Always confirm **which occurrence the framework uses** before building the
@@ -155,13 +157,24 @@ a "poisoned" next request:
 POST / HTTP/1.1
 Host: example.com
 Transfer-Encoding: chunked
-Content-Length: 4            # front-end trusts CL, back-end TE
+Content-Length: 29           # front-end trusts CL, back-end TE
+                             # 29 = 3 ("0\r\n") + 2 (chunk terminator)
+                             #    + 21 ("GET /admin HTTP/1.1\r\n") + 3 ("X: ")
 
 0
 
 GET /admin HTTP/1.1
 X: 
 ```
+
+The body is exactly those 29 bytes: it ends immediately after the space in
+`X: `, with **no** trailing CRLF, and that trailing space is what absorbs the
+*next* request's start line (`X: GET / HTTP/1.1`) so the smuggled request stays
+well-formed. Get the count wrong and the desync never happens: with a smaller
+value — copying `Content-Length: 4` from a shorter probe is the usual mistake —
+the front-end forwards only `0\r\n\r`, the back-end never completes a chunked
+message, and the prefix is never smuggled; with a larger value the front-end
+swallows the beginning of the *next* request instead.
 
 If the *next* request on the same connection returns `/admin` content, the
 front/back split is confirmed. Only test this on targets you own — it
@@ -234,6 +247,15 @@ family does not mean the WAF is useless — state the tested scope precisely.
       header variants (X-Forwarded-*, X-Original-URL).
 - [ ] I document each bypass as evidence tied to an underlying finding, with
       tested scope stated.
+
+> **Verification:** the CL.TE body was counted on 2026-09-19 with
+> `printf '0\r\n\r\nGET /admin HTTP/1.1\r\nX: ' | wc -c` → **29** bytes
+> (`xxd`: `30 0d 0a 0d 0a 47 45 54 ... 58 3a 20`), so `Content-Length: 4` covered
+> only `0\r\n\r`. The convention was corroborated against PortSwigger's own CL.TE
+> confirmation payload, whose declared `Content-Length: 49` matches its body
+> byte-for-byte when it ends after a trailing-space header and no CRLF
+> (<https://portswigger.net/web-security/request-smuggling/finding>, fetched
+> 2026-09-19). No smuggling was performed against any live target.
 
 ## Further Resources
 

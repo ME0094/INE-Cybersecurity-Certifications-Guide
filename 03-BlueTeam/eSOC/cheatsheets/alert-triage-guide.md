@@ -88,8 +88,8 @@ Severity shorthand (align to your org's scale):
 | Level | Meaning | Example |
 |---|---|---|
 | Info/Low | Expected or unactionable | Failed logon typo, blocked scan |
-| Medium | Needs review this shift | Encoded PowerShell by admin account |
-| High | Investigate promptly | Credential dump strings on a server |
+| Medium | Needs review this shift | Failed-logon burst from one source IP |
+| High | Investigate promptly | Encoded PowerShell from an admin account, or credential-dump strings on a server |
 | Critical | Immediate, active response | Ransomware execution / DC compromise |
 
 ## Fill-In Triage Template
@@ -157,5 +157,5 @@ TRIAGE NOTE — <rule/alert title>          Ticket/ID: <id>
 - FIRST CVSS / severity guidance — https://www.first.org/cvss/
 - SANS / industry blog articles on alert triage and SOC operations
 - Elastic Security docs (alert management in Kibana) — https://www.elastic.co/guide/en/security/current/index.html
-- Wazuh alerts documentation — https://documentation.wazuh.com/current/user-manual/manager/alert-reporting.html
+- Wazuh alerts documentation — https://documentation.wazuh.com/current/user-manual/manager/alert-management.html
 - VirusTotal — https://www.virustotal.com/ and AlienVault OTX — https://otx.alienvault.com/

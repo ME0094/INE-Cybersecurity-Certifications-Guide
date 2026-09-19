@@ -93,7 +93,7 @@ Goal: decide Acme's **Implementation Group** and map the controls to evidence th
 | 1  Inventory & Control of Enterprise Assets | AD computer objects + agent inventory on endpoints | Inventory report dated last month |
 | 2  Inventory & Control of Software Assets | Software list from endpoint agent | Approved software list |
 | 4  Secure Configuration | Windows/Linux hardening baseline | Baseline document + scan results |
-| 5  Account Management | MFA enforced for admins | MFA policy + AD report of admin accounts |
+| 6  Access Control Management | MFA enforced for admins (safeguard 6.5) | MFA policy + AD report of admin accounts |
 | 7  Continuous Vulnerability Management | Monthly scans of the web shop | Latest scan report + remediation ticket |
 | 8  Audit Log Management | Windows event log forwarding + auditd on Linux | Log retention policy, sample searches |
 | 11 Data Recovery | Nightly backups with quarterly restore test | Restore test log |
@@ -112,11 +112,26 @@ sudo apt update && sudo apt install -y lynis        # Debian/Ubuntu
 # RHEL family: sudo dnf install -y lynis
 
 sudo lynis audit system
-sudo lynis show warnings
-sudo lynis show suggestions
+
+# Re-display the findings. There is no `lynis show warnings`/`show suggestions`:
+# `lynis show` lists configuration and paths (categories, groups, profiles,
+# settings, tests, version), not findings. The findings of a run live in the
+# log and the report file, and --warnings-only re-runs the audit quietly
+# showing warnings alone.
+sudo lynis audit system --warnings-only
+sudo grep -E ' (Warning|Suggestion): ' /var/log/lynis.log
+sudo grep -E '^(warning|suggestion)\[\]' /var/log/lynis-report.dat
 ```
 
-**Interpreting the output:** read each `[WARNING]` with its suggestion. Common first-run findings: firewall not active, SSH root login permitted, no file-integrity tool, no automatic security updates. Apply 3 fixes, for example:
+Save the findings of this first run before you change anything — it is the "before" half of your evidence:
+
+```bash
+mkdir -p ~/eeda-evidence
+sudo grep -E '^(warning|suggestion)\[\]|^hardening_index=' \
+  /var/log/lynis-report.dat > ~/eeda-evidence/lynis-run1.txt
+```
+
+**Interpreting the output:** read each warning — `[WARNING]` on screen, `Warning: ...` in the log — together with its suggestion. Common first-run findings: firewall not active, SSH root login permitted, no file-integrity tool, no automatic security updates. Apply 3 fixes, for example:
 
 ```bash
 # Enable the firewall and allow SSH only
@@ -131,7 +146,7 @@ sudo systemctl restart ssh
 sudo dpkg-reconfigure --priority=low unattended-upgrades
 ```
 
-Then re-run `sudo lynis audit system --quiet` and confirm the **hardening index rose**. Write two sentences: "which warnings remained and why are they acceptable (or not)?"
+Then re-run `sudo lynis audit system --quiet` and confirm the **hardening index rose** — compare `hardening_index=` in `/var/log/lynis-report.dat`, and diff the remaining `warning[]`/`suggestion[]` lines against `~/eeda-evidence/lynis-run1.txt`. Write two sentences: "which warnings remained and why are they acceptable (or not)?"
 
 ### 4b. OpenSCAP
 
@@ -149,7 +164,11 @@ sudo oscap xccdf eval \
   /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
 
 # Debian/Ubuntu (package names vary by release; content ships under /usr/share/xml/scap/ssg/content/)
-sudo apt install -y libopenscap8 ssg-debian ssg-base
+# The scanner/tailoring tools are openscap-scanner and openscap-utils. The old
+# library name libopenscap8 has no candidate on Ubuntu 24.04, so do not copy it
+# blindly. Content: ssg-debderived covers Ubuntu (up to ssg-ubuntu2204-ds.xml)
+# and ssg-debian covers Debian releases (up to ssg-debian12-ds.xml).
+sudo apt install -y openscap-scanner openscap-utils ssg-debian ssg-base
 oscap info /usr/share/xml/scap/ssg/content/ssg-debian12-ds.xml
 ```
 
@@ -158,9 +177,21 @@ oscap info /usr/share/xml/scap/ssg/content/ssg-debian12-ds.xml
 1. Note the overall **score** and the count of **failed** rules.
 2. Open `/tmp/scap-report.html` in a browser. Pick the **three highest-severity failures** and read their descriptions.
 3. Choose one failure, fix it (the HTML report often links remediation; e.g., `chmod 600 /etc/shadow` style rules), and **re-run the scan** to confirm that rule now passes.
-4. Save the HTML report and the `results.xml` as your "evidence artifact" folder: `~/eeda-evidence/`. In a real audit, these files are your deliverables.
+4. Choose one failure you will **not** fix — a rule that cannot apply to this host. Tailor it out instead of editing the shipped content, and keep the tailoring file with the scan it belongs to:
 
-**Expected result:** the score improves after remediation, and you can explain each remaining failure in one sentence of risk language ("this fails because X, which matters because Y; we accept/mitigate by Z").
+```bash
+# autotailor ships with openscap-utils; `oscap xccdf generate` has no
+# tailoring-file submodule (its submodules are report, guide, fix, custom).
+autotailor \
+  --unselect xccdf_org.ssgproject.content_rule_<rule-id> \
+  --output ~/eeda-evidence/tailoring.xml \
+  /usr/share/xml/scap/ssg/content/ssg-debian12-ds.xml \
+  xccdf_org.ssgproject.content_profile_cis
+```
+
+5. Save the HTML report, the `results.xml`, and the `tailoring.xml` (plus one sentence per deviation saying why it was tailored out, and who owns that decision) in your "evidence artifact" folder: `~/eeda-evidence/`. In a real audit, these files are your deliverables — a tailoring file with no written reason is an undocumented deviation.
+
+**Expected result:** the score improves after remediation, you can explain each remaining failure in one sentence of risk language ("this fails because X, which matters because Y; we accept/mitigate by Z"), and the one rule you tailored out has a named owner and a written reason.
 
 ## Common Mistakes & Tips
 
@@ -181,6 +212,8 @@ oscap info /usr/share/xml/scap/ssg/content/ssg-debian12-ds.xml
 - [ ] I ran Lynis, applied 3 fixes, and confirmed the hardening index rose.
 - [ ] I ran an OpenSCAP scan, fixed one failing rule, re-scanned, and saved the reports as evidence.
 - [ ] I can explain each remaining scan finding in one sentence of risk language.
+
+> **Verification:** WSL Ubuntu 24.04, 2026-09-19 — **`lynis` 3.0.9** and **`oscap` 1.3.9**. `lynis show` with no argument prints its valid arguments (`categories`, `groups`, `profiles`, `settings`, `tests`, `version`, `workdir`, …) and `lynis show warnings` answers `Unknown argument 'warnings' for lynis show`; a real `lynis audit system --warnings-only --quick` run on this host wrote 3 `warning[]=` and 45 `suggestion[]=` records plus `hardening_index=62` into `/var/log/lynis-report.dat`. `oscap xccdf generate --help` lists only `report`, `guide`, `fix` and `custom`, and `oscap xccdf generate tailoring-file` answers `No such module: tailoring-file`; `autotailor --help` (openscap-utils 1.3.9) shows `-u/--unselect` over a positional `DS_FILENAME BASE_PROFILE_ID`, which is the invocation used in 4b. No SCAP Security Guide data stream is installed here (`/usr/share/xml/scap/ssg/content/` does not exist), so the `oscap xccdf eval` and `autotailor` runs themselves were not executed end to end. Package availability was checked with `apt-cache policy` on the same host: `openscap-scanner`, `openscap-utils` and `libopenscap25t64` are at `1.3.9+dfsg-1.1ubuntu2`, `libopenscap8` has **no candidate**, and the content packages are `ssg-base`/`ssg-debian`/`ssg-debderived` (`0.1.71-1`), whose newest streams are `ssg-debian12-ds.xml` and `ssg-ubuntu2204-ds.xml` respectively.
 
 ## Further Resources
 

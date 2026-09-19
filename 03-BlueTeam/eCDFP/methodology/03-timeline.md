@@ -71,7 +71,9 @@ MD5|name|inode|mode_as_string|UID|GID|size|atime|mtime|ctime|crtime
 ```bash
 # Build a bodyfile from an image (Sleuth Kit classic workflow)
 fls -o 2048 -r -m / image.dd > body.txt    # -m adds mount point to paths
-ils -o 2048 -m / image.dd >> body.txt      # add unallocated inode metadata
+ils -o 2048 -m image.dd >> body.txt        # add unallocated inode metadata
+# Note the asymmetry: 'fls -m <mount point>' takes an argument, 'ils -m' does not.
+# Give ils one and it reads the prefix as the image name instead.
 
 # Generate a sorted timeline in CSV from the bodyfile
 mactime -b body.txt -d > timeline.csv
@@ -101,29 +103,33 @@ The pipeline has three steps:
 
 ```bash
 # Parse the filesystem artifacts of an image into a storage file.
-# NOTE: CLI forms vary between plaso releases; run <tool> --help to confirm.
-# The repository itself uses two different shapes for this command — a positional
-# storage file (as in ../cheatsheets/forensic-commands.md) and a --storage-file= form.
-# Check which your release accepts before writing anything into a report.
+# NOTE: CLI forms vary between plaso releases; run <tool> --help to confirm the
+# storage-file option, and where the filter expression must sit, before you commit
+# either form to a report.
 log2timeline.py --storage-file=case.plaso image.dd
 
 # Add additional extracted sources (e.g., event logs pulled from the image)
 log2timeline.py --storage-file=case.plaso /case/evidence_extracted_logs/
 
-# Dump the whole supertimeline as sorted CSV
-psort.py -o csv -w timeline.csv case.plaso
+# Dump the whole supertimeline as sorted CSV. The CSV output module is called `l2tcsv`
+# (`-o csv` is rejected: `ERROR: Unsupported output format: csv.`). Confirm the module
+# list on your build with `psort.py --output-format list`.
+psort.py -o l2tcsv -w timeline.csv case.plaso
 
-# Filter: only events after a date, from the prefetch parser
-psort.py -o csv -w prefetch.csv \
-  "date > '2024-11-01 00:00:00' and parser == 'prefetch'" case.plaso
+# Filter: only events after a date, from the prefetch parser.
+# The filter expression is a positional argument and must come AFTER the storage file:
+# placed before it, psort reads it as part of the path and fails to compile the expression.
+psort.py -o l2tcsv -w prefetch.csv case.plaso \
+  "date > '2024-11-01 00:00:00' and parser == 'prefetch'"
 # What to look for: the filter is a string expression over event fields. Confirm the
 # field names your release exposes — `pinfo.py` output and the parser list are the
 # authority, not a remembered example.
 ```
 
 ```bash
-# One-shot alternative for quick triage: parse and export in a single command
-psteal.py --source image.dd --storage-file=case.plaso --output csv --write timeline.csv
+# One-shot alternative for quick triage: parse and export in a single command.
+# Use --output-format: a bare `--output` is ambiguous in current releases and exits 2.
+psteal.py --source image.dd --storage-file=case.plaso --output-format l2tcsv --write timeline.csv
 ```
 
 Export formats you will meet: `l2tcsv`/`csv` (flat tables for Excel), `json` (for scripting), and the classic bodyfile. Time-zone handling matters: plaso records timestamps in UTC by default, and you choose the display zone at export — store UTC, display local.
@@ -275,3 +281,31 @@ Notice what the table does *not* claim. It says a Run key was written, not that 
 - **RFC 3227**, *Guidelines for Evidence Collection and Archiving* (why ordering and time handling start at acquisition) — https://www.rfc-editor.org/rfc/rfc3227
 - **Forensics Wiki** (timeline analysis and tooling overviews) — https://forensics.wiki/
 - **SANS reading room** (white papers on timeline analysis) — https://www.sans.org/reading-room/
+
+> **Verification:** the Sleuth Kit half was executed on **2026-09-19** against **The Sleuth Kit
+> 4.12.1** (Ubuntu 24.04 WSL). On an ext4 image built in `/tmp` with `mkfs.ext4`, the corrected
+> pipeline ran end to end: `fls -f ext4 -o 0 -r -p -m /lab test.img` followed by
+> `ils -f ext4 -o 0 -e -m test.img >> body.txt` (then `mactime -b body.txt -d -z UTC`) produced the
+> CSV, with the `/lab` mount prefix on the `fls` rows. `ils -e -o 0 -m test.img` alone exited 0 and
+> wrote 4098 records — and note that its name field is an inode, `<test.img-alive-1>`, not a path.
+> The form printed in the guides, `ils -o 0 -m / test.img`, exited 1 with no stdout
+> (`Invalid magic value (raw_open: image "/" - is a directory)`), contributing nothing to the
+> bodyfile. The plaso half was then executed too, against **plaso 20260720** (`/opt/pytools/bin/`) on
+> the same date, and it both confirms and qualifies the examples above. Confirmed:
+> `log2timeline --storage-file=case.plaso disk.img` runs to `Processing completed.` and writes the
+> storage file (53 248 bytes over a 16 MiB ext4 image); `--help` documents `--storage_file PATH,
+> --storage-file PATH` as one option with two spellings; `pinfo case.plaso` prints the per-parser
+> breakdown this file tells you to read (`Events generated per parser: filestat : 12`); `psort -o
+> l2tcsv -w timeline.csv case.plaso` exits 0 and writes the CSV, so the positional storage file is
+> right. Qualified — three differences from the examples above, recorded but **not** changed, as
+> they fall outside this pass: (1) the output module is `l2tcsv`, not `csv` — `psort -o csv …`
+> fails with `ERROR: Unsupported output format: csv.`; the installed release can be asked to list its
+> own modules (the option is `--output-format list`, spelled with a hyphen) and it answers
+> `l2tcsv, dynamic, json, json_line, kml, l2ttln, null, opensearch, opensearch_ts, rawpy, tln, xlsx`
+> — there is no `csv` and no `jsonl`; (2) the **filter must follow
+> the storage file** — the order printed above (`-w out.csv "<filter>" case.plaso`) fails with
+> `ERROR: Unable to compile filter expression with error: Unsupported initial state: OPERATOR -
+> premature end of expression at position 10: case.plaso <--->`, because the path is consumed as the
+> filter, and `psort -o l2tcsv -w out.csv case.plaso "parser == 'filestat'"` exits 0; and (3) this
+> release installs the entry points **without** the `.py` suffix (`log2timeline`, `psort`, `pinfo`,
+> `psteal`), so the `log2timeline.py` spelling in the examples is the legacy one.

@@ -58,6 +58,8 @@ detection:
     - Image|endswith: '\powershell.exe'
     - Image|endswith: '\pwsh.exe'
   selection_encoded:
+    # Sigma `contains` is case-insensitive, and the surrounding spaces stop the rule matching
+    # unrelated switches such as `-Encoding`. All three translations below match this same set.
     CommandLine|contains:
       - ' -enc '
       - ' -encodedcommand '
@@ -103,15 +105,17 @@ Conversion gives you a starting query, not a finished detection: field names, in
 
 ## The same logic in the SIEM
 
-The rule above, as native queries. Both assume the supporting telemetry exists and is healthy.
+The rule above, as native queries. All three assume the supporting telemetry exists and is healthy.
 
 ```kql
-// KQL: encoded PowerShell, excluding known-good deployment parents
+// KQL: encoded PowerShell, excluding known-good deployment parents.
+// Same term set as the Sigma rule: `tolower()` plus `contains_any` reproduces Sigma's
+// case-insensitive substring match on ' -enc ' and ' -encodedcommand '.
 SecurityEvent
 | where TimeGenerated > ago(24h)
 | where EventID == 4688
 | where NewProcessName endswith_cs "\\powershell.exe" or NewProcessName endswith_cs "\\pwsh.exe"
-| where CommandLine has_any ("-enc", "-EncodedCommand", "FromBase64String")
+| where tolower(CommandLine) contains_any (" -enc ", " -encodedcommand ")
 | where ParentProcessName !endswith_cs "\\deploy-agent.exe"
 | project TimeGenerated, Computer, Account, NewProcessName, CommandLine, ParentProcessName
 ```
@@ -124,6 +128,15 @@ index=sysmon EventCode=1
   NOT ParentImage="*\\deploy-agent.exe"
 | table _time, Computer, User, Image, CommandLine, ParentImage
 ```
+
+> **The three versions now detect the same set — they did not before.** The KQL added a
+> `FromBase64String` term that the Sigma rule and the SPL did not have, and that term is a
+> *wider* rule: `[Convert]::FromBase64String` appears in plenty of legitimate administrative
+> scripts and fires on command lines where `-enc` was never used. If you want it, it is a
+> separate detection with its own baseline, its own false-positive review and its own validation
+> run — do not bolt it onto this one and assume the existing numbers carry over. Whenever you
+> change a term or a modifier in one translation, change it in all three, and re-validate in each
+> backend rather than only in the Sigma source.
 
 Threshold and correlation logic, for behaviours that are only suspicious in aggregate:
 

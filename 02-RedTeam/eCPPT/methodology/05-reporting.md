@@ -61,7 +61,12 @@ Use **CVSS v3.1** (or v4.x where the client mandates it) for the base score, the
 
 ```text
 # Example vector for a service-path privesc (local attacker, low complexity,
-# no privileges, no interaction, high confidentiality/integrity/availability impact)
+# low privileges = an authenticated local user, no interaction, high
+# confidentiality/integrity/availability impact)
+# Arithmetic on the official CVSS v3.1 base metrics:
+#   exploitability = 8.22 x AV:L(0.55) x AC:L(0.77) x PR:L(0.62) x UI:N(0.85) = 1.835
+#   impact         = 6.42 x [1 - (1-0.56)^3]                                  = 5.873
+#   base           = roundup(min(1.835 + 5.873, 10))                          = 7.8
 CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H  ->  Base Score 7.8 (High)
 
 # Qualitative mapping (common convention)
@@ -71,6 +76,11 @@ CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H  ->  Base Score 7.8 (High)
 7.0 - 8.9   High
 9.0 - 10.0  Critical
 ```
+
+Going from `PR:L` to `PR:N` (a genuinely unauthenticated attacker) would raise
+the score to 8.4 (`8.22 x 0.55 x 0.77 x 0.85 x 0.85 = 2.515`, plus the same
+impact `5.873`, rounds up to 8.4), so the vector and the prose must agree on
+which one you mean.
 
 Common CVSS traps: rating a *domain* compromise as if it were a *single host* issue (check the scope/changed-system flag and the real impact), and inflating scores because the finding "feels" bad. Score what the vector says, then use the executive narrative for business impact.
 
@@ -122,6 +132,8 @@ Never write the executive summary *after* the findings as an afterthought: draft
 - [ ] Remediation is concrete, prioritized, and distinguishes short-term fixes from long-term controls.
 - [ ] Scope, limitations, and tools/versions are documented; false positives are acknowledged.
 - [ ] A peer can re-run the top findings from the report alone and reach the same result.
+
+> **Verification:** the CVSS v3.1 base scores were recomputed from the official base-metric equations with Node 22.23.2 on 2026-09-19 (`PR:L` → 7.8, `PR:N` → 8.4 for the same vector), confirming the score printed next to the vector. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

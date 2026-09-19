@@ -225,11 +225,18 @@ The retrieval log is not a convenience: it records what was exposed even when th
 **Steps.** Run the baseline, then run the metadata-less document through a fail-open variant.
 
 ```python
-# The shipped filter is fail-closed: a chunk with no tenant is denied.
+# The shipped filter is fail-closed: a chunk with no tenant is denied, and so is a request
+# that arrives without an identity.
 def permits(chunk, tenant):
+    if not tenant:                       # no authenticated identity -> no access at all.
+        return False                     # Without this line the comparison below degenerates:
+                                         # `None in (None, "shared")` is True, so a null
+                                         # identity would serve every unclassified chunk —
+                                         # the exact documents nobody has reviewed yet.
     return chunk.get("tenant") in (tenant, "shared")
 
-# FAIL-OPEN (the classic defect): missing metadata is treated as open or shared.
+# FAIL-OPEN (the classic defect), kept as an explicit counter-example rather than the default:
+# a missing or null identity is treated as "everyone", and a chunk with no metadata as shared.
 def permits_fail_open(chunk, tenant):
     return chunk.get("tenant") in (None, "shared", tenant)
 ```
@@ -242,7 +249,7 @@ def permits_fail_open(chunk, tenant):
 
 **What you should observe.**
 
-- With the fail-closed filter, the metadata-less document is invisible to *both* tenants. The system breaks in the safe direction: the user gets "I do not know" and `served` is empty. A missing document is a support ticket; a leaked one is an incident.
+- With the fail-closed filter, the metadata-less document is invisible to *both* tenants. The system breaks in the safe direction: the user gets "I do not know" and `served` is empty. A missing document is a support ticket; a leaked one is an incident. The same filter denies everything when the request arrives with no identity at all — an unauthenticated call, or a background job that forgot to carry the principal. Check that case explicitly: a comparison written as `chunk.get("tenant") in (tenant, "shared")` returns `True` for a chunk with `tenant: null` when the caller's `tenant` is also `None`, so a fail-closed filter that never names the null identity is fail-open on exactly the documents nobody has classified.
 - With `permits_fail_open`, the same document is served to both tenants — and note *which* document it is: the one nobody has classified yet, which is disproportionately likely to be the newly uploaded confidential one. The default value of "unknown" is the whole finding.
 - A loader that writes `tenant="shared"` when metadata is absent produces the same fail-open behaviour without anyone writing a permissive comparison. Enumerate the defaults in your own loader before you trust the ACL: absent key, empty string, `null`, `"unknown"`, and a tenant name typed with different capitalisation are five different bugs.
 - `r3-03` combines the two defects: with `post`, the unclassified chunk appears in `candidates` even when the filter would have denied it in `acl`. Exposure and enforcement are separate steps, and both have to be right.
@@ -427,3 +434,12 @@ Three things make this a finding rather than a scare: a probe set someone can re
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) and [NIST AI 600-1](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — governance framing for data-handling findings.
 - [Flask](https://flask.palletsprojects.com/) and [Ollama](https://ollama.com/) — the endpoint and the local model this lab target uses.
 - [garak](https://github.com/NVIDIA/garak) and [Promptfoo](https://github.com/promptfoo/promptfoo) — automate the probe set once the manual passes are understood.
+
+> **Verification:** the `permits()` / `permits_fail_open()` block above was extracted
+> **verbatim from the markdown** and executed on **2026-09-19** under Ubuntu 24.04 /
+> Python 3.12.3 over five chunk shapes (own tenant, other tenant, `shared`, `tenant: null`,
+> missing key) × three callers (`alice`, `bob`, `None`). Pre-fix, `permits({"tenant": null}, None)`
+> returned `True` — a null identity was served the unclassified document, while the comment
+> above the function called it fail-closed. Post-fix it returns `False`, the `shared` path still
+> works for both tenants, and `permits_fail_open` still demonstrates the defect on the same
+> input. No model or vector store was involved: the comparison is on the filter's return value.

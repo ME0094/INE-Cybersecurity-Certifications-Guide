@@ -38,7 +38,9 @@ Consequences of non-compliance are not theoretical: fines, loss of the right to 
 ### PCI DSS (Payment Card Industry Data Security Standard)
 
 - Applies to any entity that stores, processes, or transmits cardholder data — from the smallest merchant to global acquirers.
-- 12 requirements grouped into 6 objectives: build/maintain a secure network; protect cardholder data; maintain a vulnerability management program; implement strong access control; regularly monitor and test; maintain an information security policy.
+- The edition in force is **PCI DSS v4.0.1**; v3.2.1 was **retired on 31 March 2024**, so language and control objectives lifted from it are out of date. Cite the version alongside any requirement number.
+- v4.x keeps the **12 requirements grouped into 6 objectives** — build/maintain a secure network; protect cardholder data; maintain a vulnerability management program; implement strong access control; regularly monitor and test; maintain an information security policy — and adds new plus future-dated requirements on top of them.
+- The 6 objectives are a summary for orientation, not the text of the standard: **Requirement 7**, for example, is "Restrict access to **system components and** cardholder data by business need to know" — the wider scope is the v4 wording, and the older "restrict access to cardholder data" phrasing is a v3.2.1 quote.
 - Compensating controls must be reviewed and approved by the assessor; SAQs apply to smaller merchants, full ROC + QSA assessment to larger ones.
 - Data minimization is the heart of compliance: the fewer card numbers you store, the smaller your attack surface and your scope.
 
@@ -146,7 +148,7 @@ Worked rows from a fictional mid-size company:
 |---|---|---|---|---|---|
 | OBL-GDPR-03 | GDPR Art. 30 | Maintain records of processing activities | `PRIV-01` RoPA | Current RoPA document, version history | DPO |
 | OBL-GDPR-07 | GDPR Art. 33 | Breach notification within 72 hours | `IR-04` notification procedure | Incident records with timestamps and decisions | DPO |
-| OBL-PCI-08 | PCI DSS — access control objective | Restrict access to cardholder data by business need to know | `AC-02` role-based access, `AC-05` review | Access review exports and removal tickets | Head of Payments |
+| OBL-PCI-08 | PCI DSS v4.0.1 — Req. 7 | Restrict access to system components and cardholder data by business need to know | `AC-02` role-based access, `AC-05` review | Access review exports and removal tickets | Head of Payments |
 | OBL-ISO-A89 | ISO/IEC 27001:2022 A.8.9 | Configuration management | `CM-01` baseline and drift process | Baseline documents and scan reports | Platform lead |
 | OBL-HIPAA-05 | HIPAA Security Rule | Risk analysis and documented safeguards | `RM-02` annual risk assessment | Signed risk assessment and treatment plan | Compliance manager |
 

@@ -122,20 +122,27 @@ Also record which files `icat` **could not** recover, and why. The negative resu
 
 **Objective:** extract a browser profile from an image and answer *what the user looked at* using SQLite queries.
 
-Preparation (one time, on `win-lab`, not on your daily driver): browse several sites in **Firefox**, then copy its profile databases into a second exercise image.
+Preparation (one time, on `win-lab`, not on your daily driver): browse several sites in **Firefox**, then copy its profile databases off the guest. Two steps, on two different machines — the copy happens **on the Windows guest**, and building the exercise image happens **on the Linux analysis host**. Never run the Linux half on `win-lab`: that machine is the exhibit.
+
+**Step A — on the guest (`win-lab`).** Firefox keeps its history in `places.sqlite`.
+
+```powershell
+# What to look for: the profile directory name — modern Firefox uses a release-suffixed
+# profile (*.default-release), but the exact name varies, so list what is actually there
+# and copy the two databases you find. `%APPDATA%` is C:\Users\<user>\AppData\Roaming.
+Get-ChildItem "$env:APPDATA\Mozilla\Firefox\Profiles" -Directory
+Copy-Item "$env:APPDATA\Mozilla\Firefox\Profiles\<profile>.default-release\places.sqlite"  C:\lab-copy\
+Copy-Item "$env:APPDATA\Mozilla\Firefox\Profiles\<profile>.default-release\cookies.sqlite" C:\lab-copy\
+```
+
+**Step B — on the analysis host (`linux-lab`).** Build a small image and drop the copies into it.
 
 ```bash
-# On the victim VM (Firefox keeps its history in places.sqlite)
-ls ~/.mozilla/firefox/*.default-release/places.sqlite ~/.mozilla/firefox/*.default-release/cookies.sqlite
-# What to look for: the profile directory name — modern Firefox uses a release-suffixed
-# profile, but the exact name varies. Copy the files you actually find.
-
-# Build a small image and drop the DBs into it
+# A 16 MiB FAT32 exercise image, mounted only while you stage it (this one is not evidence)
 dd if=/dev/zero of=~/lab/case2/browser.img bs=1M count=16 status=progress
 mkfs.vfat -F 32 -n BROWSER ~/lab/case2/browser.img
 sudo mount -o loop ~/lab/case2/browser.img /tmp/labmnt
-sudo cp ~/.mozilla/firefox/*.default-release/places.sqlite /tmp/labmnt/
-sudo cp ~/.mozilla/firefox/*.default-release/cookies.sqlite /tmp/labmnt/
+sudo cp <carried-copies>/*.sqlite /tmp/labmnt/    # the files you carried off the guest
 sudo umount /tmp/labmnt
 ```
 
@@ -167,7 +174,7 @@ sqlite3 ~/lab/case2/cookies.sqlite \
 
 Two extensions that make this drill realistic:
 
-- **Clear the browser history, then re-run the analysis.** The live tables will be empty; check the database's free pages (`PRAGMA free page counts`) and consider carving the database file. Record what you recovered and what you did not.
+- **Clear the browser history, then re-run the analysis.** The live tables will be empty; check the database's free pages (`PRAGMA freelist_count;` — the same pragma `../methodology/02-analysis.md` §8 uses) and consider carving the database file. Record what you recovered and what you did not.
 - **Compare the browser record against the file system.** Find the file created by a download and correlate its birth time with the corresponding row in the `downloads` table. That correlation is the actual forensic skill; the SQL is the easy part.
 
 ## Drill 3 — Build a timeline
@@ -235,10 +242,10 @@ vol -f ~/lab/case3/mem.raw windows.netscan
 vol -f ~/lab/case3/mem.raw windows.malfind --pid 2468
 vol -f ~/lab/case3/mem.raw windows.vadinfo --pid 2468
 
-# 5) Preserve the evidence
-vol -f ~/lab/case3/mem.raw windows.memdump --pid 2468 --dump ~/lab/case3/dumps/
-vol -f ~/lab/case3/mem.raw windows.dumpfiles --pid 2468 --dump
-sha256sum ~/lab/case3/dumps/*.dmp
+# 5) Preserve the evidence (--dump takes no argument; the output directory is the global -o)
+vol -f ~/lab/case3/mem.raw -o ~/lab/case3/dumps/ windows.memmap --pid 2468 --dump
+vol -f ~/lab/case3/mem.raw -o ~/lab/case3/dumps/ windows.dumpfiles --pid 2468
+sha256sum ~/lab/case3/dumps/pid.2468.dmp
 ```
 
 **Expected outcome:** you can name the OS/build, produce a process tree, and — if you planted the renamed `notepad.exe` — point to the anomaly: an `svchost.exe`-named process whose **parent is `explorer.exe`** (real service hosts are children of the service control manager) or whose image path points to a temporary directory. With a public sample, expect at least: OS identification, a process inventory, and one flagged process with a network connection or an executable private region. You do not need a "gotcha" finding on every sample — a clean baseline, documented, is a valid result.
@@ -365,3 +372,23 @@ fls -f fat -d -r ~/lab/case5/disk.img
 - Autopsy documentation (timeline ingest) — sleuthkit.org/autopsy.
 - DFRWS challenge datasets for authorized practice — dfrws.org.
 - `man fls`, `man icat`, `man istat`, `man mactime`, `man mkfs.vfat` on your practice system.
+
+> **Verification:** executed on **2026-09-19** against **Volatility 3 Framework 2.28.2**, **The
+> Sleuth Kit 4.12.1** and **sqlite3 3.45.1** (Ubuntu 24.04 WSL). Volatility: `vol windows.memmap
+> --help` prints `usage: vol windows.memmap.Memmap [-h] [--pid PID] [--dump]`; `--dump` takes no
+> argument (`vol -f x -o /tmp windows.memmap --pid 1 --dump /evidence/dumps` →
+> `vol: error: unrecognized arguments: /evidence/dumps`); `-o` is global and must precede the
+> plugin name (`-o` after the plugin → `unrecognized arguments`); the file written is
+> `pid.<PID>.dmp` (`framework/plugins/windows/memmap.py`: `self.open(f"pid.{pid}.dmp")`). SQLite:
+> `sqlite3 pragma.db "PRAGMA freelist_count;"` printed `8` and exited 0, while `PRAGMA free page
+> counts;` exited 1 with `Error: in prepare, near "page": syntax error`. Sleuth Kit: on an ext4
+> image built in `/tmp`, `fls -o 0 -r -p -m /lab` + `mactime -b … -d -z UTC` produced the CSV, and
+> the form the guides used for `ils`, `ils -o 0 -m /`, exits 1 with no stdout. The Step A path in
+> Drill 2 was checked against the Windows host this pass ran on: `Test-Path
+> "$env:APPDATA\Mozilla\Firefox\Profiles"` returns `True` and the directory holds
+> `22mqycb1.default-release` and `kwxr09ie.default`, which is the release-suffixed name and the
+> variation the step warns about. **Not executed:** the drills' own deletions and carvings (no case
+> image exists here). `foremost` 1.5.7 and `scalpel` 1.60 are installed, but a carving run on
+> **2026-09-19** extracted nothing from any input tried — including a real 542 091-byte JPEG, alone
+> and inside an ext4 image — so Drill 6 is a syntax reference only, and this record does not claim
+> that carving works on this build.

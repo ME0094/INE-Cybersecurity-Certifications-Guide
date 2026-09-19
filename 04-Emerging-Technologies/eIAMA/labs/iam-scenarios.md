@@ -39,9 +39,26 @@ Run Keycloak in development mode (uses an embedded database — fine for a lab, 
 
 ```bash
 docker run -d --name eiama-keycloak -p 8080:8080 \
-  -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
   quay.io/keycloak/keycloak:26.1 start-dev
 ```
+
+> **Version note — the two environment variables in that block are the current names, not the
+> historical ones.** Keycloak **26.0** deprecated `KEYCLOAK_ADMIN` and
+> `KEYCLOAK_ADMIN_PASSWORD` in favour of **`KC_BOOTSTRAP_ADMIN_USERNAME`** and
+> **`KC_BOOTSTRAP_ADMIN_PASSWORD`**, and the new pair is the supported form from 26.0 onward;
+> this lab uses it.
+>
+> What actually happens if you paste a command from a Keycloak ≤25 guide was measured rather
+> than assumed (see the verification note at the end of this file). On **26.1.0** the old names
+> still work: the server logs two deprecation warnings —
+> `KC-SERVICES0110: Environment variable 'KEYCLOAK_ADMIN' is deprecated, use 'KC_BOOTSTRAP_ADMIN_USERNAME' instead`
+> — and then bootstraps the admin anyway, so `admin`/`admin` logs in successfully. They are an
+> alias on their way out, not a broken flag. The failure you will actually meet is the other
+> one: with **neither** pair set, there is no usable admin at all and the token endpoint
+> answers `401 invalid_grant / Invalid user credentials` — which is why the note in the console
+> step below tells you to read the log instead of assuming a networking problem. Write the new
+> names, treat the warning as the deadline, and do not build a lab that depends on the alias.
 
 Verify it is up (wait a few seconds on first boot):
 
@@ -51,7 +68,7 @@ curl -s http://localhost:8080/realms/master/.well-known/openid-configuration | h
 
 **Expected:** a JSON document listing `authorization_endpoint`, `token_endpoint`, `userinfo_endpoint`, `jwks_uri`, and more. This `.well-known` document is the machine-readable contract every OIDC client uses — remember it.
 
-Open the admin console at http://localhost:8080/admin and sign in with `admin` / `admin`.
+Open the admin console at http://localhost:8080/admin and sign in with the username and password you passed in `KC_BOOTSTRAP_ADMIN_USERNAME` / `KC_BOOTSTRAP_ADMIN_PASSWORD` — `admin` / `admin` if you used the block above. If that pair is rejected, read the container log first (`docker logs eiama-keycloak | grep -iE 'admin|bootstrap'`): on 26.1.0 a rejected login means the bootstrap variables were not the ones the server read, and the log says which names it recognised and whether it created an admin at all.
 
 ## Scenario 1 — Realm and test user
 
@@ -77,27 +94,36 @@ Register a confidential client that represents a test application, then run a ti
 **Minimal OIDC test app** (`oidc-app.py`) that performs the authorization code flow with the realm:
 
 ```python
-import base64, json, secrets
+import json, os, secrets
 from flask import Flask, redirect, request, session
+import jwt                                   # PyJWT
 import requests
+from jwt import PyJWKClient
 
 CLIENT_ID = "test-app"
-CLIENT_SECRET = "REPLACE_WITH_REALM_CLIENT_SECRET"
+CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"]     # never hard-code it in the file
 REDIRECT_URI = "http://localhost:5001/callback"
 ISSUER = "http://localhost:8080/realms/lab-realm"
 
 app = Flask(__name__)
-app.secret_key = "lab-only-secret"
+app.secret_key = os.environ["FLASK_SECRET"]          # lab only, but from the environment
+
+# The realm's public keys, fetched from the discovery document rather than assumed.
+DISCOVERY = requests.get(f"{ISSUER}/.well-known/openid-configuration", timeout=10).json()
+JWKS_CLIENT = PyJWKClient(DISCOVERY["jwks_uri"])     # caches keys, refetches on kid miss
+ALGORITHMS = ["RS256"]                               # pin it: never accept the token's `alg`
 
 @app.route("/")
 def home():
     if "claims" not in session:
         state = secrets.token_urlsafe(16)
+        nonce = secrets.token_urlsafe(16)            # binds the ID token to THIS request
         session["state"] = state
-        url = requests.Request("GET", f"{ISSUER}/protocol/openid-connect/auth", params={
+        session["nonce"] = nonce
+        url = requests.Request("GET", DISCOVERY["authorization_endpoint"], params={
             "response_type": "code", "client_id": CLIENT_ID,
             "redirect_uri": REDIRECT_URI, "scope": "openid profile email",
-            "state": state}).prepare().url
+            "state": state, "nonce": nonce}).prepare().url
         return redirect(url)
     return "<pre>" + json.dumps(session["claims"], indent=2) + "</pre>"
 
@@ -105,19 +131,49 @@ def home():
 def callback():
     if request.args.get("state") != session.pop("state", None):
         return "state mismatch (possible CSRF)", 400
-    r = requests.post(f"{ISSUER}/protocol/openid-connect/token", data={
-        "grant_type": "authorization_code", "code": request.args["code"],
+    r = requests.post(DISCOVERY["token_endpoint"], data={
+        "grant_type": "authorization_code", "code": request.args.get("code"),
         "redirect_uri": REDIRECT_URI, "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET})
+        "client_secret": CLIENT_SECRET}, timeout=10)
     id_token = r.json()["id_token"]
-    payload = id_token.split(".")[1]          # middle JWT segment is the claims
-    payload += "=" * (-len(payload) % 4)      # pad base64url
-    session["claims"] = json.loads(base64.urlsafe_b64decode(payload))
+
+    # Verify — do not decode. The signature is checked against the realm's JWKS, and the
+    # claims that make the token *mean* something are checked explicitly:
+    #   signature   proves the realm issued this token and nobody edited it
+    #   iss          proves it came from THIS realm and not another one you also trust
+    #   aud          proves it was issued for THIS client, not replayed from another app
+    #   exp / iat    prove it is current (PyJWT enforces these by default)
+    #   nonce        proves it answers the login request this session started
+    # Skipping any of the five turns a login into an assertion by whoever holds the token.
+    signing_key = JWKS_CLIENT.get_signing_key_from_jwt(id_token)
+    claims = jwt.decode(
+        id_token,
+        signing_key.key,
+        algorithms=ALGORITHMS,
+        issuer=ISSUER,
+        audience=CLIENT_ID,
+        options={"require": ["exp", "iat", "iss", "aud", "sub"]},
+    )
+    # `or ""` rather than a default: a token that carries an explicit `"nonce": null` must
+    # produce a clean mismatch, not a TypeError that turns into a 500.
+    if not secrets.compare_digest(claims.get("nonce") or "", session.pop("nonce", "") or ""):
+        return "nonce mismatch (token replay or wrong login request)", 400
+    session["claims"] = claims
     return redirect("/")
 
 if __name__ == "__main__":
     app.run(port=5001)
 ```
+
+**What the earlier version of this fragment did, and why it is worth naming.** It decoded the
+ID token with `base64.urlsafe_b64decode` on the middle segment and put the result straight
+into the session — no signature check, no `iss`, no `aud`, no `exp`, no `nonce`. Everything it
+displayed was attacker-controlled: anyone could hand that callback a token of their own
+construction and the app would show whatever claims they chose. It also contradicted the rest
+of this lab, which asks for `nonce` in the checklist below and points at the "never trust a
+JWT without validating signature, issuer, audience and expiry" rule in
+[../cheatsheets/iam-protocols.md](../cheatsheets/iam-protocols.md). Decoding is not verifying,
+and a token you decoded is a claim someone else wrote.
 
 Run it, open http://localhost:5001, and sign in as `alice`.
 
@@ -147,7 +203,7 @@ Roles group permissions; Keycloak distinguishes **realm roles** (apply across th
 1. *Realm roles → Create role*: `lab-admin`.
 2. *Clients → test-app → Client scopes* is where role mappers live; the default `roles` scope usually already maps realm roles into the access token.
 3. Assign the role: *Users → alice → Role mapping → Assign role* → pick `lab-admin` (realm role) and assign.
-4. Log in to the test app again and inspect the **access token** payload as well as the ID token (extend the app to print `r.json()["access_token"]` decoded the same way, or decode it with any JWT tooling at the concept level).
+4. Log in to the test app again and inspect the **access token** payload as well as the ID token. For inspection only, decoding without verifying is fine — you are reading your own token in your own lab, and `python3 -c "import base64,json,sys; p=sys.argv[1].split('.')[1]; p+='='*(-len(p)%4); print(json.dumps(json.loads(base64.urlsafe_b64decode(p)), indent=2))" <token>` does it. Note the difference from the callback above: **reading** a token for a look is debug output; **acting** on the claims it carries is authentication, and that path verifies the signature and the claims first.
 
 **Expected:** the access token contains a `realm_access` claim like `{"roles": ["lab-admin", "default-roles-lab-realm", "offline_access", "uma_authorization"]}`. The application authorizes Alice because the token says so — that is token-based authorization in action.
 
@@ -219,3 +275,38 @@ Remove the container when finished so no throwaway credentials linger.
 - RFC 6749 (OAuth 2.0): https://www.rfc-editor.org/rfc/rfc6749
 - RFC 7636 (PKCE): https://www.rfc-editor.org/rfc/rfc7636
 - NIST SP 800-207 (Zero Trust Architecture): https://csrc.nist.gov/pubs/sp/800/207/final
+
+> **Verification.** Both corrections in this file were executed, on **2026-09-19**, under
+> Ubuntu 24.04 with **Java 21.0.12** and **Keycloak 26.1.0** (the release zip, extracted in
+> `/tmp`, `kc.sh start-dev --http-port=8180`).
+>
+> **Step 0 / the admin variables.** Three runs, each against a wiped `data/`, authenticated with
+> a real `admin-cli` password grant at the realm's token endpoint:
+>
+> | Variables set | Log | `admin`/`admin` token | `GET /admin/realms` |
+> | --- | --- | --- | --- |
+> | `KEYCLOAK_ADMIN` + `KEYCLOAK_ADMIN_PASSWORD` | `WARN KC-SERVICES0110: Environment variable 'KEYCLOAK_ADMIN' is deprecated, use 'KC_BOOTSTRAP_ADMIN_USERNAME' instead` (and the password equivalent), then `INFO KC-SERVICES0077: Created temporary admin user with username admin` | **HTTP 200** | **HTTP 200** |
+> | `KC_BOOTSTRAP_ADMIN_USERNAME` + `KC_BOOTSTRAP_ADMIN_PASSWORD` | `INFO KC-SERVICES0077: Created temporary admin user with username admin`, and *no* deprecation warning | **HTTP 200** | **HTTP 200** |
+> | *neither* (control) | no admin-creation line | **HTTP 401**, `{"error":"invalid_grant","error_description":"Invalid user credentials"}` | — |
+>
+> So on **26.1.0 the old names are deprecated but still honoured**, which is why the version note
+> above is worded as "an alias on its way out" rather than "no longer works": the audit that
+> prompted this change asserted the latter, and the measurement does not support it. The
+> server banner was `Keycloak 26.1.0 on JVM (powered by Quarkus 3.15.2) started in 24.676s.
+> Listening on: http://0.0.0.0:8180`, and the discovery document returned
+> `"issuer":"http://localhost:8180/realms/master"` with
+> `"jwks_uri":"http://localhost:8180/realms/master/protocol/openid-connect/certs"`.
+>
+> **Scenario 2 / the callback.** PyJWT was exercised against a locally generated RSA key
+> standing in for the realm's JWKS (no Keycloak needed for this half), with the corrected
+> callback logic run against eight tokens — on **both** PyJWT 2.7.0 and PyJWT 2.14.0, with
+> identical results. Accepted: the valid token
+> (`ACCEPTED: alice / sub=a1b2c3-alice`). Rejected with a named error: forged signature
+> (`InvalidSignatureError`), wrong issuer (`InvalidIssuerError`), wrong audience
+> (`InvalidAudienceError`), expired (`ExpiredSignatureError`), `alg: none`
+> (`InvalidAlgorithmError: The specified alg value is not allowed`), and both nonce cases
+> (`nonce mismatch (token replay or wrong login request)`). The pre-fix code — base64-decode
+> the middle segment and trust it — accepted **all eight**, including the forged token
+> (`'mallory'`) and the unsigned `alg: none` token. The route itself was not served over HTTP
+> with Flask; the verification is of the validation logic the callback runs, from the token
+> onwards.

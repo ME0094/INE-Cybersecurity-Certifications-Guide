@@ -57,10 +57,10 @@ grep -rniE "getSharedPreferences|openOrCreateDatabase" jadx-out/ | head -20
 unzip target.ipa -d ipa-out
 
 # Objective-C headers from a *decrypted* binary (jailbroken-device output)
-class-dump -H Payload/Target.app/Target -o headers-out
+class-dump -H Payload/Target.app/Target -o headers-out   # macOS-only tool
 
 # Linked libraries and load commands
-otool -L Payload/Target.app/Target
+otool -L Payload/Target.app/Target                       # macOS-only tool (Xcode CLT)
 
 # Quick string sweep for secrets and endpoints
 strings -a Payload/Target.app/Target | grep -iE "https?://|api[_-]?key|secret" | head
@@ -68,9 +68,11 @@ strings -a Payload/Target.app/Target | grep -iE "https?://|api[_-]?key|secret" |
 
 Swift methods are not exposed as Objective-C headers, so for Swift-heavy apps
 load the binary into **Ghidra** (or IDA) and inspect the disassembly and
-recovered symbols. Keep in mind the binary you can buy or download may be
-encrypted; decrypt it only through authorized channels (jailbroken test
-device, client-provided decrypted build).
+recovered symbols. `class-dump` and `otool` run only on macOS: from a
+Linux/Windows host, use Ghidra (and `strings`, which is portable) on the
+decrypted binary, or run the dump on a Mac. Keep in mind the binary you can buy
+or download may be encrypted; decrypt it only through authorized channels
+(jailbroken test device, client-provided decrypted build).
 
 ## Step 3 — Reviewing the Attack Surface
 
@@ -180,6 +182,14 @@ to the cipher logic, and credentials in `assets/` or iOS bundled plists.
 - [ ] I identified the app's crypto usage (algorithms, keys, modes) for later
       verification.
 - [ ] I recorded class/method/file evidence for every finding.
+
+> **Verification:** unverified syntax references — not run. `class-dump` and
+> `otool` require macOS and this lab has none, so those lines come from tool
+> documentation (<https://developer.apple.com/documentation/>, 2026-09-19). The
+> masking claim behind them was checked by execution elsewhere: the MASTG
+> UnCrackable-Level1 iOS build is `iphoneos`-only (armv7/arm64), which is why
+> `class-dump`/Ghidra work on the decrypted *device* binary and not on a
+> simulator build.
 
 ## Further Resources
 

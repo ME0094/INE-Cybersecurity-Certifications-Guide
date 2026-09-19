@@ -6,6 +6,8 @@
 
 Persistence keeps access alive after a reboot, a password change, or a session loss — the difference between "one lucky shell" and a durable foothold. This phase covers Windows persistence mechanisms an assessor should *understand and know how to detect*, plus the Kerberos golden/silver ticket concepts that can outlive almost everything. Persistence techniques are for authorized labs and red-team exercises only; in a pentest they are usually demonstrated, documented, and then removed.
 
+**Prerequisites:** test every mechanism below on the throwaway hosts of [labs/ad-lab-setup.md](../labs/ad-lab-setup.md) (`corp.local`, `DC01`/`SRV01`/`WS01`) and revert the snapshot afterwards — never first-try persistence on an environment you cannot rebuild. The end-to-end chains are in [labs/attack-simulations.md](../labs/attack-simulations.md).
+
 ## Windows Persistence Mechanisms
 
 ### 1. Registry Run keys
@@ -107,7 +109,7 @@ Detection concepts: golden tickets can't be "seen" in the KDC logs (no AS-REQ), 
 ## Common Mistakes & Tips
 
 - **Persistence that dies with the user:** Run keys fire only at interactive logon of that user — if the account is never logged in interactively, nothing runs.
-- **Forgetting architecture:** an x86 binary under a Run key won't survive on x64 cleanly, and 32/64-bit registry views differ (`WOW6432Node`).
+- **Forgetting architecture:** an x86 binary under a Run key still starts on x64 Windows — WoW64 runs it transparently, so the bitness is not what breaks your persistence. What does bite is registry redirection: a 32-bit process writing `HKLM\Software\...\Run` is redirected to `HKLM\Software\WOW6432Node\...\Run`, so the key you wrote and the key a 64-bit reader inspects are two different paths — confirm the entry where your reader actually looks.
 - **Golden ticket with the wrong SID:** you need the *domain* SID, not the user SID — a common reason the forged ticket is rejected.
 - **One mechanism only:** a real foothold usually has 2–3 layers (startup + account + ticket). In a *lab*, one clean, documented example teaches more than a pile of them.
 - **Not testing after reboot:** persistence that doesn't survive a reboot is not persistence — always validate.
@@ -123,11 +125,13 @@ Detection concepts: golden tickets can't be "seen" in the KDC logs (no AS-REQ), 
 - [ ] I can list the primary detection signals for each persistence mechanism.
 - [ ] I document every persistence change with exact reversal commands and clean up after the exercise.
 
+> **Verification:** the architecture and registry-redirection claims were checked against Microsoft Learn, "Running 32-bit Applications" (WOW64 runs 32-bit applications seamlessly on 64-bit Windows) and "32-bit and 64-bit Application Data in the Registry" (redirection subnodes named `Wow6432Node`) on 2026-09-19. Corrections applied from the 19 Sep 2026 audit.
+
 ## Further Resources
 
 - MITRE ATT&CK — Persistence tactics (T1547 boot/logon autostart, T1053 scheduled tasks, T1546 event-triggered, T1098 account manipulation, T1558 Kerberos tickets): https://attack.mitre.org/
 - Microsoft Learn — Scheduled tasks and WMI event subscriptions documentation: https://learn.microsoft.com/en-us/windows/win32/wmisdk/receiving-events-at-all-times
 - Microsoft Learn — WMI and Sysmon event reference: https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
-- Microsoft Learn — AdminSDHolder technical reference: https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc730983(v=ws.10)
+- Microsoft Learn — AdminSDHolder and SDProp (protected accounts and groups): https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/appendix-c--protected-accounts-and-groups-in-active-directory
 - HackTricks — Windows persistence: https://book.hacktricks.wiki/en/windows-hardening/windows-persistence.html
 - Sysinternals Autoruns official page: https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns

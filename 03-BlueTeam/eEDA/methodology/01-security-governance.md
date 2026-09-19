@@ -108,7 +108,8 @@ COBIT (Control Objectives for Information and Related Technologies, ISACA) frame
 - COBIT is a governance *and* management framework, so it pairs well with ISO 27001 (controls) and NIST CSF (outcomes).
 
 ```text
-NIST CSF    -> outcome language ("what good looks like": Identify/Protect/Detect/Respond/Recover)
+NIST CSF    -> outcome language ("what good looks like": the six CSF 2.0 functions —
+               Govern/Identify/Protect/Detect/Respond/Recover)
 ISO 27001   -> auditable management system + Annex A controls
 COBIT       -> governance processes and capability maturity
 ```
@@ -187,7 +188,7 @@ Auditors do not assess intent; they assess documents. Every policy, standard, an
 | Approved by / date | Executive Committee / 2026-02-14 |
 | Effective date | 2026-03-01 |
 | Next review date | 2027-03-01 (or on material change) |
-| Related frameworks | ISO/IEC 27001:2022 A.5.1; NIST CSF 2.0 GV.PO; CIS Controls v8 control 5 |
+| Related frameworks | ISO/IEC 27001:2022 A.5.1; NIST CSF 2.0 GV.PO; CIS Controls v8 control 6 (safeguard 6.5, MFA for administrative access) |
 | Related documents | SEC-STD-011 MFA standard; SEC-PR-020 MFA enrolment procedure |
 | Exceptions register | EXC-REG-2026 (see section 6) |
 

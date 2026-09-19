@@ -96,19 +96,33 @@ The classic flaws:
 - **XML signature wrapping**: the SP validates the signature on one node but
   consumes a different, unsigned node — craft a validly-signed document whose
   *used* assertion contains your identity.
-- **Comment injection** in `NameID` where the SP parses with an XML parser
-  that keeps comments (`victim<!--x-->@evil.com`).
+- **Comment injection** in `NameID`: the comment sits *after* the identity being
+  impersonated (`victim@target.com<!--x-->`). A conformant XML parser
+  **discards** comments, so the element's text content — the value the SP must
+  use — is `victim@target.com`. The flaw lives in libraries whose DOM-traversal
+  and canonicalization APIs handle comments inconsistently, so inner text
+  *after* the comment is dropped before the message is signed and ends up
+  outside the signature; the SP must parse conformantly and verify the
+  signature over the whole element (CERT VU#475445).
 - **Missing signature / signature only on part of the assertion**.
 - **`Recipient`/`Audience`/`Conditions` not enforced** — assertions issued
   for one SP accepted by another.
 
 ```xml
-<!-- Concept: two Subject nodes; signature covers the first, SP reads the last -->
+<!-- Comment injection: the comment trails the impersonated identity. A
+     conformant parser discards comments, so the text content the SP must use
+     is victim@target.com — but a library that drops text *after* the comment
+     signs less than the element holds (CERT VU#475445). -->
+<saml:NameID>victim@target.com<!--x--></saml:NameID>
+
+<!-- Signature wrapping: the SP validates the signature on one node but
+     consumes another. The signed node is the attacker's own legitimate
+     assertion (the decoy); the consumed, unsigned node carries the victim. -->
 <saml:Subject>
-  <saml:NameID>admin@target.com</saml:NameID>   <!-- signed -->
+  <saml:NameID>attacker@evil.com</saml:NameID>   <!-- signed decoy -->
 </saml:Subject>
 <saml:Subject>
-  <saml:NameID>attacker@evil.com</saml:NameID>  <!-- consumed -->
+  <saml:NameID>victim@target.com</saml:NameID>   <!-- consumed, unsigned -->
 </saml:Subject>
 ```
 
@@ -131,10 +145,14 @@ a lab IdP/SP pair — use one you control.)
   pre-change session.
 
 ```bash
-# Fixation probe (lab): set a known session cookie, log in, compare the value
-curl -s -c jar.txt http://lab/login -d 'user=x&pass=y'
+# Fixation probe (lab): supply a session id YOU chose, log in, compare what
+# comes back. `-b` sends the fixed cookie — without it the probe sends nothing;
+# `-c` saves the cookie the app hands back.
+FIXED=attacker-chosen-session-id
+curl -s -b "session=$FIXED" -c jar.txt http://lab/login -d 'user=x&pass=y'
 grep session jar.txt                       # cookie the app gave you
-# If it matches a value YOU supplied before login -> fixation candidate
+# If it still equals $FIXED after a successful login -> fixation candidate
+# (a correct app rotates the session id on login; see the notes above)
 ```
 
 ## 2FA logic gaps
@@ -208,6 +226,17 @@ Cookie: session=abc; step=otp-pending
       after token evidence.
 - [ ] I keep an auth entry-point map with the tokens/cookies issued at each
       step.
+
+> **Verification:** the SAML comment handling was checked against CERT/CC
+> VU#475445 on 2026-09-19
+> (<https://www.kb.cert.org/vuls/id/475445>), which states that inconsistent
+> comment handling makes inner text after the comment fall outside the signature
+> (CVE-2017-11427 … CVE-2018-5387) — primary documentation, no SAML lab was run
+> here. The fixation probe was executed: against a local login endpoint, the old
+> `curl -s -c jar.txt` reached the server with `Cookie: <none>`, while
+> `curl -s -b "session=$FIXED" -c jar.txt` sent
+> `Cookie: session=attacker-chosen-session-id` (curl in WSL Ubuntu 24.04,
+> 2026-09-19).
 
 ## Further Resources
 

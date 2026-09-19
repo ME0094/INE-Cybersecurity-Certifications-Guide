@@ -4,7 +4,7 @@
 >
 > Maps each attack vector to a primary control, a compensating control for the case where the primary fails, the concrete test that proves the control is present, and the signal that would make you *believe* you are protected when you are not.
 >
-> Scope: this sheet starts where the vector catalogue ends. What each vector *is* — description and educational pattern — lives in [ai-attack-vectors.md](ai-attack-vectors.md); the vector names below are reused verbatim so the two sheets can be read side by side.
+> Scope: this sheet starts where the vector catalogue ends. What each vector *is* — description and educational pattern — lives in [ai-attack-vectors.md](ai-attack-vectors.md). The two sheets do **not** share one naming list: this sheet splits and merges some of the catalogue's sections, because the control that answers a vector rarely respects the boundary of the heading that introduced it. The correspondence is spelled out below rather than asserted.
 >
 > No command in this file was executed while writing it: every entry is a method to run in your own lab.
 
@@ -38,6 +38,52 @@
 | Unsafe handling of model output | Model output → downstream sink | Treat output as untrusted input at every sink: encode, parameterise, review generated code | Static analysis plus sandboxing of generated artefacts | Route a case's output into each sink of the test app (HTML, SQL, shell, mail body) and observe how each sink handles it | "It is our own model" — provenance is not sanitisation |
 | Model or dependency supply chain | Build → runtime | Pin versions and hashes; SBOM/AIBOM; minimal dependencies; vetted hubs | Egress control on the build and deploy path plus review of every newly resolved package | Diff the resolved dependency set and hashes between two builds; flag unused and look-alike package names; observe whether anything verifies them at deploy time | A lockfile exists, but nothing re-verifies it after review |
 | Leakage via traces and logs | Logging path → trace store | Redact before storage; field-level allow-list; bounded retention | Access control and review on the trace store, identifiers stored hashed | Search your own trace store for the fictional marker used in a case; observe whether prompts, tool arguments or retrieved IDs appear in clear | Logs are "internal", while the prompts already contain production data |
+
+### How this sheet's names map onto the vector catalogue
+
+Eight rows carry a name that is identical in both sheets and are read side by side without any
+translation: **Tool abuse / confused deputy**, **Tool confusion**, **Injection of tool
+arguments**, **Excessive agency**, **Unbounded consumption**, **Unsafe handling of model
+output**, **System-prompt extraction**, **Index dominance by duplicates**.
+
+The remaining rows are this sheet's own working names, and each one covers one or more
+sections of [ai-attack-vectors.md](ai-attack-vectors.md). Read the catalogue section named on
+the right whenever a row's *mechanism* is what you need:
+
+| Row in this sheet | Section in ai-attack-vectors.md |
+| --- | --- |
+| Direct injection | Prompt injection (direct) |
+| Indirect injection via document | Prompt injection (indirect) |
+| Injection via tool output | Prompt injection (indirect) — the tool-response channel, plus the delivery-channel table |
+| Jailbreak by framing | Jailbreaks |
+| Filter evasion by encoding or obfuscation | Adversarial evasion, plus the encoding variants under Jailbreaks |
+| Training-data / membership extraction | Model extraction; Model inversion & memorization |
+| Context leakage and cross-tenant | Retrieval without authorization (cross-tenant, cross-user); Privacy leakage |
+| Retrieval corpus poisoning | Data poisoning (the RAG path); Retrieval manipulation (winning the top-k) |
+| Backdoor in a model artifact | Data poisoning; Supply-chain attacks |
+| Model or dependency supply chain | Supply-chain attacks |
+
+Two catalogue sections, **Memory and state poisoning** and **Embedding inversion**, have no row
+here on purpose: the first is covered by the context-assembly and history controls in the
+request-path section below rather than by a control of its own, and the second is a
+*measurement* finding — you prove it with the extraction probes of Phase 04, not with a
+control you deploy. Neither gap is an omission you should read as coverage.
+
+### Framework cross-references
+
+This sheet deliberately describes most controls in words rather than IDs, because a control is
+a statement about *your* system and a framework ID is not. The IDs worth carrying explicitly,
+all of them verified against the source on 19 September 2026:
+
+| Vector | Framework ID | What it is |
+| --- | --- | --- |
+| Unsafe handling of model output | **CWE-1426 — Improper Validation of Generative AI Output** | The weakness of using model output at a downstream sink without validating it, which is exactly the row above. The CWE entry is the closest thing this module has to a canonical weakness ID for the vector. |
+| Injection of any kind (direct, indirect, tool output) | **MITRE ATLAS `AML.T0051` *LLM Prompt Injection*** — sub-techniques `AML.T0051.000` (*Direct*), `AML.T0051.001` (*Indirect*), `AML.T0051.002` (*Triggered*) | The technique, in ATLAS's own numbering. There is no separate technique called "Indirect Prompt Injection". |
+| Every row, as a risk category for the control's design review | **OWASP Top 10 for LLM Applications, 2025 edition** | Cite the edition whenever you cite a number: LLM03 and LLM04 changed meaning between the 2023 and 2025 editions. |
+
+For the governance layer that decides who accepts the residual risk at the bottom of this
+sheet — as opposed to the engineering layer that implements the controls — see
+[../methodology/09-ai-governance-and-lifecycle.md](../methodology/09-ai-governance-and-lifecycle.md).
 
 ---
 

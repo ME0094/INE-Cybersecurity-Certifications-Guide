@@ -104,10 +104,14 @@ Rules that make a suite useful rather than theatrical:
 
 ## 4. Anatomy of a test case for an LLM app
 
-One schema across the module, so a case written for Phase 02 is still readable in
-`../methodology/08-evaluation-and-continuous-red-teaming.md` (the phase that owns the corpus
-and its measurement rules) and reusable in `../cheatsheets/llm-test-case-library.md`. It is
-*our* schema — map it onto whatever fields your framework wants; no framework's required
+One schema is *described* here, and three different field spellings are in use across the
+module. That is a fact about the module, not a design: the schema below is the one this file
+and Phase 08 share, and the other two are the lab runner's minimal shape and the case
+library's working shape. Translate between them deliberately — a case is portable when you
+know which field maps to which — instead of assuming a case file written for one will run in
+another. The mapping is written out under the table.
+
+It is *our* schema — map it onto whatever fields your framework wants; no framework's required
 fields are implied here.
 
 | Field | Meaning | Example |
@@ -155,6 +159,35 @@ version: 1
 Cases that assert only on response text miss the interesting half of the failure surface:
 an agent that calls the wrong tool and answers politely has failed, even though its prose is
 clean. Keep the trace in scope.
+
+### The three schemas in this module, and how they map
+
+You will meet three field sets. None of them is wrong; each was written for a different job,
+and the mapping below is the thing to carry between them.
+
+| Concept | This file and Phase 08 (8 fields) | `../cheatsheets/llm-test-case-library.md` (9 fields) | `../labs/guardrail-evaluation-lab.md` (5 fields) |
+| --- | --- | --- | --- |
+| Identity | `id` | `id` | `id` |
+| Attack family | `family` | `family` | `family` |
+| Delivery channel | `channel` | `channel` | — (implied by the target) |
+| Interface under test | — | `surface` | — (one target per run) |
+| The payload sent | `input` | `input` | `prompt` |
+| What safe looks like | `expected_safe_behaviour` | `expect` | `expect` (`block` / `pass`) |
+| What failure looks like | `failure_signature` | `fail_signature` | — (the guardrail's own `reason`) |
+| Impact if it fails | `severity` | `severity` | — (`set` carries the ground truth instead) |
+| Provenance / revision | `version` | `origin` | `set` (`positive` / `negative` / `heldout`) |
+
+Three consequences worth stating. First, the lab schema has **no `failure_signature`**: it does
+not need one, because its ground truth is a single `expect` value that its own harness scores
+mechanically — that is the trade a lab runner makes and a case library cannot. Second, the case
+library's `origin` and this file's `version` are *not* the same field: `version` is the case's
+own revision number, `origin` is where the case came from and which corpus revision it belongs
+to. A corpus needs both, so a case that moves from the library into the Phase 08 corpus should
+gain `version` rather than have `origin` renamed into it. Third, `../labs/llm-testing.md`'s
+prompts file is a *fourth* spelling (`id`, `drill`, `prompt`, plus optional `family` and
+`severity`) and is deliberately the thinnest of the four: it belongs to the introductory
+session, where the point is to get one prompt per line to a target, not to build a corpus. Do
+not treat it as a schema to reconcile — treat it as the shape you graduate out of.
 
 ## 5. Assertions that measure behaviour, not text
 
@@ -360,7 +393,7 @@ matters — rather than to enable a rail that everyone will disable later.
 ## Checklist / Self-Test
 
 - [ ] I can state the difference between evaluation and scanning, and what each one's output licenses me to claim.
-- [ ] I can name the seven fields of the module's test-case schema and write one case end to end.
+- [ ] I can name the eight fields of the module's test-case schema and write one case end to end.
 - [ ] I can explain why exact-match assertion is the wrong tool for a generative answer, and which assertion type replaces it.
 - [ ] I can list the four guardrail placements and name one thing each one cannot see.
 - [ ] I can build a positive set, a negative set with hard lookalikes, and a held-out variant set for a real control.

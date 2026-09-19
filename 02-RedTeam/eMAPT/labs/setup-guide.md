@@ -107,10 +107,14 @@ Realistic iOS practice depends on your hardware:
    Mac + devices. Do not try to run Xcode on non-macOS.
 
 ```bash
-# Example: run the vulnerable iOS app on a simulator
+# Example: run a vulnerable iOS app on a simulator. Simulators exist only on
+# macOS (Xcode), and they only install *simulator* builds: the MASTG
+# UnCrackable-Level1.ipa ships a device build (armv7/arm64, platform
+# "iphoneos"), so `simctl install` rejects it — build an app for the
+# simulator SDK yourself, or use a jailbroken device (option 2).
 xcrun simctl boot "iPhone 15"
-xcrun simctl install booted UnCrackable-Level1.app
-xcrun simctl launch booted owasp.mstg.uncrackable1
+xcrun simctl install booted "/path/to/Debug-iphonesimulator/UnCrackable Level 1.app"
+xcrun simctl launch booted sg.vp.UnCrackable1   # iOS bundle id, not the Android package
 ```
 
 Deploying to a *physical non-jailbroken* iPhone requires signing with an Apple
@@ -174,11 +178,20 @@ confirm with `frida-ps -U`.
 - [ ] My authorization notes list every device/app combination I test
 - [ ] I documented the lab stack (versions, images, proxy, tools) for reproducibility
 
+> **Verification:** read from the official crackme on 2026-09-19 — the
+> `OWASP/mastg` IPA `Crackmes/iOS/Level_01/UnCrackable-Level1.ipa` declares
+> `CFBundleIdentifier = sg.vp.UnCrackable1`, `DTPlatformName = iphoneos` and
+> `CFBundleSupportedPlatforms = ['iPhoneOS']`, and its Mach-O fat header holds
+> only `armv7` + `arm64` slices (Python 3.12 `plistlib`/`struct`). A device build
+> is therefore not installable with `simctl`; that part is Apple platform
+> documentation (<https://developer.apple.com/documentation/>), not something
+> executed here — this lab has no macOS host.
+
 ## Further Resources
 
 - Android Studio / SDK command-line tools — https://developer.android.com/studio
 - Android Emulator documentation — https://developer.android.com/studio/run/emulator-commandline
-- OWASP MASTG (test apps and environment setup chapters) — https://owasp.org/www-project-mobile-security-testing-guide/
+- OWASP MASTG (test apps and environment setup chapters) — https://mas.owasp.org/MASTG/
 - OWASP MASTG GitHub (UnCrackable and Hacking Playground sources) — https://github.com/OWASP/owasp-mastg
 - Frida — https://frida.re/docs/
 - Apple developer documentation (simctl, deployment) — https://developer.apple.com/documentation/

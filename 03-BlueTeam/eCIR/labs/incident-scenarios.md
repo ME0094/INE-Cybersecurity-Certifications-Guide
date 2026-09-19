@@ -59,7 +59,10 @@ mass file writes, a ransom note, beaconing to an external IP.
   new files under `C:\Users\Public\` including a note; rapid writes to a network share.
 - **Expected response actions:**
   1. Triage the alert: confirm the process, parent, and command line (Sysmon/`Get-Process`).
-  2. Preserve volatile data: memory dump and KAPE collection **before** isolation if feasible.
+  2. Preserve **volatile state first**: memory dump, process list, and network connections
+     **before** isolation, because isolation destroys the session and connection evidence. Only
+     then collect disk artefacts with KAPE — it runs on the live host, so it belongs after the
+     volatile capture and its output goes to the lab's evidence folder, not to `C:\`.
   3. Contain: quarantine the host (disable NIC via management plane), disable the user account.
   4. Scope: check the share path for encrypted files; identify how far writes went.
   5. Document evidence IDs and hashes; draft the containment decision log.
@@ -181,9 +184,10 @@ is a complete detection → containment → eradication → lessons-learned cycl
 ## Further Resources
 
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* — https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) — https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - NIST SP 800-115, *Technical Guide to Information Security Testing and Assessment* — https://csrc.nist.gov/publications/detail/sp/800-115/final
 - MITRE ATT&CK (use techniques to design realistic injects) — https://attack.mitre.org/
 - Sysmon and SwiftOnSecurity configuration — https://github.com/SwiftOnSecurity/sysmon-config
 - Velociraptor documentation — https://docs.velociraptor.app/
-- KAPE (for drill collection) — https://github.com/EricZimmerman/KAPE
+- KAPE (for drill collection; the tool is distributed from Kroll, and the module definitions live in the KapeFiles repository) — https://github.com/EricZimmerman/KapeFiles
 - REMnux (malware-analysis tools for the analyst VM) — https://remnux.org/

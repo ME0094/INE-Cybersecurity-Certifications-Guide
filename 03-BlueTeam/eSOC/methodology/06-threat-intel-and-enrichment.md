@@ -163,7 +163,7 @@ The general rule: **intelligence raises or lowers suspicion; behaviour determine
 ## Further Resources
 
 - MISP Project — platform documentation, data model, and API reference: https://www.misp-project.org/documentation/
-- MISP — warning lists and their role in avoiding false positives: https://www.misp-project.org/warninglists/
+- MISP — warning lists and their role in avoiding false positives (maintained list set): https://misp.github.io/misp-warninglists/
 - MITRE ATT&CK — technique-level (tactical) intelligence and its data sources: https://attack.mitre.org
 - MITRE D3FEND — knowledge graph of defensive countermeasures, useful when naming the control a finding implicates: https://d3fend.mitre.org/
 - VirusTotal — public API documentation (rate limits and usage terms apply): https://docs.virustotal.com/reference/overview

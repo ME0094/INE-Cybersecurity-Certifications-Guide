@@ -50,7 +50,14 @@ Five questions account for most endpoint hunts, and each maps to a different sou
 | 26 | FileDeleteDetected | `Image`, `TargetFilename`, `Hashes`, `IsExecutable` |
 | 27 / 28 / 29 | File block executable / block shredding / executable detected | `Image`, `TargetFilename`, `Hashes` |
 
-> Events 23–29 were introduced across Sysmon 13–15. Before you build a hunt on them, check which IDs your installed version actually writes — the channel is version-dependent, and a rule for an ID that never appears looks exactly like a clean environment.
+> **The introduction version differs per event ID**, and the current Sysinternals documentation no
+> longer carries the per-version changelog. Events 23 and 26 arrived in the Sysmon 11.x line, 24
+> in 12.0, 25 in 13.0, 27 and 28 in 14.x, and 29 in 15.0 — so do not build a hunt on a remembered
+> number. Ask the binary that is actually installed: `sysmon64.exe -s` prints the configuration
+> schema that build accepts, and
+> `Get-WinEvent -LogName 'Microsoft-Windows-Sysmon/Operational' | Select-Object -ExpandProperty Id -Unique`
+> shows which IDs are genuinely reaching the channel. A rule for an ID that never appears looks
+> exactly like a clean environment.
 
 **How to use it.**
 
@@ -419,9 +426,20 @@ yara -r -s Lab_Hunt_Marker.yar C:/lab/dumps/memory.raw
 For process memory inside a dump, let Volatility drive YARA so matches are attributed to a process rather than to a flat blob:
 
 ```bash
+# `windows.vadyarascan` walks process address space and accepts `--pid`, which is what makes a
+# hit attributable to a process. The root-level `yarascan` plugin scans kernel memory only and
+# has NO `--pid` option, and `windows.yarascan` does not exist in Volatility 3 at all.
 vol -f C:/lab/dumps/memory.raw windows.vadyarascan --yara-file C:/lab/rules/Lab_Hunt_Marker.yar
-vol -f C:/lab/dumps/memory.raw windows.yarascan --yara-file C:/lab/rules/Lab_Hunt_Marker.yar --pid 2468
+vol -f C:/lab/dumps/memory.raw windows.vadyarascan --yara-file C:/lab/rules/Lab_Hunt_Marker.yar --pid 2468
 ```
+
+> Both plugin names come from `vol --help`. `windows.vadyarascan` and the root-level
+> `yarascan.YaraScan` are loaded **only** when the `yara-x` or `yara-python` module is importable:
+> without it Volatility lists them under "The following plugins could not be loaded …" and they
+> disappear from the CLI — so confirm on the machine that will run the scan, which is often a
+> container with a slimmer Python environment than your workstation. Note also that the short name
+> `yarascan` becomes ambiguous once several YARA plugins are installed (`vol yarascan` answers
+> "matches multiple plugins"); spell out `windows.vadyarascan` or `yarascan.YaraScan`.
 
 **Limitations.**
 
@@ -472,6 +490,18 @@ vol -f C:/lab/dumps/memory.raw windows.yarascan --yara-file C:/lab/rules/Lab_Hun
 - [ ] I generated a Hayabusa timeline and a Chainsaw hunt output from the same EVTX set and compared the findings.
 - [ ] I wrote a valid YARA rule, ran it against a file and a memory image, and can name one way to evade it.
 - [ ] Every artefact I analysed came from a host I own or am authorized to monitor.
+
+> **Verification:** executed against Volatility 3 Framework 2.28.2 on 2026-09-19 in WSL Ubuntu
+> 24.04.4 LTS (yara-python 4.5.4, `yara` 4.5.0). `vol windows.vadyarascan --help` prints
+> `[--pid [PID ...]]`, so the process attribution in this section is real; `vol yarascan.YaraScan
+> --help` lists only `--insensitive/--wide/--yara-string/--yara-file/--yara-compiled-file/--max-size`
+> and contains **no** `--pid`; `vol windows.yarascan --help` fails with <!-- check-commands: ignore -->
+> `invalid choice windows.yarascan`; and `vol yarascan` alone fails as ambiguous, matching <!-- check-commands: ignore -->
+> `linux.vmayarascan`, `windows.vadyarascan` and `yarascan`. The Sysmon per-event introduction
+> versions were **checked against the Sysinternals Sysmon documentation** on 2026-09-19, which
+> lists the events but no longer publishes the per-version changelog; `sysmon64.exe -s` and the
+> PowerShell examples are **unverified syntax references — not run**, since no Windows host was
+> available.
 
 ## Further Resources
 

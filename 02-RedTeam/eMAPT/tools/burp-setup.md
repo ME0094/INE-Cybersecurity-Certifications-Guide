@@ -140,7 +140,7 @@ Java.perform(function () {
 });
 ```
 
-Run with: `frida -U -f com.example.app -l unpin.js --no-pause`
+Run with: `frida -U -f com.example.app -l unpin.js`
 
 Real apps need more: hook the specific library classes, wait for the right
 class-loader, and sometimes re-run after each app update. objection's
@@ -221,10 +221,17 @@ returns a different record).
 - [ ] I used objection or a Frida script to disable pinning on a test app
 - [ ] I re-validated interception after changing a request in Repeater
 
+> **Verification:** the `frida -U -f ... -l unpin.js` line was corrected against
+> `frida_tools/repl.py` lines 119-126 in `frida-tools` main
+> (<https://raw.githubusercontent.com/frida/frida-tools/main/frida_tools/repl.py>,
+> 2026-09-19): `--no-pause` does not exist and the spawn resumes by default.
+> `frida` is not installed in this lab, so the command was not executed —
+> primary documentation only.
+
 ## Further Resources
 
 - PortSwigger Burp Suite documentation (proxy, CA certs, mobile setup) — https://portswigger.net/burp/documentation
-- OWASP MASTG (network communication / interception chapters) — https://owasp.org/www-project-mobile-security-testing-guide/
+- OWASP MASTG (network communication / interception chapters) — https://mas.owasp.org/MASTG/
 - Frida — https://frida.re/docs/
 - objection — https://github.com/sensepost/objection
 - Android network security config reference — https://developer.android.com/training/articles/security-config

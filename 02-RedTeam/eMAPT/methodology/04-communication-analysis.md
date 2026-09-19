@@ -113,9 +113,11 @@ iOS `SecTrustEvaluateWithError` / `URLSession` delegate callbacks):
 ```js
 // pin-bypass.js — illustrative Android hook
 Java.perform(function () {
-  var TrustManagerImpl = Java.use("com.android.org.conscrypt.TrustManagerImpl");
-  TrustManagerImpl.verifyChain.implementation = function (untrustedChain, ...) {
-    return untrustedChain; // return the chain without validating
+  // Same technique as tools/burp-setup.md: neutralize the platform trust
+  // manager interface, which every default Android TLS stack implements.
+  var TM = Java.use("javax.net.ssl.X509TrustManager");
+  TM.checkServerTrusted.implementation = function (chain, authType) {
+    console.log("[*] TrustManager bypassed (" + authType + ")");
   };
   // OkHttp CertificatePinner variant
   var Pinner = Java.use("okhttp3.CertificatePinner");
@@ -195,6 +197,12 @@ security decision that should be enforced server-side is fair game.
 - [ ] I checked for cleartext traffic and weak/old TLS configurations.
 - [ ] I verified the app rejects invalid certificates on a clean install.
 - [ ] I cleaned up: proxy removed, test data and CAs scoped to the test device.
+
+> **Verification:** the `pin-bypass.js` snippet was syntax-checked with
+> `node --check` (Node.js v22.23.2, 2026-09-19). The previous
+> `function (untrustedChain, ...) {` failed with `SyntaxError: Unexpected token
+> ')'` (exit 1); the rewritten snippet passes (exit 0), as does the alternative
+> `function (...args) {` form. Files were written to `/tmp`, never into the repo.
 
 ## Further Resources
 

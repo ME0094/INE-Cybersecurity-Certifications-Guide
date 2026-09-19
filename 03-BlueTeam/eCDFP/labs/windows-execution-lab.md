@@ -197,6 +197,8 @@ SRUM is a resource-accounting database, and that framing is what makes it useful
 
 Three streams, three prerequisites, one shared rule: **a process-creation event exists only if the stream was configured before the execution happened.** You cannot backfill them.
 
+One naming detail before you type a path: the `/` in a channel name becomes `%4` in the file name under `C:\Windows\System32\winevt\Logs`. The Sysmon operational channel is therefore the file `Microsoft-Windows-Sysmon%4Operational.evtx`, not `...-Operational.evtx`. The examples below read the copied log files directly; if you export the channel with `wevtutil epl "<channel>" <name>.evtx` instead, cite the name you chose for the export.
+
 ```powershell
 # 4688 — prerequisite: auditing enabled BEFORE staging, command line included.
 auditpol /get /subcategory:"Process Creation"
@@ -204,12 +206,12 @@ auditpol /get /subcategory:"Process Creation"
 # command-line sub-setting you learn that a process ran, not what it was told to do.
 # Sysmon process creation (ID 1) — prerequisite: Sysmon already installed with process
 # creation in its config.
-Get-WinEvent -Path .\Microsoft-Windows-Sysmon-Operational.evtx -MaxEvents 20 | Select-Object TimeCreated, Id
+Get-WinEvent -Path .\Microsoft-Windows-Sysmon%4Operational.evtx -MaxEvents 20 | Select-Object TimeCreated, Id
 # What to look for: one event per staged execution, including the script host from (d), with
 # image path, parent image and command line.
 # PowerShell script block logging (4104) — prerequisite: policy applied before the session
 # that ran the script started.
-Get-WinEvent -Path .\Microsoft-Windows-PowerShell-Operational.evtx -MaxEvents 20 | Select-Object TimeCreated, Id
+Get-WinEvent -Path .\Microsoft-Windows-PowerShell%4Operational.evtx -MaxEvents 20 | Select-Object TimeCreated, Id
 # What to look for: the script block from (c2) — and nothing for (d), because PowerShell
 # logging does not see VBScript.
 ```
@@ -348,3 +350,16 @@ e      | (negative control — see below)              |                        
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - **The Sleuth Kit** (the file-system tools used in section 6.8) — https://www.sleuthkit.org/sleuthkit/
 - Official eCDFP product page on the INE website for current, authoritative details about the certification — https://ine.com/security/certifications/ecdfp-certification
+
+> **Verification:** the `%4` file-naming rule was executed on **Windows 11 Pro (10.0.26200)** on
+> **2026-09-19**: `Get-ChildItem C:\Windows\System32\winevt\Logs -Filter *PowerShell*` returns
+> `Microsoft-Windows-PowerShell%4Admin.evtx` and
+> `Microsoft-Windows-PowerShell%4Operational.evtx`, and the same listing contains both forms side
+> by side — `Microsoft-Windows-Kernel-Power%4Thermal-Operational.evtx` (channel
+> `Microsoft-Windows-Kernel-Power/Thermal-Operational`) and
+> `Microsoft-Windows-Hyper-V-VMMS-Operational.evtx` (a channel name with no `/`). The `%4` marks
+> the `/` in the channel name; a dash in the name is just a dash. **Not executed:** the Sysmon
+> line — `Get-ChildItem … -Filter *Sysmon*` returns nothing because Sysmon is not installed on this
+> machine, so the file does not exist here to open; the name follows the same rule, and
+> `wevtutil epl "Microsoft-Windows-Sysmon/Operational" <name>.evtx` is the route to use when the
+> channel has never been written.

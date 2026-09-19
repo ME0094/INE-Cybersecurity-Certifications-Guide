@@ -61,6 +61,8 @@ Three properties make the boundary real rather than ceremonial:
 
 Most real agent incidents do not need a clever payload. The tool set was simply larger than the task, and the model used it as instructed — by the attacker, in one sentence.
 
+This phase is the agentic one, so its risk vocabulary is the OWASP **Top 10 for Agentic Applications for 2026** (released 9 December 2025 by the OWASP GenAI Security Project) rather than the LLM Top 10 alone: the LLM set describes an application that answers, and this phase is about one that *acts*, which is where excessive agency, tool misuse and unbounded consumption stop being categories in a list and become the architecture under review.
+
 | Shape | What it looks like | The question that exposes it |
 | --- | --- | --- |
 | **Unnecessary tool** | A summariser that can also send mail "for convenience"; a search tool with a write mode | If this tool were removed, which user story would break? If the answer is "none", it is not a control problem, it is a design problem |
@@ -298,8 +300,8 @@ The last row is the one people skip. Hardening without re-measurement produces a
 
 ## Further Resources
 
-- OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/
-- OWASP Agentic AI — Threats and Mitigations (OWASP GenAI Security Project) — https://genai.owasp.org/
-- MITRE ATLAS (Adversarial Threat Landscape for AI Systems) — https://atlas.mitre.org/
+- OWASP Top 10 for Large Language Model Applications (2025 edition) — https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- OWASP Top 10 for Agentic Applications for 2026 — https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ — the agentic risk set this phase's vocabulary follows; released 9 December 2025 (https://genai.owasp.org/2025/12/09/owasp-genai-security-project-releases-top-10-risks-and-mitigations-for-agentic-ai-security/)
+- MITRE ATLAS (Adversarial Threat Landscape for Artificial-Intelligence Systems) — https://atlas.mitre.org/
 - NIST AI Risk Management Framework — https://www.nist.gov/itl/ai-risk-management-framework
 - OWASP Cheat Sheet Series — https://cheatsheetseries.owasp.org/

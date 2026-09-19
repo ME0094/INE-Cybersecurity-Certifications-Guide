@@ -30,7 +30,7 @@
 | MFT / USN journal | `$MFT`, `$UsnJrnl:$J` | That a binary **existed**, was created or renamed, and when | That it ran | `MFTECmd`, Sleuth Kit | The pair that survives when caches were cleared |
 | LNK / jump list | `...\Recent\`, `AutomaticDestinations` | That a file was opened through the shell / per-application recency | Execution of a program | `LECmd`, `JLECmd` | User interaction, not execution |
 
-**The ranking that matters:** Prefetch and process-creation events < Amcache < ShimCache. Use them in that order of weight, and prefer two of them agreeing over one of them alone.
+**The ranking that matters:** Prefetch and process-creation events > Amcache > ShimCache. Prefetch and a process-creation event are the two that prove execution; Amcache is an inventory and ShimCache is the weakest of the three. Use them in that order of weight, and prefer two of them agreeing over one of them alone.
 
 ## 2. "What would run again?" — persistence
 
@@ -187,7 +187,16 @@ FILE SYSTEM ARTEFACTS
 - **Eric Zimmerman's forensic tools** (parsers named throughout: `PECmd`, `AmcacheParser`, `AppCompatCacheParser`, `MFTECmd`, `LECmd`, `JLECmd`, `RECmd`, `SBECmd`, `SrumECmd`, `RBCmd`, `WxTCmd`, `EvtxECmd`) — https://ericzimmerman.github.io/
 - **RegRipper** (offline registry parsing and plugin set) — https://github.com/keydet89/RegRipper3.0
 - **The Sleuth Kit** (`fls`, `istat`, `icat`, `ils`, `blkls`) — https://www.sleuthkit.org/sleuthkit/
-- **Microsoft — Windows security auditing and event reference** (the authority for the events referenced here) — https://learn.microsoft.com/windows/security/threat-protection/auditing/
+- **Microsoft — Windows security auditing and event reference** (the authority for the events referenced here) — https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/advanced-security-audit-policy-settings
 - **Forensics Wiki** (per-artefact references, version differences, and known limitations) — https://forensics.wiki/
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - The eCTHP module's own artefact sheet, from a hunting perspective — `../../eCTHP/cheatsheets/windows-artifacts.md`
+
+> **Verification:** checked against primary sources in this repository, not executed — **no command
+> in this sheet was run**. The ranking in section 1 was corrected on **2026-09-19** against the
+> artefact table immediately above it (Prefetch "proves: that the program ran"; Amcache "proves:
+> that a binary was inventoried — does not prove: execution"; ShimCache "proves: that a binary was
+> known to the compatibility infrastructure — does not prove: execution") and against
+> `../methodology/05-windows-artifact-forensics.md` §1, whose evidential ladder names Prefetch and
+> process creation as the strongest evidence for "the program executed" and ShimCache as not
+> sufficient on its own. The operator in the previous wording was inverted relative to both.

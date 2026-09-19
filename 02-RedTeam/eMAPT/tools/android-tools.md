@@ -155,8 +155,8 @@ adb root && adb shell "/data/local/tmp/frida-server &"   # run as root
 # Client basics
 frida-ps -Uai                  # list installed apps on USB device (-U)
 frida -U -f com.example.app -l hook.js   # spawn app with script
-# Spawn, keep the app paused, then resume:
-frida -U -f com.example.app -l hook.js --no-pause
+# Spawn, hold the app at its entry point, then %resume in the REPL:
+frida -U -f com.example.app -l hook.js --pause
 
 # objection one-liners
 objection -g com.example.app explore        # attach and drop into REPL
@@ -240,6 +240,13 @@ adb shell run-as com.example.app cat shared_prefs/example.xml
 - [ ] I wrote and ran a Frida script that changed a method's return value
 - [ ] I used objection to list activities or disable SSL pinning on a test app
 
+> **Verification:** `frida-tools` has no `--no-pause` flag; the flag that holds a
+> spawned process is `--pause`, and the default is to resume
+> (`frida_tools/repl.py` lines 119-126 in `frida-tools` main,
+> <https://raw.githubusercontent.com/frida/frida-tools/main/frida_tools/repl.py>,
+> checked 2026-09-19). The `frida` binary is not installed in this lab, so the
+> command lines here were not executed — primary documentation only.
+
 ## Further Resources
 
 - Android platform-tools / adb reference — https://developer.android.com/studio/command-line/adb
@@ -248,4 +255,4 @@ adb shell run-as com.example.app cat shared_prefs/example.xml
 - jadx — https://github.com/skylot/jadx
 - Frida — https://frida.re/docs/
 - objection — https://github.com/sensepost/objection
-- OWASP MASTG Android testing guide — https://owasp.org/www-project-mobile-security-testing-guide/
+- OWASP MASTG Android testing guide — https://mas.owasp.org/MASTG/

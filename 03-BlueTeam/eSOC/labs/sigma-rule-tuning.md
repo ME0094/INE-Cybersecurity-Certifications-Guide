@@ -264,13 +264,14 @@ Two properties make that filter defensible, and both are easy to get wrong. It n
 Then run the regression test, in both directions, before the tuned rule goes back into service:
 
 ```text
-# Syntax check and conversion. NOT EXECUTED while writing this note:
-# the Sigma CLI is not installed on the machine that produced this document.
+# Syntax check and conversion.
 sigma check office-spawns-script-host.yml
 sigma convert -t es-qs   office-spawns-script-host.yml
 sigma convert -t splunk  office-spawns-script-host.yml
 sigma convert -t kusto   office-spawns-script-host.yml
 ```
+
+`sigma check` was run against these two rules with **sigma-cli 3.1.0** (see the verification note at the end of this lab); `sigma convert` was **not**, because a conversion backend is a separately installed plugin rather than part of the CLI.
 
 - **Positive case re-run:** repeat the macro drill and confirm the alert still fires. An exclusion that swallows your positive case has turned a detection into a placebo.
 - **Negative case re-run:** confirm the volume dropped to what the arithmetic predicted, and that the drop came from the add-in and not from the rule being broken.
@@ -281,7 +282,7 @@ sigma convert -t kusto   office-spawns-script-host.yml
 The process rule answers "did this happen?". It says nothing about the file that `certutil` pulled down. That is a different question with a different tool.
 
 ```text
-# Scan the file you collected in the lab, using the study rule in
+# Scan the file you collected in the lab, using the study rules in
 # ../tools/detection-rules/yara-rules/yara-example.yar
 yara ../tools/detection-rules/yara-rules/yara-example.yar <collected-file>
 
@@ -289,13 +290,15 @@ yara ../tools/detection-rules/yara-rules/yara-example.yar <collected-file>
 yara ../tools/detection-rules/yara-rules/yara-example.yar <some-benign-file>
 ```
 
+Two rules live in that file, and which one fires *is* the measurement: `Suspicious_CredDump_Strings_AnyFile` fires on any artifact carrying the strings (a text note included), while `Suspicious_CredDump_Strings_PE` additionally requires a real PE. A `.txt` printing only the first name is the expected result, not a near-miss.
+
 What to look for, and the distinction that matters more than the match:
 
 | Result | What it means | What it does not mean |
 |---|---|---|
-| A plain text file matches | The strings exist in a file someone wrote or downloaded. Low severity on its own | That the file is malicious, or that anything executed |
-| A real PE matches, **and** the host shows network activity to the same address | Strings, a compiled artifact and behaviour line up | Still not proof of intent — but it is no longer a coincidence |
-| Nothing matches | This rule does not see this sample | That the artifact is clean: YARA only finds what its strings describe |
+| A plain text file matches `Suspicious_CredDump_Strings_AnyFile` | The strings exist in a file someone wrote or downloaded. Low severity on its own | That the file is malicious, or that anything executed |
+| A real PE matches `Suspicious_CredDump_Strings_PE`, **and** the host shows network activity to the same address | Strings, a compiled artifact and behaviour line up | Still not proof of intent — but it is no longer a coincidence |
+| Nothing matches | This rule set does not see this sample | That the artifact is clean: YARA only finds what its strings describe |
 
 That is the whole point of the pair: **a match is a lead, not a verdict.** The same strings inside a note someone saved and inside a signed-looking executable that also calls home are two different conversations. `../labs/soc-scenarios.md` runs the same reasoning as a standalone YARA drill with a harmless text file, and `../tools/detection-rules/` holds both study rules.
 
@@ -330,6 +333,8 @@ Be precise about the boundary, because the temptation is to claim more than a la
 - [ ] I re-ran the positive case after tuning and confirmed the rule still fires.
 - [ ] I scanned an artifact with a YARA rule and can explain why a match in a text file is a weaker finding than a match in a PE with network activity.
 - [ ] I recorded the numbers, the diff and the reason where the next analyst will find them.
+
+> **Verification:** the two Sigma rules in Parts 3 and 5 were extracted to `/tmp` and checked with **sigma-cli 3.1.0** on **2026-09-19**: both returned `Found 0 errors, 0 condition errors and 0 issues`, and their YAML also parsed under PyYAML 6.0.1. `sigma convert` was not exercised — sigma-cli 3.1.0 reports *"No backends installed"*, so the conversion lines above remain a shape to run where a backend plugin exists. The YARA rules used in Part 6 were run with **yara 4.5.0** on the same date against files created under `/tmp`, never inside the repository: a `.txt` with three of the strings matches `Suspicious_CredDump_Strings_AnyFile` only, the same strings appended to a real PE match `Suspicious_CredDump_Strings_PE` too, and a clean text file matches neither.
 
 ## Further Resources
 

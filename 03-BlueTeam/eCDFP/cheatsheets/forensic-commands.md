@@ -15,9 +15,9 @@ dd if=DEV of=/evidence/case/disk.dd bs=4M conv=noerror,sync status=progress
 # Single partition (logical acquisition)
 dd if=/dev/sdb1 of=/evidence/case/part1.dd bs=4M conv=noerror,sync status=progress
 
-# dc3dd: copy + hash + log in one pass
+# dc3dd: copy + hash + log in one pass (the hash log option is `hlog=`, not `hashlog=`)
 dc3dd if=DEV of=/evidence/case/disk.dd hash=sha256 \
-      hashlog=/evidence/case/hash.log log=/evidence/case/acq.log
+      hlog=/evidence/case/hash.log log=/evidence/case/acq.log
 
 # E01 (Expert Witness) format with libewf
 ewfacquire DEV            # interactive; answers recorded in a .E01 + .info
@@ -26,8 +26,9 @@ ewfacquire DEV            # interactive; answers recorded in a .E01 + .info
 blockdev --getro DEV      # prints 1 when read-only
 hdparm -r DEV             # prints "readonly  = 1"
 
-# Never mount the source read-write; read-only fallback only
-mount -o ro,noexec,nodev /dev/sdb1 /mnt/evidence
+# If you mount at all, mount a read-only WORKING COPY derived from the image. The source
+# device (DEV) is never mounted, and neither is the sealed original.
+mount -o ro,noexec,nodev,loop /evidence/case/working/part1.dd /mnt/evidence
 ```
 
 ```bash
@@ -69,7 +70,7 @@ Rules that keep hashes useful: store the manifest **outside** the tree it descri
 
 ## 3. The Sleuth Kit (TSK)
 
-Common flags: `-f <fstype>` force type, `-o <sector>` partition offset (512-byte sectors), `-r` recursive, `-d` deleted only, `-p` full paths, `-m <prefix>` bodyfile output with a path prefix. For raw whole-disk images, read the offset from `mmls` first.
+Common flags: `-f <fstype>` force type, `-o <sector>` partition offset (512-byte sectors), `-r` recursive, `-d` deleted only, `-p` full paths, `fls -m <prefix>` bodyfile output with a path prefix (`ils -m` is the same idea but takes **no** argument). For raw whole-disk images, read the offset from `mmls` first.
 
 ```bash
 mmls IMG                        # partition layout; note Start sectors
@@ -92,11 +93,13 @@ icat -o OFF -r IMG 42 > deleted.bin     # recover deleted content
 # On NTFS, pass a full stream name to read an alternate data stream.
 
 ils  -o OFF IMG                 # metadata records, including unallocated ones
-ils  -o OFF -m / IMG >> body.txt        # bodyfile-formatted, for timeline tools
+ils  -o OFF -m IMG >> body.txt  # bodyfile-formatted, for timeline tools (-m takes no argument)
 
 blkls -o OFF IMG > unallocated.raw      # units as a flat stream (check -a semantics!)
 blkcat -o OFF IMG 12345                 # one cluster, when you have an offset
-sigfind -o OFF -l 512 0xAA55 IMG        # where a byte signature appears (damaged FS)
+sigfind -b 512 -o 510 -l AA55 IMG       # where a byte signature appears (damaged FS)
+# Here -o is an offset WITHIN each block of size -b, not the partition offset:
+# the AA55 boot signature sits at byte 510 of a 512-byte sector.
 
 ffind -o OFF IMG 42                     # reverse lookup: which name owns this address
 tsk_recover -e -o OFF IMG outdir/       # bulk-recover files (-a = allocated only)
@@ -161,7 +164,7 @@ rip.pl -r exports/NTUSER.DAT -p userassist
 
 ## 7. Volatility 3
 
-Pattern: `vol -f IMG <module>.<plugin>` where module is `windows`, `linux`, or `macos`. Symbol tables download on first run; use `-s <dir>` when offline. **List your build's plugins and read each plugin's `--help`** — names and module paths change between releases.
+Pattern: `vol -f IMG <module>.<plugin>` where module is `windows`, `linux`, or `mac`. Symbol tables download on first run; use `-s <dir>` when offline. **List your build's plugins and read each plugin's `--help`** — names and module paths change between releases.
 
 ```bash
 vol --help                              # framework version, global options, plugin list
@@ -182,13 +185,13 @@ vol -f mem.raw windows.modules          # linked kernel modules
 vol -f mem.raw windows.modscan          # physically found modules (differ = investigate)
 vol -f mem.raw windows.hashdump         # local account hashes (sensitive evidence)
 vol -f mem.raw windows.filescan         # file objects recovered from memory
-vol -f mem.raw windows.memdump --pid 2468 --dump dumps/    # full process memory
-vol -f mem.raw windows.dumpfiles --pid 2468 --dump         # extract File objects
+vol -f mem.raw -o dumps/ windows.memmap --pid 2468 --dump   # full process memory
+vol -f mem.raw -o dumps/ windows.dumpfiles --pid 2468       # extract File objects (no --dump)
 vol -f mem.raw -r json windows.pslist   # machine-readable output for scripting
 
 # After dumping: inspect strings (Windows text is often UTF-16LE) and hash the artefact
-strings -el dumps/2468.dmp | head -50
-sha256sum dumps/2468.dmp
+strings -el dumps/pid.2468.dmp | head -50
+sha256sum dumps/pid.2468.dmp
 ```
 
 | Volatility 2 equivalent | Command |
@@ -205,9 +208,10 @@ Volatility 2 requires a `--profile` on every command and runs on Python 2 — le
 Sleuth Kit body-file pipeline:
 
 ```bash
-# body file: -m /path sets the mount prefix for full paths
+# body file: 'fls -m <prefix>' sets the mount prefix for full paths. 'ils -m' is a
+# flag with no argument — passing one makes ils read the prefix as the image.
 fls -f fat -r -p -m /lab IMG > body.txt
-ils -f fat -o OFF -m /lab IMG >> body.txt     # adds metadata records fls does not show
+ils -f fat -o OFF -m IMG >> body.txt          # adds metadata records fls does not show
 
 # CSV timeline in UTC (comma-delimited); note one file yields up to four rows
 mactime -b body.txt -d -z UTC > timeline.csv
@@ -225,7 +229,7 @@ log2timeline.py --help
 psort.py --help
 
 log2timeline.py --storage-file=case.plaso IMG   # collect events (see note above)
-psort.py -o csv -w timeline.csv case.plaso      # export
+psort.py -o l2tcsv -w timeline.csv case.plaso   # export (the CSV module is l2tcsv)
 pinfo.py case.plaso                             # storage stats/sanity: what actually parsed
 # What to look for: per-parser event counts. A source type that contributed zero events
 # is a hole in your timeline, not a quiet system.
@@ -295,7 +299,7 @@ Unix epoch (ms)   = value / 1000
 - [ ] I can launch Autopsy and name its case → data source → ingest → timeline workflow.
 - [ ] I can run `windows.info`, `pslist`, `psscan`, `pstree`, `netscan`, `malfind` and `vadinfo` and read their output.
 - [ ] I can list the plugins my Volatility build ships rather than relying on remembered names.
-- [ ] I can dump a process with `memdump --dump` and extract files with `dumpfiles --dump`, then hash them.
+- [ ] I can dump a process with `windows.memmap --dump` and extract files with `windows.dumpfiles`, then hash them.
 - [ ] I can generate a body file with `fls -m` and `ils -m` and turn it into a UTC CSV with `mactime`.
 - [ ] I can convert between FILETIME, Unix epoch seconds and a browser microsecond timestamp.
 - [ ] I can state, for a failed command, whether my result is an error or a genuine negative.
@@ -309,3 +313,29 @@ Unix epoch (ms)   = value / 1000
 - libewf (`ewfacquire`, `ewfverify`, `ewfinfo`) — github.com/libyal/libewf.
 - NIST SP 800-86 — *Guide to Integrating Forensic Techniques into Incident Response* (csrc.nist.gov/publications).
 - Local help: `man dd`, `man fls`, `man istat`, `man mactime`, `man tsk_recover`, and `vol --help` on your practice system.
+
+> **Verification:** executed on **2026-09-19** against **Volatility 3 Framework 2.28.2**,
+> **The Sleuth Kit 4.12.1** and **sqlite3 3.45.1** (Ubuntu 24.04 WSL). Volatility:
+> `vol windows.memmap --help` prints `[--pid PID] [--dump]` with `--dump` taking no argument; the
+> global `-o/--output-dir` is rejected after the plugin name
+> (`vol: error: unrecognized arguments: -o /tmp`) and accepted before it. The namespace is `mac`
+> (there is no `macos`), confirmed by `ls framework/plugins/` and by the plugin chooser. Sleuth
+> Kit: on an ext4 image built in `/tmp` with `mkfs.ext4` and populated with `debugfs`,
+> `ils -e -o 0 -m test.img` exited 0 with 4098 bodyfile records, while the form printed in the
+> guides, `ils -o 0 -m / test.img`, exited 1 with no stdout at all —
+> `Invalid magic value (raw_open: image "/" - is a directory)` — so a bodyfile built with it
+> silently gains no lines. `sigfind -b 512 -o 510 -l AA55 sig.bin` reported
+> `Block size: 512  Offset: 510  Signature: 55AA` and found the two planted signatures
+> (`Block: 0`, `Block: 10`), whereas the form printed in the guides,
+> `sigfind -o 2048 -l 512 0xAA55 sig.bin`, exited 1 with `Invaild signature - full bytes only`
+> (sigfind's own spelling), and `sigfind -o 0 -l 512 0xAA55 test.img` exited 1 with
+> `Error converting offset value: 0`. Version banner: `ils -V` / `sigfind -V` → `The Sleuth Kit
+> ver 4.12.1`. The acquisition half was exercised against **dc3dd 7.2.646**, and it caught a switch
+> name in section 1 that this version does not accept: `dc3dd if=src.bin of=copy.dd hash=sha256
+> hashlog=hash.log log=acq.log` aborts with `[!!] unrecognized option hashlog=hash.log` and exit 1 —
+> the option is now `hlog=FILE` (`dc3dd --help`: `hlog=FILE  Log total hashes and piecewise hashes to
+> FILE`, alongside `log=FILE` and `mlog=FILE`). With `hash=sha256` alone, `dc3dd if=src.bin
+> of=copy3.dd hash=sha256` completes and the output re-hashes to the source's digest. The line above
+> was left as written — out of this pass's scope — so read it together with this note. **Not
+> executed:** `dd`/`dc3dd` against a real device, and `ewfacquire` on a device; no evidence device is
+> attached to this machine.

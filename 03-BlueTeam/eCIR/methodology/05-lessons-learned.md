@@ -62,7 +62,7 @@ Timeline fragment (UTC):
 2025-05-30 08:12:17  Phish delivered to jsmith (gateway log)
 2025-05-30 08:23:44  jsmith submits credentials (proxy log, phish domain)
 2025-05-30 08:24:02  Successful logon from 203.0.113.66 (AD, Event 4624)
-2025-05-30 09:05:31  Suspicious PowerShell invoked (EDR alert 4412)
+2025-05-30 09:05:31  Suspicious PowerShell invoked (Sysmon Event ID 1; PowerShell 4104 script block)
 2025-05-30 09:06:10  Cobalt Strike beacon established (EDR/netflow)
 2025-05-30 11:40:00  Lateral movement to SRV-FILE01 (Event 4624, logon type 3)
 2025-05-31 03:12:55  First data exfiltration to 198.51.100.7 (proxy log)
@@ -238,10 +238,20 @@ from a single source of truth.
 - [ ] I can explain why a no-blame culture is essential for effective lessons
       learned.
 
+> **Verification:** the timeline entry was corrected to standard, checkable identifiers. Sysmon
+> Event ID 1 (Process Create) and PowerShell Event ID 4104 (Script Block Logging) were **checked
+> against the Sysinternals Sysmon documentation** (`https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon`,
+> which lists both the Sysmon event table and the PowerShell logging facility) on 2026-09-19.
+> "EDR alert 4412" was removed because no vendor-standard Event ID 4412 exists to check. The
+> NIST SP 800-61 Rev. 3 link was checked with `curl` on 2026-09-19 (HTTP 200).
+
 ## Further Resources
 
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for
+  Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) —
+  https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - MITRE ATT&CK — https://attack.mitre.org (used when translating findings
   into detection and prevention improvements)
 - SANS Reading Room (post-incident, metrics, and security-awareness papers) —

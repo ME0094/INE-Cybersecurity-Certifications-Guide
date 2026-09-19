@@ -221,7 +221,7 @@ High-value forensic keys (all under the profile or system hives):
 - **Autostart keys** (`Run`, `RunOnce`, services) — persistence mechanisms used by attackers.
 - **UserAssist** — records GUI program executions (paths are ROT13-obfuscated); includes run counts and last-run times.
 - **Shellbags** — folder browsing history with timestamps, useful when the user deleted other traces.
-- **ShimCache / Amcache** — evidence of executed programs, including some that never wrote other artifacts.
+- **ShimCache / Amcache** — evidence that a binary was *present* to the compatibility infrastructure, not that it ran: ShimCache can record files that were merely seen, and Amcache is an inventory rather than an execution log. Execution needs Prefetch or a process-creation event (see `05-windows-artifact-forensics.md` §1, "The evidential ladder", and `../cheatsheets/windows-artifacts.md`).
 - **USBSTOR + MountedDevices** — which USB devices connected, when, and their serial numbers.
 
 ```bash
@@ -368,7 +368,7 @@ icat -o 2048 image.dd 29-128-1 > recovered.docx
 ffind -o 2048 image.dd 29-128-1
 
 # List metadata (inodes), including deleted ones, with timestamps
-ils -o 2048 -m / image.dd
+ils -o 2048 -m image.dd
 ```
 
 | Tool | Question it answers |
@@ -461,3 +461,21 @@ A typical Autopsy workflow: start a new case → add the image → let ingest mo
 - **libyal file system libraries** (`libfsntfs`, `libfsfat`, `libfsext`, `libvshadow` and siblings: the reference documentation for the on-disk structures described above) — https://github.com/libyal
 - **Forensics Wiki** (artifact encyclopedia) — https://forensics.wiki/
 - **SANS reading room** (white papers on Windows and browser forensics) — https://www.sans.org/reading-room/
+
+> **Verification:** executed on **2026-09-19** against **The Sleuth Kit 4.12.1** and **sqlite3
+> 3.45.1** (Ubuntu 24.04 WSL). The Section 8 pragma was run in both forms on a 10-page database
+> with a freed table: `sqlite3 pragma.db "PRAGMA freelist_count;"` printed `8` and exited 0, while
+> `PRAGMA free page counts;` exited 1 with `Error: in prepare, near "page": syntax error`. The
+> Section 10 correction was run on an ext4 image built in `/tmp`: `ils -o 2048 -m / image.dd`
+> fails — with `-o 0` as the offset it exits 1 with
+> `Invalid magic value (raw_open: image "/" - is a directory)` and writes nothing to stdout —
+> whereas `ils -o 0 -m image.dd` exits 0. **Not executed:** the browser-database and registry
+> examples — no case image or hive is available here. The carving example was attempted and is
+> recorded honestly as inconclusive: `foremost` 1.5.7 and `scalpel` 1.60 are installed and both run,
+> but `foremost -t jpg` (and `-t jpeg`, `-t all`) extracted **0 files** from every input tried on
+> 2026-09-19 — a raw payload with the `ffd8ffe0`/`ffd9` markers, the same payload padded, and a real
+> 542 091-byte JPEG from `C:\Windows\Web`, as a plain file and inside an ext4 image — and `scalpel`
+> carved nothing with its default config. On this build `strings /usr/bin/foremost` contains no
+> `jpg`/`jpeg`/`png`/`pdf`/`zip`, and `/etc/foremost.conf` ships with every type line commented out,
+> so the `-t jpg,pdf,zip` form above may need those lines enabled before it carves anything. Confirm
+> on your build rather than assuming either way.

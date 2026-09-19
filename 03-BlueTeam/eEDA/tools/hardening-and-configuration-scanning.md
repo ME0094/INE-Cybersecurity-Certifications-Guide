@@ -47,25 +47,31 @@ oscap xccdf generate fix \
   /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
 ```
 
-> These OpenSCAP commands are a **syntax reference**: no Linux host was available while this module was written, so none of them was executed here. Flags differ between releases — confirm against `oscap --help` and the manual page for your installed version, and confirm the profile ID with `oscap info` rather than trusting an ID copied from a blog post.
+> These OpenSCAP commands are a **syntax reference**: no Linux host was available while this module was written, so none of them was executed here. Flags differ between releases — confirm against `oscap --help` and the manual page for your installed version, and confirm the profile ID with `oscap info` rather than trusting an ID copied from a blog post. The submodule list under `oscap xccdf generate` is the specific trap: it offers `report`, `guide`, `fix` and `custom`, and **no** `tailoring-file` — tailoring files come from `autotailor` or from an overlay you write yourself.
 
 **Tailoring instead of editing content.** Never edit the shipped data stream: create an overlay that deselects rules that genuinely do not apply, with the reason recorded.
 
 ```bash
-# Generate a tailoring file from a profile, then edit it
-oscap xccdf generate tailoring-file \
-  --profile xccdf_org.ssgproject.content_profile_cis \
-  --output /etc/scap/tailoring-cis.xml
+# Generate a tailoring file that deselects a rule. autotailor ships with
+# openscap-utils (OpenSCAP 1.3+). Note that `oscap xccdf generate` has no
+# tailoring-file submodule -- its submodules are report, guide, fix and custom.
+autotailor \
+  --unselect xccdf_org.ssgproject.content_rule_<rule-id> \
+  --output /etc/scap/tailoring-cis.xml \
+  /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml \
+  xccdf_org.ssgproject.content_profile_cis
 
-# Use it during the scan, and attach it to the evidence so the deviation is auditable
+# Use it during the scan, and attach it to the evidence so the deviation is auditable.
+# autotailor emits a NEW profile derived from the base one (default suffix
+# _customized), so the evaluation selects that derived profile:
 sudo oscap xccdf eval \
-  --profile xccdf_org.ssgproject.content_profile_cis \
+  --profile xccdf_org.ssgproject.content_profile_cis_customized \
   --tailoring-file /etc/scap/tailoring-cis.xml \
   --report /var/tmp/scap-report-tailored.html \
   /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
 ```
 
-Inside the tailoring file, an exempted rule is marked `xccdf:selected="false"`. An exemption without a written reason and an owner is an undocumented deviation, not a tailoring.
+`autotailor` takes the data stream and the base profile ID as positional arguments; `--unselect` removes a rule, `--select` adds one, and `--var-value` changes an XCCDF variable. Inside a tailoring file maintained by hand, an exempted rule is marked `xccdf:selected="false"`. An exemption without a written reason and an owner is an undocumented deviation, not a tailoring.
 
 **Interpreting the result.**
 
@@ -100,15 +106,20 @@ sudo apt install lynis            # or: sudo dnf install lynis
 # Full audit (root, otherwise checks are skipped)
 sudo lynis audit system
 
-# Re-read the findings of the last run without re-scanning
-sudo lynis show warnings
-sudo lynis show suggestions
+# Re-show only warnings, without a full report (re-runs the audit quietly)
+sudo lynis audit system --warnings-only
+
+# Or re-read the findings of the last run from its own artefacts, without re-scanning.
+# Note the format difference: the terminal prints [WARNING]/[SUGGESTION], the log
+# file records the same lines as "Warning: ..."/"Suggestion: ..." with a timestamp.
+sudo grep -E ' (Warning|Suggestion): ' /var/log/lynis.log
+sudo grep -E '^(warning|suggestion)\[\]' /var/log/lynis-report.dat
 
 # Quiet run for trend tracking (compare the index over time)
 sudo lynis audit system --quiet
 ```
 
-> Syntax reference only — not executed in this environment.
+> Verified with `lynis` 3.0.9 on WSL Ubuntu 24.04, 2026-09-19: a real `lynis audit system --warnings-only --quick` run wrote the records the two `grep` lines above read. There is no `lynis show warnings` or `lynis show suggestions` — `lynis show` accepts `categories`, `groups`, `profiles`, `settings`, `tests`, `version` and similar, but never findings; findings live in `/var/log/lynis.log` and `/var/log/lynis-report.dat`, and `--warnings-only` is the flag that re-displays them.
 
 **How to use the output well.**
 
@@ -150,7 +161,7 @@ sudo lynis audit system --quiet
 
 On Windows the equivalent work is done by security baselines delivered through Group Policy, Intune, or the Microsoft Security Compliance Toolkit, and by management platforms that evaluate settings continuously. For hands-on verification — and for hosts or sessions where WMI/CIM is unavailable — **registry-based checks are the practical fallback**.
 
-> Why this matters in practice: in the environment where this module was written, every CIM-backed cmdlet failed, including `Get-CimInstance`, `Get-Volume`, `Get-NetFirewallProfile`, `Get-NetTCPConnection`, `Get-ScheduledTask`, `Get-SmbShare`, `Get-Disk`, and `Get-HotFix`, all with the same message: `El cliente no tenía acceso disponible a un recurso CIM.` (a localized "the CIM client could not access a resource"). Registry reads kept working. An administrator who can only check configuration through WMI has no check at all in a restricted, hardened, or degraded session.
+> Why this matters in practice: in the environment where this module was written, every CIM-backed cmdlet failed. `Get-CimInstance`, `Get-Volume`, `Get-NetFirewallProfile`, `Get-NetTCPConnection`, `Get-ScheduledTask`, `Get-SmbShare`, and `Get-Disk` all returned the same message — `El cliente no tenía acceso disponible a un recurso CIM.` (a localized "the CIM client could not access a resource"). `Get-HotFix` failed too, but **not with that message**: it returned `Acceso denegado` (access denied), which is a permissions failure on its own provider rather than a missing CIM resource. Two different faults, two different diagnoses — do not read one cmdlet's error as the state of the whole CIM stack. Registry reads kept working throughout. An administrator who can only check configuration through WMI has no check at all in a restricted, hardened, or degraded session.
 
 A real run of twelve registry-based configuration checks on a Windows workstation (output verbatim; `<not set>` means the value does not exist at that path on this build):
 
@@ -269,7 +280,7 @@ Evidence that survives an audit interview has three properties: it is dated, it 
 | Scan completes but every rule is `notchecked` or the report is nearly empty | Wrong content for the OS, or missing privileges | `oscap info` on the data stream; confirm root; confirm the profile ID exists |
 | Score is suspiciously high on a host you know is weak | Non-root run, or content that does not cover the failing areas | Re-run with `sudo`; read the `notapplicable`/`notchecked` counts |
 | Findings change without any host change | Content version changed | Pin and record the content version per scan |
-| Lynis index moves in the wrong direction after "fixes" | A change disabled a check, or the fix applied a setting that breaks another check | Compare `lynis show warnings` between runs, item by item |
+| Lynis index moves in the wrong direction after "fixes" | A change disabled a check, or the fix applied a setting that breaks another check | Compare the `Warning:`/`Suggestion:` lines in `/var/log/lynis.log` (or the `warning[]`/`suggestion[]` records in `/var/log/lynis-report.dat`) between runs, item by item |
 | Scan takes hours on a large host | Broad file-system rules | Scope the scan; schedule outside business hours |
 | Windows check script reports `<not set>` for everything | Reading the wrong hive path or wrong policy location (user vs. machine, policy vs. preference) | Verify the path on the host, and confirm whether the setting is delivered by policy or by default |
 | A "compliant" report contradicts a security incident | The benchmark covers configuration, not vulnerability or monitoring effectiveness | Cross-check patch level and detection coverage — see [../methodology/07-vulnerability-and-patch-management](../methodology/07-vulnerability-and-patch-management.md) |
@@ -291,7 +302,7 @@ Evidence that survives an audit interview has three properties: it is dated, it 
 
 - [ ] I can state the four jobs of hardening tooling and explain why enforcement precedes verification.
 - [ ] I can inspect an OpenSCAP data stream, list its profiles, and run an evaluation producing both an HTML report and XML results.
-- [ ] I can create a tailoring file, deselect a rule, and document the reason and owner.
+- [ ] I can create a tailoring file (with `autotailor` or by hand), deselect a rule, and document the reason and owner.
 - [ ] I can explain what `pass`, `fail`, `notapplicable`, and `notchecked` each mean for my compliance claim.
 - [ ] I can run a Lynis audit, read the warnings, and explain why the hardening index is a trend and not a grade.
 - [ ] I can describe what a CIS-CAT-style assessor adds over OpenSCAP, and what its score does and does not measure.
@@ -300,6 +311,8 @@ Evidence that survives an audit interview has three properties: it is dated, it 
 - [ ] I can name two checks that fail when WMI/CIM is unavailable, and the non-WMI alternative for each.
 - [ ] I can organize scan output as dated evidence that states the benchmark content version.
 - [ ] I can triage a scan that returns implausible results using the diagnostics table.
+
+> **Verification:** PowerShell 7.6.6 (`pwsh`) on Windows, 2026-09-19, elevated session: the CIM-backed cmdlets named in this section were re-probed one by one and `Get-Volume`, `Get-NetFirewallProfile`, `Get-NetTCPConnection`, `Get-ScheduledTask`, `Get-SmbShare`, `Get-Disk` and `Get-HotFix` all returned data; `Get-CimInstance` without `-ClassName` returned its parameter error, as expected. The failure note above therefore describes a **non-elevated** session (the module's original authoring environment), not Windows in general — reproduce it from a restricted session before quoting it, and note that a non-elevated re-probe here hung on the first CIM call rather than returning the message. The distinct `Acceso denegado` message attributed to `Get-HotFix` comes from the 2026-09-19 audit and was not reproducible from an elevated session. WSL Ubuntu 24.04, same date: **`oscap` 1.3.9** — `oscap xccdf generate --help` lists only `report`, `guide`, `fix` and `custom`, and `oscap xccdf generate tailoring-file` answers `No such module: tailoring-file`; `autotailor --help` (openscap-utils 1.3.9) confirms `-u/--unselect`, `-s/--select`, `-v/--var-value`, `-p/--new-profile-id` and `-o/--output` over a positional `DS_FILENAME BASE_PROFILE_ID`; **`lynis` 3.0.9** — `lynis show` lists `categories`, `groups`, `profiles`, `settings`, `tests`, `version` and similar but no `warnings`/`suggestions`, `lynis show warnings` answers `Unknown argument 'warnings' for lynis show`, and a real `lynis audit system --warnings-only --quick` run wrote 3 `warning[]=` and 45 `suggestion[]=` records plus `hardening_index=62` into `/var/log/lynis-report.dat` and 48 ` (Warning|Suggestion): ` lines into `/var/log/lynis.log`. No SSG data stream is installed, so no `oscap xccdf eval` was executed. None of the Windows cmdlets or Linux scanners here were ever claimed to be executed in the module's own authoring environment.
 
 ## Further Resources
 

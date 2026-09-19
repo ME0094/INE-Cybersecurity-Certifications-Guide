@@ -198,5 +198,5 @@ VALUES ('3', 'alice', 'alice.jpg', MD5('Password123'), NOW(), 0);
 ## Further Resources
 
 - DVWA official repository (README has full install notes) — <https://github.com/digininja/DVWA>
-- OWASP Broken Web Applications Project (alternative lab VM) — <https://owasp.org/www-project-broken-web-applications/>
+- OWASP Vulnerable Web Applications Directory (where to find further deliberately vulnerable apps to practise against) — <https://owasp.org/www-project-vulnerable-web-applications-directory/>
 - PortSwigger Web Security Academy (complementary guided labs) — <https://portswigger.net/web-security>

@@ -239,8 +239,10 @@ The right fix is to treat templates as code, never interpolating user input into
 - [ ] File uploads: I tested extension/content-type parsing and the served path of uploaded files.
 - [ ] SSTI: I probed with a math expression (`{{7*7}}`) and identified the engine before chaining.
 
+> **Verification:** the OWASP Top 10 category names were checked against the OWASP Top 10 2021 sources (`A03:2021 – Injection`, `A05:2021 – Security Misconfiguration`) on 2026-09-19. Corrections applied from the 19 Sep 2026 audit.
+
 ## Further Resources
 
-- OWASP Top 10 — A03 Injection and A02 Cryptographic/security contexts; see the project page for current mappings: https://owasp.org/www-project-top-ten/
+- OWASP Top 10 — A03:2021 Injection and A05:2021 Security Misconfiguration are the categories this phase maps to; see the project page for current mappings: https://owasp.org/www-project-top-ten/
 - OWASP Web Security Testing Guide — WSTG-INPV (Input Validation Testing) covers SQLi, XSS, command injection, LFI, and uploads chapter by chapter: https://owasp.org/www-project-web-security-testing-guide/
 - PortSwigger Web Security Academy — dedicated learning paths and labs for SQL injection, XSS, command injection, path traversal, file uploads, and SSTI: https://portswigger.net/web-security

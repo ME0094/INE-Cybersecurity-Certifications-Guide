@@ -33,20 +33,44 @@ An **adversarial example** is an input intentionally modified so that a model mi
 - **Universal triggers.** A short phrase or patch that works across many inputs and models — the inference-time cousin of a backdoor trigger (Phase 03).
 
 ```python
-# Educational illustration: FGSM-style perturbation (concept only).
-# Direction of steepest loss increase, bounded by epsilon.
-# epsilon * sign(gradient) is added to the input to force a wrong answer.
+# Educational illustration: FGSM on a small LINEAR classifier, in numpy.
+#
+# The earlier version of this fragment mixed the two libraries — it called
+# `x.astype(np.float32)` on a numpy array and then set `x.requires_grad`, called
+# `loss.backward()` and read `x.grad`, which are torch operations. It could not run under
+# either library. The fix is to pick one, and for a linear model numpy is enough: the
+# gradient of the loss with respect to the INPUT is analytic, so no autograd is required.
+#
+#   logits = W @ x + b      p = softmax(logits)      loss = -log p[y_true]
+#   dloss/dx = W.T @ (p - onehot(y_true))          <- computed by hand, no framework
+#
+# FGSM then takes ONE step in the direction that increases the loss, bounded by epsilon:
+#   x_adv = clip(x + eps * sign(dloss/dx), 0, 1)
+#
+# For a deep network the same three lines hold, but the gradient has to come from autograd
+# (torch: `loss.backward()` then `x.grad`, with `x.requires_grad_(True)`) instead of algebra.
 
 import numpy as np
 
-def fgsm(model, x, y_true, eps=0.05):
-    x = x.astype(np.float32)
-    x.requires_grad = True
-    loss = model.loss(x, y_true)
-    loss.backward()
-    grad = x.grad
-    perturbation = eps * np.sign(grad)   # smallest visible push
-    return np.clip(x + perturbation, 0.0, 1.0)   # adversarial example
+
+def softmax(logits):
+    shifted = logits - np.max(logits)          # subtract the max: keeps exp() in range
+    exponents = np.exp(shifted)
+    return exponents / exponents.sum()
+
+
+def fgsm_linear(W, b, x, y_true, eps=0.05):
+    """Return an adversarial example: `x` nudged by one bounded gradient step.
+
+    W is (classes x features), b is (classes,), x is (features,), y_true is the index of the
+    correct class. eps is the L-infinity budget — the per-feature change no reader should see.
+    """
+    probabilities = softmax(W @ x + b)
+    onehot = np.zeros_like(probabilities)
+    onehot[y_true] = 1.0
+    gradient = W.T @ (probabilities - onehot)   # dloss/dx, by hand
+    perturbation = eps * np.sign(gradient)      # the smallest visible push
+    return np.clip(x + perturbation, 0.0, 1.0)  # adversarial example
 ```
 
 Why this matters in practice: models used for spam filtering, biometric checks, fraud triage, or content moderation can be evaded by cheap input perturbations even when the underlying task looks "solved."
@@ -262,7 +286,20 @@ A robustness claim is a measurement, and a measurement without its budget is an 
 
 ## Further Resources
 
-- OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/
-- MITRE ATLAS (Adversarial Threat Landscape for AI Systems) — https://atlas.mitre.org/
+- OWASP Top 10 for Large Language Model Applications (2025 edition) — https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- MITRE ATLAS (Adversarial Threat Landscape for Artificial-Intelligence Systems) — https://atlas.mitre.org/
 - NIST AI Risk Management Framework — https://www.nist.gov/itl/ai-risk-management-framework
-- NIST Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations (NIST AI 100-2) — https://csrc.nist.gov/pubs/ai/100/2/final
+- NIST Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations (NIST AI 100-2) — https://csrc.nist.gov/pubs/ai/100/2/e2025/final — the `e2025` path segment is the canonical one; the edition-less `…/100/2/final` returns 404 (checked 19 September 2026).
+
+> **Verification:** the FGSM fragment above was extracted **verbatim from the markdown** and
+> executed on **2026-09-19** under Ubuntu 24.04 / Python 3.12.3. numpy is not installed on the
+> writing machine and packages must not be installed, so the fragment ran unmodified against a
+> minimal stand-in in `/tmp` implementing only the six numpy entry points it uses
+> (`max`, `exp`, `zeros_like`, `sign`, `clip`, plus `@`, `.T` and `.sum`) — the arithmetic is
+> the documented one, and `python3 -m py_compile` confirms the fragment's syntax. On a trivial
+> 3-class linear model at `eps = 0.05`, one bounded step moved `p(class 0) − p(class 1)` from
+> `+0.0474` to `−0.0070` and flipped the predicted class, while a wide-margin input was
+> correctly left alone; the `eps` sweep flipped the class at `eps = 0.10`. The canonical torch
+> form of the same attack (`loss.backward()`, `x.grad`) was **not** executed: no torch here.
+> The NIST link check used `curl -sI` from the same machine (404 for the edition-less path, 200
+> for `e2025`).

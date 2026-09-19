@@ -35,6 +35,15 @@ New alert / report
 **Golden rules:** never skip 3 before 4–6 · never analyze the original · never
 communicate externally before the comms lead · log every decision with its why.
 
+> **Name the model when you quote a phase count.** This seven-step flow is the operational
+> sequence this module teaches; it is not the NIST phase model. SP 800-61 **Rev. 2** has four
+> lifecycle phases, and containment, eradication and recovery are **one** of them. SP 800-61
+> **Rev. 3** (April 2025, *Incident Response Recommendations and Considerations for Cybersecurity
+> Risk Management: A CSF 2.0 Community Profile*) drops the phase model altogether and organises
+> response around CSF 2.0 functions. The familiar six-step sequence — Preparation, Identification,
+> Containment, Eradication, Recovery, Lessons learned — is **PICERL**, the SANS teaching model,
+> not NIST.
+
 ## 1. Decision Trees by Incident Type
 
 ### Malware / Ransomware-Like
@@ -121,8 +130,16 @@ reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
 Get-FileHash -Algorithm SHA256 C:\Users\Public\n.exe | Format-List
 
 # Export event logs (as evidence, not just for reading)
-wevtutil epl Security C:\case\sec.evtx
+wevtutil epl Security E:\evidence\case-014\sec.evtx
 ```
+
+> **Every capture writes to the dedicated evidence medium, never to the host under
+> investigation.** The paths above are absolute and land on the mounted evidence volume
+> (`E:\evidence\case-014\`), not on `C:\` and not in a relative folder. A capture written to
+> `C:\case\` sits on the disk you are investigating: it is volatile, it contaminates the
+> timeline you are about to build, and it is no longer defensible. Mount the evidence medium
+> with a fixed drive letter (or mount point), create the case folder once, and check `mount` /
+> `Get-Volume` before you run anything.
 
 ### Linux
 
@@ -194,9 +211,18 @@ Contact: <name/role/phone/email>.
 - [ ] I can explain why preserve precedes contain, with an example.
 - [ ] Every command I run during a drill produces output that lands in the case file.
 
+> **Verification:** the phase-count note was **checked against the NIST SP 800-61 Rev. 3
+> publication page** (`https://csrc.nist.gov/pubs/sp/800/61/r3/final`, HTTP 200 via `curl` on
+> 2026-09-19; title *Incident Response Recommendations and Considerations for Cybersecurity Risk
+> Management: A CSF 2.0 Community Profile*). The Rev. 2 four-phase structure and the PICERL
+> attribution are **documentation references, not executed checks** — neither the Rev. 2 PDF nor
+> a SANS publication was read for this pass. The capture commands are **unverified syntax
+> references — not run**; the evidence paths must be pointed at your own mounted medium.
+
 ## Further Resources
 
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* — https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) — https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - MITRE ATT&CK (technique IDs for triage and scope) — https://attack.mitre.org/
 - Windows Sysinternals documentation (tools behind many commands above) — https://learn.microsoft.com/en-us/sysinternals/
 - plaso / log2timeline documentation — https://plaso.readthedocs.io/

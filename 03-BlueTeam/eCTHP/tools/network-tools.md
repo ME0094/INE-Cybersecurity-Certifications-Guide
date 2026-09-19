@@ -91,13 +91,16 @@ cat conn.log | zeek-cut -d ts id.orig_h id.resp_h id.resp_p
 Beaconing, computed straight from `conn.log` (regular intervals per conversation):
 
 ```bash
-# Inter-arrival deltas per (source, destination, port) — low spread means a beacon
+# Inter-arrival deltas per (source, destination, port). The signal is the coefficient of
+# variation (stddev / mean), not the raw stddev: an absolute sigma of 5 s is rigid for a 30 s
+# beacon and sloppy for a 600 s one, so an absolute threshold both misses slow beacons and
+# admits fast jittery traffic.
 cat conn.log \
   | zeek-cut id.orig_h id.resp_h id.resp_p ts \
   | sort -k1,1 -k2,2 -k3,3n -k4,4n \
   | awk '{ key=$1" "$2" "$3; if (key==prev) { d=$4-last; if (key in n) { n[key]++; s[key]+=d; ss[key]+=d*d } else { n[key]=1; s[key]=d; ss[key]=d*d } } prev=key; last=$4 }
-         END { for (k in n) if (n[k]>=10) { m=s[k]/n[k]; v=ss[k]/n[k]-m*m; if (v<0) v=0; printf "%d conns  mean_sec %.1f  stddev_sec %.1f  %s\n", n[k]+1, m, sqrt(v), k } }' \
-  | sort -k6,6n | head -20
+         END { for (k in n) if (n[k]>=20) { m=s[k]/n[k]; v=ss[k]/n[k]-m*m; if (v<0) v=0; sd=sqrt(v); printf "%d conns  mean_sec %.1f  stddev_sec %.1f  cv %.3f  %s\n", n[k]+1, m, sd, (m>0 ? sd/m : 0), k } }' \
+  | sort -k8,8n | head -20
 ```
 
 That awk is deliberately plain: a hunt computed with tools you understand is a hunt you can defend. If you would rather not reimplement statistics, use RITA (section 8).
@@ -220,13 +223,15 @@ nfdump --help
 | Category / action | Allowed versus blocked, and the policy's own opinion |
 
 ```spl
-// Periodic requests to one host from one client: beaconing over HTTP
+// Periodic requests to one host from one client: beaconing over HTTP.
+// Filter on the coefficient of variation (stdev / mean), not on an absolute stdev.
 index=proxy
 | sort 0 + _time
 | streamstats current=f last(_time) as prev by src_ip, dest_host
 | eval delta = _time - prev
 | stats count avg(delta) as avg_delta stdev(delta) as jitter sum(bytes_out) as uploaded by src_ip, dest_host
-| where count > 20 and jitter < 5
+| eval cv = jitter / avg_delta
+| where count >= 20 and cv < 0.1
 ```
 
 **Limitations.**
@@ -252,8 +257,10 @@ cat dns.log | zeek-cut id.orig_h query qtype rcode | sort | uniq -c | sort -nr |
 # Longest query names — the signature of encoded data in DNS tunnelling
 cat dns.log | zeek-cut query | awk '{ print length($0), $0 }' | sort -nr | head -20
 
-# Unique subdomains per registered domain, second level and below
-cat dns.log | zeek-cut query | awk -F. 'NF>=2 { d=$(NF-1)"."$NF; c[d]++ } END { for (k in c) print c[k], k }' | sort -nr | head -20
+# Unique subdomains per registered domain, second level and below.
+# `sort -u` first: without it you count QUERIES, so one frequently repeated name is reported as
+# many "subdomains" and the number stops measuring name generation.
+cat dns.log | zeek-cut query | sort -u | awk -F. 'NF>=2 { d=$(NF-1)"."$NF; c[d]++ } END { for (k in c) print c[k], k }' | sort -nr | head -20
 ```
 
 ```kusto
@@ -351,7 +358,7 @@ rita import --help
 - [ ] I can name the five layers of network evidence and the trade-off each one makes.
 - [ ] I ran Zeek over a PCAP and located `conn.log`, `dns.log`, `ssl.log`, and `http.log`.
 - [ ] I can name three `conn_state` values and what each one tells a hunter.
-- [ ] I computed inter-arrival deltas for a conversation from `conn.log` and can say what jitter value would make me suspicious.
+- [ ] I computed inter-arrival deltas for a conversation from `conn.log` and can say what coefficient of variation would make me suspicious.
 - [ ] I extracted SNI, HTTP host, and DNS names from a capture with `tshark -T fields`.
 - [ ] I produced a top-talkers-by-bytes list from flow records and can explain why flow data has no hostnames.
 - [ ] I can state what a `CONNECT` line in a proxy log hides, and which source compensates for it.
@@ -360,11 +367,21 @@ rita import --help
 - [ ] I can name the confounder for each of the four network behaviours in section 9.
 - [ ] Every capture and log I analysed came from infrastructure I own or am authorized to monitor.
 
+> **Verification:** the beacon awk and the `sort -u` DNS awk were executed on 2026-09-19 against
+> synthetic `conn.log` and `dns.log` data in WSL Ubuntu 24.04 — the absolute-stdev rule admitted a
+> fast jittery pair (σ 2.3 s, CV 0.52) and rejected a genuine slow beacon (σ 11.4 s, CV 0.019),
+> while the CV rule did the opposite; the query-counted version reported 90 and 50 "subdomains"
+> for a log holding 30 and 1 distinct names. `zeek` and `zeek-cut` are **not installed** in that
+> environment, so the projected fields were reproduced with `awk` on the tab-separated log body.
+> The RITA URL was checked with `curl` on 2026-09-19: `github.com/activecm/rita` returns HTTP 200
+> and the previous `github.com/activecountermeasures/rita` returns HTTP 404. The SPL, Kusto and
+> nfdump/tshark examples are **unverified syntax references — not run**.
+
 ## Further Resources
 
 - Zeek documentation, log reference, and script reference — docs.zeek.org.
 - Wireshark display filter reference and tshark manual — wireshark.org/docs.
 - nfdump / nfcapd — github.com/phaag/nfdump; softflowd — github.com/irino/softflowd.
-- RITA (Active Countermeasures) — github.com/activecountermeasures/rita (see the project page for the current release and backend requirements).
+- RITA (Active Countermeasures) — github.com/activecm/rita (see the project page for the current release and backend requirements).
 - MITRE ATT&CK techniques for C2, exfiltration, and lateral movement — attack.mitre.org (the vocabulary for writing these hypotheses).
 - Official eCTHP page on the INE website for current, authoritative details about the certification.

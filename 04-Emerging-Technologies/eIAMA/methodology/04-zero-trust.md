@@ -14,17 +14,53 @@ By the end of this phase you should be able to:
 - Describe continuous verification as a loop, not a login event.
 - Argue why identity-centric architecture is the practical realization of zero trust.
 
-## Principles — "Never Trust, Always Verify"
+## Principles — the seven tenets, and the slogans that are not tenets
 
-NIST SP 800-207 summarizes the shift: **all resources are treated as untrusted**, regardless of location; trust is established per request from observable state, then continuously re-evaluated. Core principles:
+NIST SP 800-207 §2.1 states that **"a zero trust architecture is designed and deployed with
+adherence to the following zero trust basic tenets"**, and then lists exactly seven. They are
+reproduced below in the standard's own words, because the list is short, it is quotable, and a
+paraphrase loses the parts that constrain an architecture. Read the full text in the
+publication before quoting one in a design document.
 
-1. **Never trust, always verify** — no implicit trust for networks, devices, or users; every request is authenticated and authorized.
-2. **Assume breach** — design for the attacker already inside: minimize blast radius, assume credentials and endpoints can be compromised.
-3. **Least privilege** — per-session, per-resource access, just-in-time, with dynamic policy (Phase 03).
-4. **All data sources and compute services are resources** — laptops, IoT, SaaS, APIs, and data all get the same scrutiny.
-5. **Secure all communication** regardless of network location (encryption + authn/authz end to end).
-6. **Continuous monitoring and measurement** of integrity and security posture — not a point-in-time check.
-7. **Dynamic policy from observable state** — identity, device posture, location, behavior, threat intel feed the decision each time.
+1. **All data sources and computing services are considered resources.** A network may be
+   composed of multiple classes of devices; an enterprise may also classify personally owned
+   devices as resources if they can access enterprise-owned resources.
+2. **All communication is secured regardless of network location.** Network location alone does
+   not imply trust; access requests from inside a legacy perimeter must meet the same
+   requirements as any other. Communication should protect confidentiality and integrity and
+   provide source authentication.
+3. **Access to individual enterprise resources is granted on a per-session basis.** Trust in
+   the requester is evaluated before access is granted, and *"access should also be granted
+   with the least privileges needed to complete the task"*. Crucially: *"authentication and
+   authorization to one resource will not automatically grant access to a different resource"* —
+   that sentence is the whole reason a shared SSO session is not a zero-trust session.
+4. **Access to resources is determined by dynamic policy** — including the observable state of
+   client identity, application/service, and the requesting asset — and may include other
+   behavioral and environmental attributes.
+5. **The enterprise monitors and measures the integrity and security posture of all owned and
+   associated assets.** No asset is inherently trusted.
+6. **All resource authentication and authorization are dynamic and strictly enforced before
+   access is allowed** — a constant cycle of obtaining access, scanning and assessing threats,
+   adapting, and continually re-evaluating trust in ongoing communication.
+7. **The enterprise collects as much information as possible about the current state of assets,
+   network infrastructure and communications and uses it to improve its security posture.**
+   That data feeds policy creation and enforcement, not only incident response.
+
+> **What is *not* on that list.** SP 800-207 does not contain the phrases *"never trust, always
+> verify"* or *"assume breach"*; neither is a tenet. They are the industry's shorthand — useful
+> in a briefing, and a frequent source of exam-style errors when they are presented as the
+> standard's own list. *Assume breach* in particular is a design posture from vendor and
+> government guidance (it assumes the network is already compromised), and it overlaps with
+> tenet 5's "no asset is inherently trusted" without being the same statement. **Least
+> privilege** is likewise not a separate tenet: it appears *inside* tenets 3 and 4, as the rule
+> that a grant is scoped to the task and that visibility is restricted alongside accessibility.
+
+**The operational principles this phase actually applies**, stated separately so they are not
+mistaken for the standard: *never trust, always verify* as a working posture; *assume breach*
+as a planning assumption; *least privilege, just-in-time* as the shape of a grant; and
+*identity as the control plane* — which is this module's own framing, not a quotation from
+anyone. The phase's job is to show how each of those maps onto one of the seven tenets above
+and onto architecture you can point at.
 
 ## NIST SP 800-207 Architecture: PE / PA / PEP
 

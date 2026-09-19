@@ -88,7 +88,7 @@ SharpHound.exe -c All -d corp.local
 SharpHound.exe --collectionmethods Session --loop --loopduration 02:00:00
 
 :: Authenticate explicitly if your current context cannot read the domain
-SharpHound.exe --collectionmethods All --ldapuser corp\svc_enum --ldappass 'P@ssw0rd!' --domain corp.local
+SharpHound.exe --collectionmethods All --ldapusername corp\svc_enum --ldappassword 'P@ssw0rd!' --domain corp.local
 ```
 
 Key collection methods:
@@ -230,6 +230,8 @@ read them before writing your own.
 - [ ] I can run a shortest-path query from a controlled user to Domain Admins
 - [ ] I can explain what each edge on that path means and how to abuse it
 - [ ] I know which collection methods need admin rights and which are LDAP-only
+
+> **Verification:** the SharpHound LDAP flags were checked against the upstream SharpHound README (<https://raw.githubusercontent.com/SpecterOps/SharpHound/master/README.md> — `--ldapusername` / `--ldappassword`, lines 92 and 94) on 2026-09-19. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

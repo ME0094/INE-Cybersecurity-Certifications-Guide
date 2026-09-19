@@ -166,4 +166,4 @@ VPN    Virtual Private Network
 - [NIST Computer Security Resource Center (CSRC)](https://csrc.nist.gov/glossary) — authoritative glossary of security terms.
 - [CIS Controls](https://www.cisecurity.org/controls) — terminology used with the 18 controls.
 - [ISO/IEC 27001](https://www.iso.org/standard/27001.html) — official ISMS standard page.
-- [OWASP Glossary](https://owasp.org/www-community/OWASP_Glossary_of_Terms) — application-security terminology.
+- [OWASP community pages](https://owasp.org/www-community/) — project and initiative index for application-security terminology (the standalone Glossary of Terms page this list used before is gone).

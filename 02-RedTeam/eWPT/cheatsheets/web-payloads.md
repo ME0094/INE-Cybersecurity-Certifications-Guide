@@ -131,7 +131,7 @@ Goal: read files outside the intended directory by manipulating the path.
 ```text
 ../../../../etc/passwd
 ..%2f..%2f..%2fetc%2fpasswd        # encoded slashes
-....//....//etc/passwd             # naive filter bypass (double-encoding style)
+....//....//etc/passwd             # filter bypass: stripping "../" once turns ....// into ../
 /etc/passwd                        # absolute path when allowed
 ```
 
@@ -242,6 +242,8 @@ trust that input — move on.
 - [ ] Every family above has at least one working probe in my own lab.
 
 ---
+
+> **Verification:** the filter-bypass behaviour was reproduced locally with Node 22.23.2 on 2026-09-19: stripping `../` once from `....//` yields `../` (and `....//....//....//etc/passwd` yields `../../../etc/passwd`), which is why it is a single-strip bypass and not double-encoding. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

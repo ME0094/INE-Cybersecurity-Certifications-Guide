@@ -181,7 +181,7 @@ Strategic considerations: protocol support (SAML for legacy/B2B, OIDC for modern
 ## Further Resources
 
 - NIST SP 800-63C, *Digital Identity Guidelines: Federation and Assertions*: https://doi.org/10.6028/NIST.SP.800-63c
-- OASIS SAML V2.0 core specification: https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.html
+- OASIS SAML V2.0 core specification: https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf (the HTML rendering under the same path is gone; the PDF is the published form)
 - OpenID Connect Core 1.0 specification: https://openid.net/specs/openid-connect-core-1_0.html
 - OAuth.net — OAuth 2.0 overview: https://oauth.net/2/
 - Microsoft Entra ID documentation (federation and SSO concepts): https://learn.microsoft.com/en-us/entra/identity/

@@ -82,9 +82,25 @@ falsepositives:
     - Legitimate administrative or automation scripts that use encoding
       to pass complex commands (e.g., some deployment tooling)
     - Scripts started by approved IT tooling during maintenance windows
+    - Command lines where "-enc" appears as a SUBSTRING of a longer token,
+      because "-enc" also matches "-Encoding". Any script that passes
+      "-Encoding UTF8" (to Get-Content, Out-File, Export-Csv and friends)
+      inside a -Command string trips the rule with no base64 payload
+      present at all. This is the false positive to expect most often.
 # List what can look like this rule so the next analyst knows why it may be
 # noise in YOUR environment.
 
 level: high
 # Alert severity (informational/low/medium/high/critical). Encoded PowerShell
 # is rarely run by a normal user by accident, so treat it as urgent.
+
+# =============================================================================
+# VERIFICATION -- 2026-09-19
+#   sigma check (sigma-cli 3.1.0), on a copy of this file under /tmp:
+#     === Summary ===
+#     Found 0 errors, 0 condition errors and 0 issues.
+#     No rule errors found. / No condition errors found. / No validation issues found.
+#   YAML also parses cleanly under PyYAML 6.0.1 (3 falsepositives entries).
+# NOT VERIFIED: sigma convert. sigma-cli 3.1.0 reports "No backends installed",
+# so no backend query was produced or run against real events.
+# =============================================================================

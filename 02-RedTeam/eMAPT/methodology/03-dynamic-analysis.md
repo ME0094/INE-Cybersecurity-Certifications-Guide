@@ -35,7 +35,8 @@ pip install frida-tools
 # Verify device connectivity
 frida-ps -U
 
-# Spawn the app paused, run hooks, resume (Android)
+# Spawn the app with the hooks loaded (Android). The main thread resumes by
+# itself; add --pause to hold it until you type %resume in the REPL.
 frida -U -f com.example.app -l hooks.js
 ```
 
@@ -190,6 +191,13 @@ privileged flows.
 - [ ] I tested on both an emulator and a real device (or documented why not).
 - [ ] I logged crypto inputs/outputs, filesystem writes, and key UI flows.
 - [ ] I saved screenshots and logs as evidence for each observation.
+
+> **Verification:** the spawn comment was corrected against the `frida` CLI's own
+> option parser, `frida_tools/repl.py` lines 119-126 in `frida-tools` main
+> (<https://raw.githubusercontent.com/frida/frida-tools/main/frida_tools/repl.py>,
+> 2026-09-19): the hold flag is `--pause` and `on_spawn_complete` defaults to
+> `"resume"`. `frida` is not installed here, so the command was not executed —
+> primary documentation only.
 
 ## Further Resources
 

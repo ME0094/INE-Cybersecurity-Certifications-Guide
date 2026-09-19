@@ -61,7 +61,7 @@ Java.perform(function () {
   };
 });
 EOF
-frida -U -f owasp.mstg.uncrackable1 -l probe.js --no-pause
+frida -U -f owasp.mstg.uncrackable1 -l probe.js
 ```
 
 **Expected outcome:** triggering the action in the app prints your log line —
@@ -140,13 +140,16 @@ dynamic → traffic → storage → report.
 
 **Steps:** combine Drills 1–4 against a fresh app install. Timebox each phase
 (10/15/15/10/10 minutes). End with a short written report: scope, tools,
-findings table (weakness, evidence, impact, MASVS control), and a remediation
+findings table (weakness, evidence, impact, MASVS control ID), and a remediation
 hint per finding.
 
 **Expected outcome:** a one-page report with at least three verified findings,
 each backed by a command output or screenshot, plus a straight list of what you
-checked and found clean. Compare your findings against the OWASP MASVS control
-groups (storage, crypto, network, platform, code quality).
+checked and found clean. Map every finding to a MASVS **control ID** — the
+standard has eight categories today (`MASVS-STORAGE`, `MASVS-CRYPTO`,
+`MASVS-AUTH`, `MASVS-NETWORK`, `MASVS-PLATFORM`, `MASVS-CODE`,
+`MASVS-RESILIENCE`, `MASVS-PRIVACY`), not five. See the mapping table below for
+a starting ID per drill.
 
 ## Drill 6 — iOS Cross-Check (hardware permitting)
 
@@ -154,13 +157,15 @@ groups (storage, crypto, network, platform, code quality).
 differences.
 
 **Setup:** simulator or jailbroken device (see setup-guide.md), the iOS
-UnCrackable L1 app.
+UnCrackable L1 app — a *device* build, so it installs on the jailbroken device
+and not on the simulator.
 
 ```bash
-# Simulator path:
-xcrun simctl install booted UnCrackable-Level1.app
-xcrun simctl launch booted owasp.mstg.uncrackable1
-xcrun simctl get_app_container booted owasp.mstg.uncrackable1 data
+# Simulator path (macOS + Xcode, and a build compiled for the simulator: the
+# MASTG UnCrackable-Level1.ipa is a device build and will not install here):
+xcrun simctl install booted "/path/to/Debug-iphonesimulator/UnCrackable Level 1.app"
+xcrun simctl launch booted sg.vp.UnCrackable1          # iOS bundle id
+xcrun simctl get_app_container booted sg.vp.UnCrackable1 data
 # Jailbroken device path: frida-ios-dump, class-dump, Ghidra (see ios-tools.md)
 ```
 
@@ -168,6 +173,25 @@ xcrun simctl get_app_container booted owasp.mstg.uncrackable1 data
 testing differs from Android (encrypted binaries, keychain vs keystore,
 no user-installable CA store without extra trust steps) and you completed at
 least the static-analysis pass on the iOS app.
+
+## MASVS mapping — example control IDs per drill
+
+The current MASVS has **eight** categories: `MASVS-STORAGE`, `MASVS-CRYPTO`,
+`MASVS-AUTH`, `MASVS-NETWORK`, `MASVS-PLATFORM`, `MASVS-CODE`,
+`MASVS-RESILIENCE`, and `MASVS-PRIVACY`. Quote the control **ID**, not just the
+category, in every finding. Starting points:
+
+| Drill | Category | Example control ID and statement |
+| --- | --- | --- |
+| 1 — Static analysis | PLATFORM / CODE / STORAGE | `MASVS-PLATFORM-1` (IPC used securely), `MASVS-PLATFORM-2` (WebViews), `MASVS-CODE-4` (untrusted input validated), `MASVS-STORAGE-2` (no sensitive-data leakage) |
+| 2 — Dynamic hooking | RESILIENCE | `MASVS-RESILIENCE-1` (platform integrity validated), `MASVS-RESILIENCE-4` (anti-dynamic-analysis techniques) |
+| 3 — Traffic | NETWORK | `MASVS-NETWORK-1` (traffic secured), `MASVS-NETWORK-2` (identity pinning) |
+| 4 — Storage | STORAGE / CRYPTO / PRIVACY | `MASVS-STORAGE-1` (secure storage), `MASVS-STORAGE-2` (no leakage), `MASVS-CRYPTO-2` (key management), `MASVS-PRIVACY-1` (data minimization) |
+| 5 — End-to-end | AUTH | `MASVS-AUTH-1` (secure auth protocols), `MASVS-AUTH-3` (extra auth for sensitive operations) |
+| 6 — iOS cross-check | CRYPTO / STORAGE | `MASVS-CRYPTO-2` (keychain / key management), `MASVS-STORAGE-2` (no leakage) |
+
+Pinning (`MASVS-NETWORK-2`) is a control you report as present or absent, not a
+vulnerability by itself (see `tools/burp-setup.md`).
 
 ## Common Mistakes & Tips
 
@@ -195,12 +219,24 @@ least the static-analysis pass on the iOS app.
 - [ ] Drill 5: I produced a one-page report with at least three verified findings
 - [ ] Drill 6 (if hardware allows): I completed the iOS static pass and noted platform differences
 - [ ] Every finding has a command output or screenshot as evidence
-- [ ] I mapped my findings to the relevant OWASP MASVS control groups
+- [ ] I mapped every finding to a MASVS control ID (one of the eight categories)
+
+> **Verification:** the iOS identifiers were read from the official crackme
+> itself on 2026-09-19: `Crackmes/iOS/Level_01/UnCrackable-Level1.ipa` from
+> `OWASP/mastg` gives `CFBundleIdentifier = sg.vp.UnCrackable1`,
+> `CFBundleSupportedPlatforms = ['iPhoneOS']` and a fat binary with only
+> `armv7`/`arm64` **device** slices (parsed with Python 3.12 `plistlib` and
+> `struct`), so it cannot run on a simulator; the Android APK of the same level
+> decodes with apktool 2.7.0 to `package="owasp.mstg.uncrackable1"`. The MASVS
+> categories and every control ID quoted here were taken from
+> <https://mas.owasp.org/MASVS/controls/> (eight categories, 24 controls). The
+> `frida` line was corrected against `frida-tools` main (see `tools/android-tools.md`);
+> `frida` itself is not installed, so no device command was executed.
 
 ## Further Resources
 
-- OWASP MASTG — https://owasp.org/www-project-mobile-security-testing-guide/
+- OWASP MASTG — https://mas.owasp.org/MASTG/
 - OWASP MASVS — https://mas.owasp.org/
-- Frida examples — https://frida.re/docs/examples/
+- Frida — documentation and usage examples: https://frida.re/docs/home/
 - objection — https://github.com/sensepost/objection
 - UnCrackable / Hacking Playground app sources — https://github.com/OWASP/owasp-mastg

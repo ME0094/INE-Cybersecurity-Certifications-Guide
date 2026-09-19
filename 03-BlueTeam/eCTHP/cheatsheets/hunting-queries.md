@@ -7,7 +7,7 @@
 **Conventions used below**
 
 - **Field names are environment-specific.** `process.name`, `Account_Name`, and `event_data.Image` all describe "the process" in different backends. Confirm against a real event before trusting a query copied from anywhere — including this sheet.
-- **Every threshold is a starting point, not a truth.** `count > 20`, `jitter < 5`, `orig_bytes > 1000000` are placeholders. Baseline your own environment and set them from data.
+- **Every threshold is a starting point, not a truth.** `count >= 20`, `cv < 0.1`, `orig_bytes > 1000000` are placeholders. Baseline your own environment and set them from data.
 - A query returning nothing is a statement about your telemetry until you prove otherwise.
 
 ---
@@ -70,8 +70,10 @@ DeviceProcessEvents
 ```
 
 ```text
-# Kibana
-event.category : "process" and process.name : "powershell.exe" and process.command_line : *-enc*
+# Kibana. Match process.args — the tokenised argument array — instead of leading-wildcarding
+# the whole command line: ECS splits the command line into arguments, so the switch is its own
+# value and costs no wildcard scan (see "Leading-wildcard searches at scale" below).
+event.category : "process" and process.name : "powershell.exe" and process.args : ("-enc" or "-EncodedCommand" or "-nop")
 ```
 
 ```spl
@@ -221,30 +223,34 @@ last -n 20
 cat conn.log | zeek-cut id.orig_h id.resp_h id.resp_p duration orig_bytes resp_bytes \
   | sort | uniq -c | sort -nr | head -20
 
-# Zeek: inter-arrival deltas — low stddev relative to mean means machine-like timing.
-# Requires the #fields header, so feed zeek-cut whole log files.
+# Zeek: inter-arrival deltas per conversation. The signal is the COEFFICIENT OF VARIATION
+# (stddev / mean), not the raw stddev: an absolute sigma of 5 s is rigid for a 30 s beacon and
+# sloppy for a 600 s one, so an absolute threshold both misses slow beacons and admits fast
+# jittery traffic. Requires the #fields header, so feed zeek-cut whole log files.
 cat conn.log \
   | zeek-cut id.orig_h id.resp_h id.resp_p ts \
   | sort -k1,1 -k2,2 -k3,3n -k4,4n \
   | awk '{ key=$1" "$2" "$3; if (key==prev) { d=$4-last;
              if (key in n) { n[key]++; s[key]+=d; ss[key]+=d*d } else { n[key]=1; s[key]=d; ss[key]=d*d } }
            prev=key; last=$4 }
-         END { for (k in n) if (n[k]>=10) { m=s[k]/n[k]; v=ss[k]/n[k]-m*m; if (v<0) v=0;
-                 printf "%d conns  mean_sec %.1f  stddev_sec %.1f  %s\n", n[k]+1, m, sqrt(v), k } }' \
-  | sort -k6,6n | head -20
+         END { for (k in n) if (n[k]>=20) { m=s[k]/n[k]; v=ss[k]/n[k]-m*m; if (v<0) v=0; sd=sqrt(v);
+                 printf "%d conns  mean_sec %.1f  stddev_sec %.1f  cv %.3f  %s\n", n[k]+1, m, sd, (m>0 ? sd/m : 0), k } }' \
+  | sort -k8,8n | head -20
 
 # Zeek: attempted-and-unanswered connections (dead C2, blocked egress, scanning)
 cat conn.log | zeek-cut id.orig_h id.resp_h id.resp_p conn_state | awk '$4=="S0"' | sort | uniq -c | sort -nr | head
 ```
 
 ```spl
-// Splunk: beaconing candidates from proxy logs
+// Splunk: beaconing candidates from proxy logs.
+// The filter is on the coefficient of variation (stdev / mean), never on the raw stdev.
 index=proxy
 | sort 0 + _time
 | streamstats current=f last(_time) as prev by src_ip, dest_host
 | eval delta = _time - prev
 | stats count avg(delta) as avg_delta stdev(delta) as jitter sum(bytes_out) as uploaded by src_ip, dest_host
-| where count > 20 and jitter < 5
+| eval cv = jitter / avg_delta
+| where count >= 20 and cv < 0.1
 ```
 
 ```bash
@@ -293,9 +299,11 @@ index=proxy method=POST
 ```
 
 ```bash
-# DNS as an egress channel: long query names and unique-subdomain counts
+# DNS as an egress channel: long query names and unique-subdomain counts.
+# `sort -u` first: without it you are counting QUERIES, so one frequently repeated name looks
+# like a tunnel and the number says nothing about how many distinct names were generated.
 cat dns.log | zeek-cut query | awk '{ print length($0), $0 }' | sort -nr | head -20
-cat dns.log | zeek-cut query | awk -F. 'NF>=2 { d=$(NF-1)"."$NF; c[d]++ } END { for (k in c) print c[k], k }' | sort -nr | head -20
+cat dns.log | zeek-cut query | sort -u | awk -F. 'NF>=2 { d=$(NF-1)"."$NF; c[d]++ } END { for (k in c) print c[k], k }' | sort -nr | head -20
 ```
 
 ```powershell
@@ -409,9 +417,12 @@ yara -r -s rule.yar C:/lab/samples/
 yara -r -t apt_lab rule.yar C:/lab/samples/       # only rules with a given tag
 yara -r -s rule.yar C:/lab/dumps/memory.raw
 
-# Volatility 3 + YARA, so matches are attributed to a process
+# Volatility 3 + YARA. `windows.vadyarascan` walks process address space and accepts `--pid`,
+# which is what makes a match attributable to a process. The root-level `yarascan` plugin scans
+# kernel memory and has NO `--pid` option, and there is no `windows.yarascan` plugin at all
+# (`vol --help` lists the plugin names for your build).
 vol -f mem.raw windows.vadyarascan --yara-file rule.yar
-vol -f mem.raw windows.yarascan --yara-file rule.yar --pid 2468
+vol -f mem.raw windows.vadyarascan --yara-file rule.yar --pid 2468
 ```
 
 ```text
@@ -474,7 +485,7 @@ WHERE System.EventID.Value == 4625
 | Filter by field | `where EventID == 1` | `EventCode=1` | `process where process.name == "cmd.exe"` | `WHERE Name = "cmd.exe"` |
 | Case-insensitive match | `in~ ("a","b")` | `Image IN ("a","b")` | `process.name in ("a","b")` | `Name =~ "(?i)a\|b"` |
 | Substring | `has "abc"` / `contains` | `Image="*abc*"` | `process.command_line : "*abc*"` | `CommandLine =~ "abc"` |
-| Count per entity | `summarize count() by User` | `stats count by User` | — (use a rule query) | `GROUP BY` is done in the source, not the query |
+| Count per entity | `summarize count() by User` | `stats count by User` | — (use a rule query) | `SELECT Name, count() AS n FROM pslist() GROUP BY Name` |
 | Time bucket | `bin(TimeGenerated, 1h)` | `bin _time span=1h` | — | `GROUP BY` on a formatted time field |
 | Sequence | — (use `join`/`summarize`) | `transaction` / `streamstats` | `sequence by host with maxspan=…` | `chain()` / ordered collection |
 | Time bound | `where TimeGenerated > ago(7d)` | time picker or `earliest=-7d` | timeline selector | `StartTime`/`EndTime` args on collection |
@@ -485,9 +496,9 @@ WHERE System.EventID.Value == 4625
 
 - **Wrong time window.** Most "my query is broken" moments are a time-range problem. Set the window explicitly before debugging syntax.
 - **Field names copied from another environment.** `process.name` in one backend is `event_data.Image` in another and `New_Process_Name` in a third. Expand a sample event and read the real names.
-- **Leading-wildcard searches at scale.** `*foo*` on a large index is slow and often truncated; filter on a cheaper field first.
+- **Leading-wildcard searches at scale.** `*foo*` on a large index is slow and often truncated; filter on a cheaper field first. For process arguments, query the tokenised `process.args` instead of wildcarding `process.command_line` (section 1).
 - **Calling a pattern a finding.** "Beaconing detected" is not a finding. Name the host, the pair, the count, the interval statistics, the time window, and the process that owned it.
-- **Ignoring variance.** A mean interval of 60 s means nothing without the standard deviation. The ratio of the two is the beacon signal.
+- **Ignoring variance.** A mean interval of 60 s means nothing without the standard deviation, and a raw deviation means nothing without the mean: quote the ratio of the two — the coefficient of variation. A fixed `jitter < 5 s` test is not a beacon test; it rejects a genuine 600-second beacon and admits fast jittery traffic.
 - **Trusting a threshold from a cheatsheet.** Every numeric threshold here is a placeholder. Derive yours from a baseline you can point at.
 - **Forgetting that `zeek-cut` needs the header.** Piping a pre-stripped log into `zeek-cut` gives you silent nonsense.
 - **Interpreting an empty result as an all-clear.** State the coverage: which sources, which window, which gaps. A negative without coverage is an apology, not a result.
@@ -500,13 +511,26 @@ WHERE System.EventID.Value == 4625
 - [ ] I can write a process-creation hunt in KQL, SPL, and VQL without looking them up.
 - [ ] I can extract any Sysmon field by name in PowerShell instead of guessing property indexes.
 - [ ] I can build a logon-type distribution for an account and explain what an anomaly means.
-- [ ] I can compute beacon interval mean and standard deviation from `conn.log` by hand.
+- [ ] I can compute beacon interval mean, standard deviation, and their ratio (the coefficient of variation) from `conn.log` by hand.
 - [ ] I can find an exfiltration candidate in flow data without packet capture.
 - [ ] I can produce a lateral-movement fan-out view and attach a process to one connection.
 - [ ] I can turn an EVTX directory into a timeline with Hayabusa and a Sigma hunt with Chainsaw.
 - [ ] I can validate a Sigma hunt pipeline against a known-bad test event before trusting a clean result.
 - [ ] I state the telemetry coverage next to every negative result.
 - [ ] I re-derived my thresholds from my own baseline rather than using the numbers on this page.
+
+> **Verification:** executed against Volatility 3 Framework 2.28.2 on 2026-09-19 in WSL Ubuntu
+> 24.04.4 LTS. `vol windows.vadyarascan --help` prints `[--pid [PID ...]]`; `vol yarascan.YaraScan
+> --help` has **no** `--pid` (it scans kernel memory only); `vol windows.yarascan --help` fails <!-- check-commands: ignore -->
+> with `invalid choice windows.yarascan`; `vol windows.hivelist --help` fails the same way while <!-- check-commands: ignore -->
+> `vol windows.registry.hivelist --help` resolves to `HiveList`. The beacon awk and the
+> `sort -u` DNS awk were executed on 2026-09-19 against synthetic `conn.log` and `dns.log` data
+> with GNU Awk 5.2.1. `zeek` and `zeek-cut` are **not installed** there, so the projected field
+> list was reproduced with `awk` on the tab-separated log body. The SPL, KQL, EQL, VQL and Kibana
+> examples are **unverified syntax references — not run**: no Splunk, Sentinel or Kibana was
+> available.
+
+## Further Resources
 
 ## Further Resources
 

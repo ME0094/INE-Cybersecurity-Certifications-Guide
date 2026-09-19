@@ -143,7 +143,7 @@ Why those two, and why two routes: they leave a deleted-record trail without bre
    Do not mount the image; analyse a verified working copy.
 ```
 
-Two facts to record as you go, because they explain the tail of your timeline: **the shutdown is itself a state change** (the image is the post-shutdown state, moments after the snapshot — note the shutdown time so a late event is attributable to your procedure rather than the incident), and **the tools have versions**, because a report naming a suite without a version cannot be reproduced ([04-reporting:36](../methodology/04-reporting.md)).
+Two facts to record as you go, because they explain the tail of your timeline: **the shutdown is itself a state change** (the image is the post-shutdown state, moments after the snapshot — note the shutdown time so a late event is attributable to your procedure rather than the incident), and **the tools have versions**, because a report naming a suite without a version cannot be reproduced ([04-reporting](../methodology/04-reporting.md), "Documenting Methodology and Evidence").
 
 **Why disk is mandatory and memory is optional.** Disk is mandatory because the staged incident *is* persisted state — two persistence mechanisms, a renamed file, two deletions, a new account — and a powered-off disk can be imaged reproducibly and hashed end to end ([lab-environment.md:30](lab-environment.md)). Memory is optional because nothing here needs live-only state to be reconstructed, with one instructive exception: step 8. What a memory capture adds to a timeline:
 
@@ -159,20 +159,20 @@ Three routes over the same evidence, each answering a different question. Build 
 
 ### 6.1 Route A — the file-system timeline (Sleuth Kit bodyfile)
 
-The classic pipeline, unchanged since the bodyfile format was defined ([03-timeline:29-46](../methodology/03-timeline.md)). TSK takes single-dash switches (`fls -V`, `fls -h`); confirm on your build.
+The classic pipeline, unchanged since the bodyfile format was defined (the Bodyfile Format section of [03-timeline](../methodology/03-timeline.md)). TSK takes single-dash switches (`fls -V`, `fls -h`); confirm on your build.
 
 ```bash
 # Partition layout first — every later TSK command needs the right offset
 mmls ~/lab/<case-id>/working/disk.dd
 # Bodyfile: the allocated namespace, then the inode metadata the namespace no longer references
 fls -o <offset> -r -m / ~/lab/<case-id>/working/disk.dd > ~/lab/<case-id>/working/body.txt
-ils -o <offset> -m / ~/lab/<case-id>/working/disk.dd >> ~/lab/<case-id>/working/body.txt
+ils -o <offset> -m ~/lab/<case-id>/working/disk.dd >> ~/lab/<case-id>/working/body.txt
 mactime -b ~/lab/<case-id>/working/body.txt -d -z UTC > ~/lab/<case-id>/exports/fs-timeline.csv
 # What to look for: one row per file per timestamp type, and a file thick enough to be plausible
 # for the machine you acquired — a wrong offset or file system gives a thin or nonsensical file.
 ```
 
-In this incident, look for **the two names of one file** (the download's birth and the renamed copy's birth, in two directories — and neither row tells you they are the same content, which is what your recorded payload hash is for); **the marker file and its deletion**, including any new recycle-container entry; **paths that no longer resolve**, since the deleted view lists entries that have left the namespace ([forensic-exercises.md:133-145](forensic-exercises.md) is the basic version of that reading); and **containers rather than contents** — the task file and the registry hives are containers whose timestamps you get here and whose *definitions* you do not. On NTFS the bodyfile carries one timestamp set; the other set is a separate reading, and a mismatch between them is the timestomping signal in [03-timeline:21](../methodology/03-timeline.md). Find that switch on your own version rather than trusting a remembered one.
+In this incident, look for **the two names of one file** (the download's birth and the renamed copy's birth, in two directories — and neither row tells you they are the same content, which is what your recorded payload hash is for); **the marker file and its deletion**, including any new recycle-container entry; **paths that no longer resolve**, since the deleted view lists entries that have left the namespace ([forensic-exercises.md:133-145](forensic-exercises.md) is the basic version of that reading); and **containers rather than contents** — the task file and the registry hives are containers whose timestamps you get here and whose *definitions* you do not. On NTFS the bodyfile carries one timestamp set; the other set is a separate reading, and a mismatch between them is the timestomping signal in the timestamp-reliability table of [03-timeline](../methodology/03-timeline.md). Find that switch on your own version rather than trusting a remembered one.
 
 ### 6.2 Route B — the plaso super-timeline over the image and the extracted artefacts
 
@@ -225,9 +225,9 @@ The method, in order. Its central discipline: **pivot on entities, not on time**
 ```bash
 # Filter syntax and field names vary between plaso releases. Confirm on yours:
 psort.py --help
-psort.py -o csv -w ~/lab/<case-id>/exports/window-<n>.csv \
-  "date > '<anchor-time>' and date < '<anchor-time plus a few minutes>'" \
-  ~/lab/<case-id>/working/<case-id>.plaso
+psort.py -o l2tcsv -w ~/lab/<case-id>/exports/window-<n>.csv \
+  ~/lab/<case-id>/working/<case-id>.plaso \
+  "date > '<anchor-time>' and date < '<anchor-time plus a few minutes>'"
 # What to look for: rows that are NOT the anchor. Its neighbours are the free information in
 # this step; the anchor itself proves nothing you did not already know.
 ```
@@ -268,7 +268,7 @@ None of the three is "the" timeline. The defensible report says which route supp
 
 A timeline is a **derived artefact**. Its inputs are the exhibit; it is not.
 
-- **Tool and version per command** — `04-reporting` is explicit that naming the suite is not enough ([04-reporting:36](../methodology/04-reporting.md)).
+- **Tool and version per command** — `04-reporting` is explicit that naming the suite is not enough ([04-reporting](../methodology/04-reporting.md), "Documenting Methodology and Evidence").
 - **The storage file's name and SHA-256**, hashed at creation and again before you cite a filter result. If the two differ, the storage file changed and everything derived from it is in question.
 - **The exact filter** — verbatim, with its quoting, display zone and anchor value — and **the export command** verbatim, including the output module, because modules change the column set and therefore what a subset can be shown to contain.
 - **The filtered subset as an exhibit**: exported into `reports/`, named, hashed, and logged as an acquisition-style row. That CSV is what a reviewer reads; the storage file is what proves the CSV is a faithful filter over it.
@@ -307,7 +307,7 @@ Score your precision as well as your recall: count the rows in your filtered sub
 - **Pivoting by widening the time range.** Widening adds every unrelated component on the machine; pivoting on a hash or a path adds only plausible events. Widen when the *question* changes, and write the new question down first.
 - **Treating the full super-timeline CSV as the analysis.** It is the raw material you filter from. A report citing "the timeline" without a filter has cited nothing checkable.
 - **A filter you cannot regenerate** — missing quoting, missing display zone, missing tool version. Record the filter as you type it, not afterwards.
-- **Mixing display zones across subsets.** One subset in UTC and the next in local time produces a sequence that exists only in your spreadsheet. The victim's offset is part of the timeline ([03-timeline:112](../methodology/03-timeline.md)).
+- **Mixing display zones across subsets.** One subset in UTC and the next in local time produces a sequence that exists only in your spreadsheet. The victim's offset is part of the timeline, as the closing tips of [03-timeline](../methodology/03-timeline.md) put it.
 - **Concluding absence from a parser that never ran.** Check the per-parser breakdown before writing "no such activity": a failed parse looks exactly like a clean machine.
 - **Analysing on the victim, or mounting the image.** Both are covered at [lab-environment.md:334-345](lab-environment.md), and both invalidate the case rather than one result.
 - **Leaving the answer key on the victim**, where it becomes evidence — the one artefact that can tell you the answer without the timeline supporting it.
@@ -340,7 +340,7 @@ Score your precision as well as your recall: count the rows in your filtered sub
 - **plaso / log2timeline project** (release notes: the CLI does change) — https://github.com/log2timeline/plaso
 - **The Sleuth Kit** — `mactime` and the bodyfile format — https://www.sleuthkit.org/sleuthkit/man/mactime.html
 - **Timesketch** (collaborative timeline analysis over a plaso storage file) — https://timesketch.org/
-- **EvtxECmd** (Eric Zimmerman's EVTX parser, CSV/JSON timeline output) — https://github.com/EricZimmerman/EvtxECmd
+- **EvtxECmd** (Eric Zimmerman's EVTX parser, CSV/JSON timeline output; it lives in the `evtx` repository) — https://github.com/EricZimmerman/evtx
 - **Chainsaw** (rapid EVTX triage and Sigma-based hunting) — https://github.com/WithSecureLabs/chainsaw
 - **Hayabusa** (Sigma-based Windows event-log timeline generator) — https://github.com/Yamato-Security/hayabusa
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
@@ -348,3 +348,22 @@ Score your precision as well as your recall: count the rows in your filtered sub
 - **ISO/IEC 27037**, *Guidelines for identification, collection, acquisition and preservation of digital evidence* — https://www.iso.org/standard/44381.html
 - **RFC 2606** (the `.invalid` reserved name used in step 8) — https://www.rfc-editor.org/rfc/rfc2606
 - **Official eCDFP page on the INE website** for current, authoritative certification details — https://ine.com/security/certifications/ecdfp-certification
+
+> **Verification:** the Sleuth Kit half was executed on **2026-09-19** against **The Sleuth Kit
+> 4.12.1** (Ubuntu 24.04 WSL): on an ext4 image built in `/tmp`, `fls -f ext4 -o 0 -r -p -m /lab` +
+> `ils -f ext4 -o 0 -e -m` + `mactime -b … -d -z UTC` ran end to end, while the form previously
+> printed here, `ils -o <offset> -m / disk.dd`, exits 1 with no stdout
+> (`Invalid magic value (raw_open: image "/" - is a directory)`). The four internal citations were
+> repointed by section after checking their targets: `04-reporting` puts the tool-and-version
+> requirement under "Documenting Methodology and Evidence"; `03-timeline` puts the bodyfile
+> pipeline under "The Bodyfile Format", the NTFS timestamp-set discussion in the
+> timestamp-reliability table, and the clock-offset advice among its closing tips. The plaso route
+> was executed too, against **plaso 20260720** on the same date: `log2timeline
+> --storage-file=<case>.plaso disk.img` completed, and `pinfo` printed the per-parser breakdown that
+> section 6.2 tells you to read (`Events generated per parser: filestat : 12`), so the storage-file
+> form and the sanity check are both real. Two caveats measured on this release, recorded and **not**
+> changed here: the output module is `l2tcsv` (`psort -o csv …` fails with `ERROR: Unsupported output
+> format: csv.`) and the filter expression must follow the storage file (`psort … <filter> <path>`
+> fails with `ERROR: Unable to compile filter expression … premature end of expression`). **Not
+> executed:** the EVTX triage tools (Hayabusa and Chainsaw are not installed here) and the lab
+> itself — no `win-lab` VM exists on this machine, so every step below remains a syntax reference.

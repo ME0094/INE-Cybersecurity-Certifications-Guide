@@ -90,12 +90,16 @@ API) and works well as a first-pass health check.
 ```bash
 pip install garak
 # Then run, for example, a prompt-injection probe set against an OpenAI-compatible model
-garak --model_type openai --model_name gpt-3.5-turbo --probes promptinject
+garak --target_type openai --target_name gpt-3.5-turbo --spec probes.promptinject
 ```
 
-The exact flags, model-type names, and probe identifiers change between releases — run
-`garak --help` and check the project README for the current plugin list before relying on
-any specific invocation.
+Two flags this line gets wrong if you copy an older guide. The current names are
+`--target_type` and `--target_name`; `--model_type`/`--model_name` are the old spellings,
+kept as aliases in garak 0.17.0 but legacy either way. And `--probes` has been deprecated
+since 0.15.1.pre1 in favour of `--spec probes.<module>`. Beyond those, the exact flags,
+target-type names, and probe identifiers change between releases — run `garak --help`,
+`--list_probes` and `--list_generators`, and check the project README for the current plugin
+list before relying on any specific invocation.
 
 ### Microsoft PyRIT — Python Risk Identification Tool for generative AI
 
@@ -107,8 +111,18 @@ across models or versions.
 
 ```python
 # Illustrative structure only — PyRIT's API changes often. Read the project's docs.
-from pyrit.orchestrator import RedTeamingOrchestrator  # concept, not a copy-paste snippet
+#
+# `pyrit.orchestrator.RedTeamingOrchestrator`, which earlier revisions of this file showed,
+# no longer exists: the orchestrator layer was reorganised under `pyrit.executor.attack`,
+# and the class names, constructor arguments and target configuration all moved with it.
+# The shape below is what to look for in the current release, NOT a snippet to paste.
+from pyrit.executor.attack import AttackExecutor      # verify the name in your release
 ```
+
+The rename is the point rather than an obstacle: PyRIT is the tool in this module whose
+Python API moves fastest, so treat every import in your own scripts as version-pinned and
+re-check it after an upgrade — a break here is a two-minute fix at review time and a
+broken campaign at 02:00.
 
 The value of PyRIT is reproducibility: an attack campaign is code, so you can re-run it
 after a model or guardrail update and see whether the risk moved. Budget real time to
@@ -293,3 +307,35 @@ nothing more — see `offensive-scanners.md` for how each tool feeds this pipeli
 - [INE Security — eAIS (AI Systems Security Specialist) official certification page](https://ine.com/security/certifications/eais-certification)
 - In-repo: `offensive-scanners.md` (depth on garak, PyRIT, and Promptfoo) and
   `../labs/llm-testing.md` (the local lab where these runs belong).
+
+> **Verification:** both tool claims above were checked on **2026-09-19** by running the
+> installed binaries on Ubuntu 24.04 / Python 3.12.3.
+>
+> **garak 0.17.0** (`/usr/local/bin/garak` and the venv's `/opt/pytools/bin/garak`, same
+> version). `garak --help` defines the pair as
+> `--target_type TARGET_TYPE, -t TARGET_TYPE, --model_type TARGET_TYPE, -m TARGET_TYPE` and
+> `--target_name TARGET_NAME, --model_name TARGET_NAME, -n TARGET_NAME` — so the new names are
+> primary and the old ones survive as aliases, which is why the note above says "legacy" rather
+> than "removed". The same output prints `--probes PROBES, -p PROBES   DEPRECATED, use --spec`,
+> and a real run with `--probes promptinject` emitted
+> `DEPRECATION: --probes on CLI is deprecated since version 0.15.1.pre1`. `--list_generators`
+> listed `openai`, `openai.OpenAICompatible`, `ollama`, `rest` and `test`;
+> `--spec probes.promptinject` selected the three `promptinject.*` probes.
+>
+> **PyRIT 1.1.0 is installed** (in the `/opt/pytools/bin` virtualenv, not on the system
+> interpreter's path — which is why a bare `python3 -c "import pyrit"` says it is missing and
+> why "PyRIT is not installed" is the wrong conclusion to draw from that). The import this file
+> used to show fails exactly as described:
+>
+> ```
+> $ /opt/pytools/bin/python -c "from pyrit.orchestrator import RedTeamingOrchestrator"
+> ModuleNotFoundError: No module named 'pyrit.orchestrator'
+> ```
+>
+> and the replacement path above **was executed and resolves**:
+> `pyrit.executor.attack` imports from
+> `…/site-packages/pyrit/executor/attack/__init__.py`, and its public names include
+> `AttackExecutor`, `AttackStrategy`, `AttackScoringConfig`, `CrescendoAttack`, `PAIRAttack`
+> and `ManyShotJailbreakAttack`. `pyrit.attack_strategy` also does not exist. Confirm the exact
+> class you need against `dir()` in your release: the package is real and the path is right,
+> the specific class name is still yours to check.

@@ -50,7 +50,11 @@ SELECT name, action, path, enabled, hidden, last_run_time FROM scheduled_tasks;
 
 -- Accounts, and accounts that can actually log in
 SELECT uid, username, shell FROM users WHERE shell NOT IN ('/usr/sbin/nologin','/bin/false');
-SELECT name, enabled, last_logon FROM users;
+SELECT uid, username, description, directory, shell FROM users;
+-- The `users` table has no `name`, `enabled` or `last_logon` column: it exposes
+-- uid, gid, username, description, directory, shell and uuid. Check with
+-- `.schema users` on your build, and take logon state from the platform itself
+-- (`Get-LocalUser` on Windows, below; `last`/`lastlog` on Linux).
 ```
 
 ```bash
@@ -122,7 +126,7 @@ Detection needs two points in time. Create the second one deliberately, so you k
 # A diff you can defend: normalise, sort, compare -- one line per change
 sort snapshot-1-host.txt > s1.sorted
 sort snapshot-2-host.txt > s2.sorted
-diff s1.sorted s2.sorted        # added lines: <, removed lines: >, depending on order
+diff s1.sorted s2.sorted        # lines only in s1 (removed) are prefixed <, lines only in s2 (added) are prefixed >
 ```
 
 Output template for the findings table (**template, not captured output** — fill it from your own diff):
@@ -214,6 +218,8 @@ A good finding survives being read by someone who was not there. Write one for y
 - [ ] I baselined two settings, detected one drift, and classified it as authorized change, drift, or deviation.
 - [ ] I wrote one unauthorized-software finding and one drift finding, each with evidence, an owner, and a date.
 - [ ] I can explain why "the inventory is clean" and "the query returned nothing" are not the same statement.
+
+> **Verification:** osquery is not installed in this environment, so on 2026-09-19 the schema claims above were checked against the upstream table specification (`specs/users.table`: `uid`, `gid`, `uid_signed`, `gid_signed`, `username`, `description`, `directory`, `shell`, `uuid`, plus `type` on Windows) rather than against a live build — confirming that `name`, `enabled` and `last_logon` are not columns of `users`. The `diff` prefix semantics were verified in WSL Ubuntu 24.04 on the same date: `diff <(printf 'a\nb\nc\n') <(printf 'a\nc\nd\n')` printed `< b` (present only in the first file, i.e. removed) and `> d` (present only in the second, i.e. added).
 
 ## Further Resources
 

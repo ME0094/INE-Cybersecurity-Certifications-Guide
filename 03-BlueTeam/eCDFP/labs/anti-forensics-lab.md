@@ -183,9 +183,9 @@ The contrast with NTFS is the lesson: `touch` rewrites the modification time, an
 ## 5. Freeze and acquire
 
 1. **Finish the answer key first, then stop touching `win-lab`.** Section 4 is not complete until every line holds real UTC values, exact commands, the true hashes from 4a and the verbatim before/after state — and no tidying up, no "one more check" afterwards: every extra command writes to the volume you are about to image and adds events to the window you are trying to characterise.
-3. **Take snapshot `04-anti-forensics-after`.** It is not evidence — it is what lets you re-run the same analysis against the same state, which is why a destructive acquisition costs you nothing here.
-4. **Then follow the acquisition flow in [lab-environment.md](lab-environment.md):** power the victim off, attach its disk read-only or as a raw file, hash the source, image with `dd` / `dc3dd` and/or `ewfacquire`, re-hash, and write the acquisition log line (UTC, examiner, tool and version, source, destination, hashes). Do not improvise a variant here.
-5. **Never mount the image, and analyse on `linux-lab`** — never on the machine that generated the evidence, which here would corrupt the volume-wide coverage questions in steps 3 and 6 of section 6. Work on a verified copy in `~/lab/<case-id>/working/` with the sealed master and its hash untouched beside it, and note in the case file that the answer key exists and is unopened.
+2. **Take snapshot `04-anti-forensics-after`.** It is not evidence — it is what lets you re-run the same analysis against the same state, which is why a destructive acquisition costs you nothing here.
+3. **Then follow the acquisition flow in [lab-environment.md](lab-environment.md):** power the victim off, attach its disk read-only or as a raw file, hash the source, image with `dd` / `dc3dd` and/or `ewfacquire`, re-hash, and write the acquisition log line (UTC, examiner, tool and version, source, destination, hashes). Do not improvise a variant here.
+4. **Never mount the image, and analyse on `linux-lab`** — never on the machine that generated the evidence, which here would corrupt the volume-wide coverage questions in steps 3 and 6 of section 6. Work on a verified copy in `~/lab/<case-id>/working/` with the sealed master and its hash untouched beside it, and note in the case file that the answer key exists and is unopened.
 
 Acquiring before the key is finished does not produce a scored exercise; it produces a story about what you think you did.
 
@@ -347,8 +347,19 @@ Described as behaviour and signatures, never as invented output. Depending on yo
 - Microsoft, `fsutil usn` reference (query, read and manage the change journal) — <https://learn.microsoft.com/windows-server/administration/windows-commands/fsutil-usn>.
 - Microsoft, *File Times* — how the timestamp-setting API behaves and which times it writes — <https://learn.microsoft.com/windows/win32/sysinfo/file-times>.
 - Eric Zimmerman's tools — MFT and USN journal parsing, prefetch, Amcache, ShimCache, Recycle Bin, registry: <https://ericzimmerman.github.io/>.
-- The Sleuth Kit wiki — NTFS `$MFT`, `$LogFile` and `$UsnJrnl` structure, plus the body-file format: <https://wiki.sleuthkit.org/index.php?title=NTFS>.
+- The Sleuth Kit documentation — NTFS `$MFT`, `$LogFile` and `$UsnJrnl` structure, plus the body-file format: <https://www.sleuthkit.org/sleuthkit/docs.php>.
 - Forensics Wiki — artefact encyclopedia and tool notes: <https://forensics.wiki/>.
 - SANS Reading Room — white papers on timestomping, anti-forensics and evidence integrity: <https://www.sans.org/reading-room/>.
 - libyal — `libfsntfs` and `libewf`, the libraries behind several parsers above: <https://github.com/libyal>.
 - Official eCDFP page on the INE website for current, authoritative information about the certification.
+
+> **Verification:** unverified syntax references — **not run**, and this file's only change is
+> editorial. The numbered list in Section 5 was renumbered from `1, 3, 4, 5` to `1, 2, 3, 4` on
+> **2026-09-19**; the content of every step is unchanged, and step 1 already carries the
+> "stop touching `win-lab`" instruction that the missing number would otherwise have held. The
+> commands in this lab were not executed: most of them target a Windows victim (`wevtutil`,
+> `fsutil usn`, `fsutil behavior`, PowerShell). `foremost` 1.5.7 and `scalpel` 1.60 are installed on
+> the analysis host, but a carving run there on **2026-09-19** extracted nothing from any input tried
+> (including a real JPEG, alone and inside an ext4 image), so the carving steps below remain
+> unverified rather than confirmed — and that is a fact about this build's type configuration, not
+> about the lab.

@@ -272,7 +272,7 @@ For a fleet, the honest architectural answers are **Windows Event Forwarding** (
 - [Red Hat: Auditing the system](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/auditing-the-system_security-hardening) — practical rule sets and key conventions.
 - [systemd: journalctl](https://www.freedesktop.org/software/systemd/man/latest/journalctl.html) — filtering, verification, and sealing options.
 - [systemd: journald.conf](https://www.freedesktop.org/software/systemd/man/latest/journald.conf.html) — `Storage`, size limits, retention, and `Seal`.
-- [Microsoft: Windows Event Forwarding](https://learn.microsoft.com/en-us/windows/win32/wevtutil/wevtutil) — the `wevtutil` command reference behind the `gl` output above.
+- [Microsoft: wevtutil](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/wevtutil) — the command reference behind the `gl` output above.
 - [Microsoft: Auditpol](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/auditpol) — reading and setting audit policy by subcategory.
 - [Sysmon](https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon) — deployment and configuration for the process, network, and registry telemetry the built-in channels lack.
 - [NIST SP 800-92](https://csrc.nist.gov/pubs/sp/800/92/final) — Guide to Computer Security Log Management, for retention and infrastructure reasoning.

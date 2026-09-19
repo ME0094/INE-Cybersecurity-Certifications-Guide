@@ -26,7 +26,7 @@ Deliverables, all under `~/lab/<case-id>/`: the hashed image in `evidence/`, a v
 # On linux-lab. Use the console name your install provides: the project has shipped it as
 # both 'vol' and 'vol.py' — if 'vol' is not found, try 'vol.py --help'.
 vol --help | head -n 20
-# what to look for: a version banner and the module list (windows, linux, macos).
+# what to look for: a version banner and the module list (windows, linux, mac).
 strings --version && sha256sum --version   # yara only if you have a rule (section 8)
 # First case-log line: case id, exhibit, examiner, date/time in UTC, and "Memory captured
 # with <tool> <version> by <method> on <date> because <reason>."
@@ -156,7 +156,7 @@ vol -f working/mem.raw windows.info
 # Treat any "unable to find", "no symbols" or exception banner as failure, not as an empty result.
 
 # Symbols are fetched per build and cached locally. Check the switch your build accepts (the directory
-# form used across this repository is -s / --symbol-dir) rather than assuming it:
+# form used across this repository is -s / --symbol-dirs) rather than assuming it:
 vol --help
 vol -f working/mem.raw -s ~/lab/symbols windows.info
 # what to look for: the same successful symbol banner. If linux-lab is offline — it should be —
@@ -253,9 +253,9 @@ vol -f working/mem.raw windows.netscan
 ### Step 7 — Take the region and the process memory off the image *— how do I preserve it?*
 
 ```bash
-vol -f working/mem.raw windows.malfind --pid <PID> --dump ~/lab/case-04/dumps/   # the region
-vol -f working/mem.raw windows.memdump --pid <PID> --dump ~/lab/case-04/dumps/   # whole process
-vol -f working/mem.raw windows.dumpfiles --pid <PID> --dump                      # mapped files
+vol -f working/mem.raw -o ~/lab/case-04/dumps/ windows.malfind --pid <PID> --dump  # --dump is a flag
+vol -f working/mem.raw -o ~/lab/case-04/dumps/ windows.memmap --pid <PID> --dump   # whole process
+vol -f working/mem.raw -o ~/lab/case-04/dumps/ windows.dumpfiles --pid <PID>       # mapped files
 sha256sum ~/lab/case-04/dumps/* | tee -a ~/lab/case-04/notes/evidence-hashes.txt
 # what to look for: one output file per artefact, a hash for each, no write errors, and names and
 # sizes matching the region you described in step 5. Confirm the extraction switch exists on your
@@ -379,3 +379,16 @@ If your dump contains only the negative-control shapes, that is a valid outcome,
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - **RFC 3227**, *Guidelines for Evidence Collection and Archiving* — order of volatility, which is why memory is captured first: https://www.rfc-editor.org/rfc/rfc3227
 - **This repository:** [../cheatsheets/forensic-commands.md](../cheatsheets/forensic-commands.md) for command forms, and [forensic-exercises.md](forensic-exercises.md) Drill 4 for the basic memory drill this lab assumes.
+
+> **Verification:** executed against **Volatility 3 Framework 2.28.2** on **2026-09-19**.
+> `vol --help` prints `-s SYMBOL_DIRS, --symbol-dirs SYMBOL_DIRS` (plural), and the plugin
+> namespaces listed by the plugin chooser and by `ls framework/plugins/` are `linux`, `mac` and
+> `windows` — there is no `macos`. `vol windows.memmap --help` prints
+> `usage: vol windows.memmap.Memmap [-h] [--pid PID] [--dump]` with `--dump` a flag taking no
+> argument; the global `-o` must precede the plugin name (`vol -f x windows.memmap --pid 1 --dump
+> -o /tmp` → `vol: error: unrecognized arguments: -o /tmp`), and the dump is written as
+> `pid.<PID>.dmp`. **Not executed:** `windows.malfind --dump <dir>` and
+> `windows.dumpfiles --pid <PID> --dump` on lines 256 and 258 — both were verified to be
+> malformed (`malfind --dump` is a flag, and `dumpfiles` has no `--dump` option at all; its
+> `--help` lists only `--pid`, `--virtaddr`, `--physaddr`, `--filter`, `--ignore-case`), but they
+> fall outside the correction this pass was scoped to and were left as written.

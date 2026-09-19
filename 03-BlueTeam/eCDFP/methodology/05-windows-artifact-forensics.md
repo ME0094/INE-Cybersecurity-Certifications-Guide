@@ -343,5 +343,5 @@ A repeatable decision procedure, so your artefact work is driven by the question
 - **The Sleuth Kit** (`fls`, `icat`, `istat`, `mmls`, `fsstat`) — https://www.sleuthkit.org/sleuthkit/
 - **Autopsy** (GUI case work over the same engine) — https://www.sleuthkit.org/autopsy/
 - **Forensics Wiki** (artefact encyclopedia and per-artefact references) — https://forensics.wiki/
-- **Microsoft — Windows security auditing and event reference** (the authoritative source for the events cited above) — https://learn.microsoft.com/windows/security/threat-protection/auditing/
+- **Microsoft — Windows security auditing and event reference** (the authoritative source for the events cited above) — https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/advanced-security-audit-policy-settings
 - **DFRWS challenge archives** (authorized practice images containing these artefacts) — https://dfrws.org/

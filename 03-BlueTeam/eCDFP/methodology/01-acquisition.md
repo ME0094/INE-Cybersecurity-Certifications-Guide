@@ -180,7 +180,9 @@ Choose between them deliberately:
 #    (Disable automount first; verify the exact device path twice.)
 sudo fdisk -l          # note the device, e.g. /dev/sdb — NOT the workstation disk!
 
-# 2. Hash the SOURCE before imaging (hash while the write blocker is active)
+# 2. Hash the SOURCE before imaging (hash while the write blocker is active). Keep this
+#    manifest separate: it names the DEVICE, so 'sha256sum -c' on it would re-read the
+#    device — it is not a check of the image.
 sudo sha256sum /dev/sdb | tee /case/evidence-source.sha256
 
 # 3. Create a raw forensic image.
@@ -188,18 +190,24 @@ sudo sha256sum /dev/sdb | tee /case/evidence-source.sha256
 #    bs=4M             : large block size for speed
 sudo dd if=/dev/sdb of=/case/evidence.dd bs=4M conv=noerror,sync status=progress
 
-# 4. Hash the RESULT. It must match the source hash exactly.
-sha256sum /case/evidence.dd
-sha256sum -c /case/evidence-source.sha256   # reads the file's stored hash
+# 4. Hash the IMAGE and write the image's OWN manifest, naming the image
+sha256sum /case/evidence.dd | tee /case/evidence.dd.sha256
+
+# 5. Verify the image against the image's manifest. This reads evidence.dd and nothing else.
+sha256sum -c /case/evidence.dd.sha256
+
+# 6. Compare the two recorded digests explicitly — source device against image. They must be
+#    equal. This is the source-to-image comparison, and note that it is not what step 5 did:
+#    re-reading the device is a deliberate act, not a side effect of a manifest check.
+cat /case/evidence-source.sha256 /case/evidence.dd.sha256
 ```
 
 ```bash
-# Alternative: acquire directly into EWF (.E01) with libewf's ewfacquire
-sudo ewfacquire /dev/sdb \
-  -u "evidence-exhibit-1" \
-  -e "Case 2024-001, Exhibit 1: suspect laptop HDD" \
-  -m fixed \
-  -t /case/evidence.E01
+# Alternative: acquire directly into EWF (.E01) with libewf's ewfacquire.
+# Two traps in this switch set: -u is *unattended mode* and takes NO argument, and
+# -t names the target WITHOUT its extension (-t /case/evidence writes /case/evidence.E01).
+sudo ewfacquire -u -C "2024-001" -D "suspect laptop HDD" -e "A. Examiner" \
+  -m fixed -t /case/evidence /dev/sdb
 # What to look for: a completed acquisition summary, and a read-error count you can
 # explain. Confirm the switch set with ewfacquire -h on your build: it differs between
 # libewf releases.
@@ -293,12 +301,14 @@ Practical rules:
 Hashes are the integrity backbone of an acquisition. The forensic standard is **SHA-256** (collision-resistant, fast, and supported by every tool). MD5/SHA-1 alone are legacy; some labs compute both for compatibility, but SHA-256 is the defensible primary.
 
 - Hash the **source** and the **destination** at acquisition time.
+- Write a manifest **per artefact**, each naming the file it describes. `sha256sum -c` re-hashes whatever its manifest names, so a manifest of the source device verifies the device — never the image — and reading the device again is a separate, deliberate act.
 - Store hashes **away from the image** (in the case file / notes), so they can independently verify the image later.
 - Re-hash the image each time it is checked out for analysis; the hash of the original sealed copy is the reference.
 
 ```bash
-# Verify an image against its manifest (one "<hash>  <filename>" per line)
-sha256sum -c /case/evidence-source.sha256
+# Verify an image against the IMAGE's manifest (one "<hash>  <filename>" per line).
+# A manifest that names the source device is not this one: -c would read the device again.
+sha256sum -c /case/evidence.dd.sha256
 
 # Record hashes of both original and working copy in the notes
 sha256sum /case/evidence.dd /case/working-copy.dd
@@ -388,9 +398,33 @@ A custody log row for reference:
 ## Further Resources
 
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
-- **NIST SP 800-101 Rev. 1**, *Guidelines on Mobile Phone Forensics* (acquisition levels for a device you cannot detach) — https://csrc.nist.gov/publications/detail/sp/800-101/rev-1/final
+- **NIST SP 800-101 Rev. 1**, *Guidelines on Mobile Device Forensics* (acquisition levels for a device you cannot detach) — https://csrc.nist.gov/publications/detail/sp/800-101/rev-1/final
 - **ISO/IEC 27037**, *Guidelines for identification, collection, acquisition and preservation of digital evidence* — https://www.iso.org/standard/44381.html
 - **RFC 3227**, *Guidelines for Evidence Collection and Archiving* — https://www.rfc-editor.org/rfc/rfc3227
 - **The Sleuth Kit documentation** (partition and filesystem inspection of images) — https://www.sleuthkit.org/sleuthkit/
 - **libewf (EWF/E01 format) project** — https://github.com/libyal/libewf
 - **SANS reading room** (white papers on acquisition and evidence handling) — https://www.sans.org/reading-room/
+
+> **Verification:** executed on **2026-09-19** (Ubuntu 24.04 WSL). The hashing flow was rehearsed
+> with files standing in for the device and the image, which isolates the defect: with `source.bin`
+> and `image.dd` carrying the same digest, `sha256sum -c source.sha256` printed `source.bin: OK`
+> and `sha256sum -c image.dd.sha256` printed `image.dd: OK`; after flipping **one byte of the
+> image**, `sha256sum -c source.sha256` still printed `source.bin: OK, exit 0` — it never opened
+> the image — while `sha256sum -c image.dd.sha256` printed `image.dd: FAILED` and exited 1.
+> `sha256sum --help` documents `-c, --check   read checksums from the FILEs and check them`.
+> EWF was also executed with **ewfacquire/ewfverify 20140814** on a 4 MiB test file:
+> `ewfacquire -u -q -C 2024-001 -D … -e … -m fixed -d sha256 -t case src.bin` printed
+> `ewfacquire: SUCCESS` and wrote `case.E01`, and `ewfverify -d sha256 case.E01` printed
+> `ewfverify: SUCCESS` with the stored MD5 equal to the calculated MD5 and the calculated SHA-256
+> equal to the source's. That run also exposed a defect in the EWF example above that this pass was
+> not scoped to change, so it is recorded rather than fixed: `-u` is *unattended mode* and takes no
+> argument (`ewfacquire -h`: `-u: unattended mode (disables user interaction)`), so
+> `-u "evidence-exhibit-1"` makes that string a second **source** and the acquisition aborts with
+> `libbfio_pool_open: unable to open entry: 0` and no output file; and `-t` names the target
+> *without* extension (`-t: specify the target file (without extension) to write to`), so
+> `-t /case/evidence.E01` creates `evidence.E01.E01`. Passing the examiner name to `-e` and
+> `-t /case/evidence` works.
+> **Not executed:** `dd`/`dc3dd`/`ewfacquire` against a real block device —
+> no evidence device is attached to this machine. The publication title was corrected against the
+> NIST CSRC record, which names SP 800-101 Rev. 1 *Guidelines on Mobile Device Forensics*:
+> https://csrc.nist.gov/pubs/sp/800/101/r1/final.

@@ -46,8 +46,10 @@ Cloud IdPs host the identity store and authentication in the vendor's cloud and 
 
 This family splits into two roles:
 
-- **Directories** (Active Directory Domain Services, OpenLDAP) are identity *stores* speaking LDAP/Kerberos. They authenticate (bind) and answer attribute lookups but do not themselves do modern web SSO.
-- **IdP servers** (Keycloak, FreeIPA, Shibboleth IdP) sit in front of or beside directories and translate directory identity into web standards (OIDC/SAML). Keycloak is the most common open-source example and can use an LDAP directory as its user federation backend.
+- **Directories** (Active Directory Domain Services, OpenLDAP, FreeIPA) are identity *stores* speaking LDAP and/or Kerberos. They authenticate (bind, or issue a Kerberos ticket) and answer attribute lookups but do not themselves provide modern web SSO.
+- **IdP servers** (Keycloak, Shibboleth IdP) sit in front of or beside directories and translate directory identity into web standards (OIDC/SAML). Keycloak is the most common open-source example and can use an LDAP directory as its user federation backend.
+
+> **FreeIPA is in the first list, not the second.** It is a **Kerberos domain (KDC) plus an LDAP directory** with integrated DNS, a CA and a policy framework — a directory-and-authentication stack for Linux/Unix estates, comparable in role to AD DS rather than to an IdP. It does **not** speak OIDC or SAML natively: to let a web application authenticate against it you put something in front (Keycloak, or a SAML gateway such as Shibboleth or `ipsilon`/`lasso`-based tooling), or you federate it to an IdP that does. Listing it beside Keycloak as a self-hosted OIDC/SAML IdP misdescribes what you are deploying and what it can be asked to do.
 
 - **Core strengths:** full control over data and code; no per-user SaaS fees; strong for legacy/on-prem estates (AD is the identity backbone of most Windows environments); Kerberos/LDAP native.
 - **Common use:** government/regulated/air-gapped environments, hybrid estates bridging AD to modern SSO, cost-sensitive or lab deployments.
@@ -56,7 +58,7 @@ This family splits into two roles:
 
 ### 3. Cloud-provider-native IAM — AWS IAM, Azure RBAC/Entra, GCP IAM
 
-The hyperscalers ship identity services for their *own* platforms. AWS IAM is the canonical example: it manages **principals** (users, groups, roles) and **policies** (JSON documents) that grant or deny API actions on AWS resources.
+The hyperscalers ship identity services for their *own* platforms. AWS IAM is the canonical example: it manages **principals** and **policies** (JSON documents) that grant or deny API actions on AWS resources. The principal types are **IAM users, IAM roles, role sessions, federated user principals and AWS services** — an IAM **group** is *not* one, and AWS's own documentation is explicit: *"You cannot identify a user group as a principal in a policy (such as a resource-based policy) because groups relate to permissions, not authentication, and principals are authenticated IAM entities."* A group exists only as a target for attaching identity-based policies to its members: it has no credentials, cannot be trusted, and cannot appear in a `Principal` element. Where group-like access is needed for a workload, the mechanism is a role with a trust policy, not a group.
 
 - **Core strengths:** purpose-built for the cloud provider's API surface; role-based, short-lived credentials via STS; fine-grained, auditable policy evaluation; enables workload identity (EC2 instance roles, container roles, OIDC federation for Kubernetes).
 - **Common use:** controlling human and *machine* access to cloud APIs — the "who can call which API on which resource" problem.
@@ -125,3 +127,16 @@ Work through these questions:
 - OpenLDAP documentation: https://www.openldap.org/doc/
 - NIST SP 800-207 (Zero Trust Architecture): https://csrc.nist.gov/pubs/sp/800/207/final
 - RFC 7644 (SCIM 2.0 protocol): https://www.rfc-editor.org/rfc/rfc7644
+
+> **Verification:** the AWS IAM statement above was checked on **2026-09-19** against AWS's own
+> documentation (HTTP 200 at
+> `docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html` and
+> `…/id_groups.html`), which reads: *"You cannot identify a user group as a principal in a
+> policy (such as a resource-based policy) because groups relate to permissions, not
+> authentication, and principals are authenticated IAM entities."* The listed principal types
+> ("AWS account and root user, IAM roles, Role sessions, IAM users, Federated user principals,
+> AWS services") are quoted from the same page. The **FreeIPA** classification was **not**
+> re-verified against FreeIPA's own documentation in this pass — it is stated from the
+> product's documented architecture (a Kerberos KDC plus LDAP directory with integrated DNS,
+> CA and policy), and it was corrected here because the previous text placed it among OIDC/SAML
+> IdP servers, which its own documentation does not claim.

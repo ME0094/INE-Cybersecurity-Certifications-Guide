@@ -24,7 +24,7 @@ Time-box yourself: if a stage has no progress after a while, re-read the brief a
 
 Save every meaningful step as request/response pairs (Burp *Save item*, or `curl` commands in your notes). A useful per-finding note:
 
-```markdown
+````markdown
 # Finding: <title> — <severity>
 
 - Target URL: <url>
@@ -53,7 +53,7 @@ Save every meaningful step as request/response pairs (Burp *Save item*, or `curl
 
 - [ ] verified
 - [ ] written up
-```
+````
 
 The discipline is: **every claim in the write-up must map to a saved request/response pair**. If you cannot reproduce the step from your notes, your notes are wrong.
 
@@ -140,6 +140,16 @@ Each drill names an objective, the techniques it exercises, and the evidence tha
 - [ ] I completed Drill 1–3 on authorized labs and recorded root-cause notes, not just payloads.
 - [ ] I completed Drill 4–6 and can explain the detection signal before the impact for each.
 - [ ] My chain ledger format (table + evidence ids) is ready to reuse in a report's attack narrative.
+
+> **Verification:** the fence levels were checked on 2026-09-19 with a Python
+> 3.12 script implementing the CommonMark fenced-code-block rules. Before the
+> fix the outer fence closed at line 45, so `## Impact chain` (line 48) and
+> `## Suggested fix` (line 51) rendered as real H2 sections, and the fence
+> reopened at line 56 stayed open to the end of the file, swallowing the rest of
+> the document as code. With the template fence raised to four backticks the
+> block spans lines 27-56 and no section heading leaks out. The repo's own
+> `check-links.mjs` and `check-catalog.mjs` were re-run after the change and
+> still pass.
 
 ## Further Resources
 

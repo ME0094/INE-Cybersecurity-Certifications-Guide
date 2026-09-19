@@ -18,7 +18,7 @@ That inversion has three consequences for method:
 
 ## 1. Mobile forensics — what you can get, and what it costs
 
-NIST SP 800-101 (*Guidelines on Mobile Phone Forensics*) is the reference framing for this section; the extraction taxonomy below follows the way that guidance and vendor practice classify acquisition levels. Check the current revision for exact terminology, because it has evolved with the platforms.
+NIST SP 800-101 (*Guidelines on Mobile Device Forensics*) is the reference framing for this section; the extraction taxonomy below follows the way that guidance and vendor practice classify acquisition levels. Check the current revision for exact terminology, because it has evolved with the platforms.
 
 ### 1.1 The acquisition levels
 
@@ -253,10 +253,15 @@ The characteristic failure of container forensics is not technical difficulty �
 
 ## Further Resources
 
-- **NIST SP 800-101 Rev. 1**, *Guidelines on Mobile Phone Forensics* — https://csrc.nist.gov/publications/detail/sp/800-101/rev-1/final
+- **NIST SP 800-101 Rev. 1**, *Guidelines on Mobile Device Forensics* — https://csrc.nist.gov/publications/detail/sp/800-101/rev-1/final
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - **NIST SP 800-145**, *The NIST Definition of Cloud Computing* (the vocabulary of service and deployment models) — https://csrc.nist.gov/publications/detail/sp/800-145/final
 - **ISO/IEC 27037**, *Guidelines for identification, collection, acquisition and preservation of digital evidence* — https://www.iso.org/standard/44381.html
 - **ISO/IEC 27050** (electronic discovery, relevant to obtaining data held by third parties) — https://www.iso.org/standard/44459.html
 - **NIST Computer Security Resource Center publications list** (for the current cloud and mobile guidance, which is updated more often than any citation) — https://csrc.nist.gov/publications
 - **DFRWS challenge archives** (authorized practice datasets, including mobile images) — https://dfrws.org/
+
+> **Verification:** checked against source, not executed — **no command in this file was run**. The
+> publication title was corrected on **2026-09-19** against the NIST CSRC record, which names
+> SP 800-101 Rev. 1 *Guidelines on Mobile Device Forensics* (not "Mobile Phone Forensics"):
+> https://csrc.nist.gov/pubs/sp/800/101/r1/final.

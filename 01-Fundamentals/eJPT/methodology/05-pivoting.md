@@ -89,9 +89,14 @@ ssh -N -D 1080 user@10.10.10.5
 
 # Use it with SOCKS-aware tools:
 curl --socks5 127.0.0.1:1080 http://10.10.20.10/
-nmap -sT -Pn --proxies http://127.0.0.1:1080 10.10.20.10   # nmap's native SOCKS
-proxychains nmap -sT -Pn 10.10.20.10                      # or proxychains below
+proxychains nmap -sT -Pn 10.10.20.10                      # SSH -D speaks SOCKS5
 ```
+
+`ssh -D` gives you a **SOCKS5** proxy, and `nmap --proxies` only accepts HTTP or
+SOCKS4 proxies — the scheme in the URL selects which (`--proxies
+socks4://127.0.0.1:1080`), and there is no `socks5://` scheme. So through an
+`ssh -D` tunnel, route nmap with `proxychains` as above; use `--proxies` only
+when you actually have a SOCKS4 or HTTP proxy.
 
 ## Using the compromised host as a jump box
 
@@ -234,6 +239,8 @@ msf6 auxiliary(...) > run -j
 - [ ] In Metasploit I can add a route with `route add`/`autoroute`, scan the
       internal subnet, and use `portfwd add` for a single service.
 - [ ] I clean up SSH tunnels, proxies, and routes when the objective is done.
+
+> **Verification:** commands checked against `nmap --help` (Nmap 7.94SVN) on 2026-09-19: `--proxies <url1,[url2],...>: Relay connections through HTTP/SOCKS4 proxies` — HTTP and SOCKS4 only, no SOCKS5, so an `ssh -D` tunnel has to go through `proxychains`. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

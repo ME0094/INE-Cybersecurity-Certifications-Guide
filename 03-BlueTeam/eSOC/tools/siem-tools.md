@@ -48,8 +48,8 @@ Then send Windows logs with Winlogbeat configured on your Windows VM (point it a
 # Every process-creation event from PowerShell
 event.category : "process" and process.name : "powershell.exe"
 
-# Failed logons (Event 4625) from an odd source IP, last 24h
-event.code : "4625" and source.ip : "10.0.0.0/8"
+# Failed logons (Event 4625) from one source IP, last 24h
+event.code : "4625" and source.ip : "203.0.113.77"
 
 # Any process whose command line mentions EncodedCommand (case-insensitive by default)
 process.command_line : *EncodedCommand*
@@ -58,9 +58,11 @@ process.command_line : *EncodedCommand*
 host.name : "win-lab-01"
 
 # Note there is no relative-time literal in KQL: the window comes from the time
-# picker, not from the query text. If you want the range inside the query, switch
-# Kibana to Lucene syntax, where ranges use brackets:
+# picker, not from the query text. KQL also has no CIDR notation, so a subnet
+# filter is not something it can express: switch Kibana to Lucene syntax (or use
+# ES|QL) and write the range explicitly:
 #   host.name:"win-lab-01" AND @timestamp:[now-1h TO now]
+#   source.ip:[10.0.0.0 TO 10.255.255.255]
 ```
 
 Elasticsearch Query DSL (Kibana → Dev Tools) when you need precision:
@@ -97,7 +99,7 @@ bash wazuh-install.sh --generate-config-files
 wazuh-agent-4.7.5-1.exe /q
 ```
 
-Query example in the Wazuh dashboard (OpenSearch/PPL syntax is close to KQL):
+Query example in the Wazuh dashboard. Its search bar speaks **DQL** (OpenSearch Dashboards Query Language), which is close to KQL — do not confuse it with **PPL** (Piped Processing Language), the separate pipe-based language reached through the `_plugins/_ppl` endpoint and used from the API, not from the dashboard search bar:
 
 ```text
 data.win.system.eventID : 4625 and data.win.system.channel : Security

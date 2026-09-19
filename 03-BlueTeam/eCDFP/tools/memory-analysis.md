@@ -97,7 +97,7 @@ volatility -f mem.raw --profile=Win7SP1x64 pslist
 
 ### Symbols (Volatility 3)
 
-Volatility 3 figures out the OS automatically and **downloads the right PDB symbol tables** from the official symbol server into a local cache. Offline labs need `--symbol-dir` pointing at pre-fetched tables.
+Volatility 3 figures out the OS automatically and **downloads the right PDB symbol tables** from the official symbol server into a local cache. Offline labs need `-s` / `--symbol-dirs` pointing at pre-fetched tables.
 
 ```bash
 # Auto-detection + symbol download on first run
@@ -240,19 +240,21 @@ python3 vol.py -f mem.raw windows.hashdump
 
 Related credential plugins extract cached domain credentials, LSA secrets, and other material. Which ones exist and what they require varies by build and by OS version — list the plugins your build ships and read `--help` for each, rather than relying on a remembered name.
 
-### dumpfiles and memdump — extraction
+### dumpfiles and memmap — extraction
 
-- `windows.memdump` writes the **full address space of one process** to disk for `strings`/AV scanning.
+- `windows.memmap` writes the **full address space of one process** to disk for `strings`/AV scanning. `memdump` was the Volatility 2 plugin name; Volatility 3 has no `windows.memdump`, and the plugin list your build prints is the authority.
 - `windows.dumpfiles` extracts **individual files** (e.g., the malware binary) from File objects in memory.
 
 ```bash
-# Dump one process's whole memory
-python3 vol.py -f mem.raw windows.memdump --pid 2468 --dump /evidence/dumps
-# What to look for: a written file per process, named with the PID. Confirm the size is
+# Dump one process's whole memory. --dump is a flag with no argument: the output DIRECTORY
+# comes from the global -o, which must appear before the plugin name.
+python3 vol.py -f mem.raw -o /evidence/dumps windows.memmap --pid 2468 --dump
+# What to look for: one written file, named pid.<PID>.dmp. Confirm the size is
 # plausible for the process before treating it as complete.
 
-# List then extract files owned by the process
-python3 vol.py -f mem.raw windows.dumpfiles --pid 2468 --dump
+# List then extract files owned by the process. `windows.dumpfiles` has no --dump:
+# it extracts what --pid, --virtaddr or --filter select, and the output directory is -o.
+python3 vol.py -f mem.raw -o /evidence/dumps windows.dumpfiles --pid 2468
 # What to look for: extracted files whose type (checked with `file`) matches the
 # extension they claim, and which are large enough to be a real binary.
 ```
@@ -260,22 +262,26 @@ python3 vol.py -f mem.raw windows.dumpfiles --pid 2468 --dump
 Then examine what you dumped:
 
 ```bash
-strings -el /evidence/dumps/2468.dmp | head -50
+strings -el /evidence/dumps/pid.2468.dmp | head -50
 # What to look for: UTF-16LE strings typical of Windows binaries — URLs, mutexes,
 # file paths, error messages. '-el' decodes 16-bit little-endian; try plain ASCII too.
 
-sha256sum /evidence/dumps/2468.dmp
+sha256sum /evidence/dumps/pid.2468.dmp
 # Record the hash: a dumped region is an exhibit, and it must be reproducible.
 ```
 
 ### YARA against memory
 
 ```bash
-python3 vol.py -f mem.raw windows.yarascan --yara-file /evidence/rules/lab.yar
-python3 vol.py -f mem.raw windows.vadyarascan --yara-file /evidence/rules/lab.yar
+python3 vol.py -f mem.raw yarascan --yara-file /evidence/rules/lab.yar
+python3 vol.py -f mem.raw windows.vadyarascan --yara-file /evidence/rules/lab.yar --pid 2468
 # What to look for: matches attributed to a specific process and address, which is far
-# more useful than a flat scan of the image. Confirm the plugin names and options with
-# --help on your build.
+# more useful than a flat scan of the image. Note the two names: `yarascan` is a
+# root-level plugin (a flat scan of the image), and `windows.vadyarascan` is the
+# Windows-module plugin that walks virtual address descriptors and accepts `--pid`.
+# There is no `windows.yarascan` in Volatility 3. Both require yara-x or yara-python
+# (>=3.8) to be importable, or the whole family is absent from your plugin list.
+# Confirm the plugin names and options with --help on your build.
 ```
 
 ### Registries and system state from memory
@@ -305,7 +311,7 @@ Reusable recipe for "something looks off on this box":
 3. **Read the command lines:** `windows.cmdline` — attackers leave flags/paths behind.
 4. **Check the network:** `windows.netscan` — is the PID talking to an unusual remote host?
 5. **Look for injection:** `windows.malfind --pid <PID>`, then `windows.vadinfo --pid <PID>` to see whether the region is file-backed.
-6. **Preserve and extract:** `windows.memdump --pid <PID> --dump <dir>` and `windows.dumpfiles --pid <PID> --dump`.
+6. **Preserve and extract:** `windows.memmap --pid <PID> --dump` (directory via `-o`, set before the plugin name) and `windows.dumpfiles --pid <PID>` (`dumpfiles` takes no `--dump`; it writes the files its selector matches).
 7. **Analyze offline:** `strings`, hashing the dumped PE (`sha256sum`), then YARA or a sandbox in your own lab.
 8. **Corroborate on disk:** was the binary's image on disk ever written? Does the injecting process exist on disk at all? Is there a process-creation event, a Prefetch entry, an Amcache record? Memory evidence plus one independent artefact is a finding; memory alone is a strong lead.
 
@@ -315,9 +321,9 @@ python3 vol.py -f /evidence/mem.raw windows.cmdline
 python3 vol.py -f /evidence/mem.raw windows.netscan
 python3 vol.py -f /evidence/mem.raw windows.malfind --pid 2468
 python3 vol.py -f /evidence/mem.raw windows.vadinfo --pid 2468
-python3 vol.py -f /evidence/mem.raw windows.memdump --pid 2468 --dump /evidence/dumps/
-python3 vol.py -f /evidence/mem.raw windows.dumpfiles --pid 2468 --dump
-sha256sum /evidence/dumps/2468.dmp
+python3 vol.py -f /evidence/mem.raw -o /evidence/dumps/ windows.memmap --pid 2468 --dump
+python3 vol.py -f /evidence/mem.raw -o /evidence/dumps/ windows.dumpfiles --pid 2468
+sha256sum /evidence/dumps/pid.2468.dmp
 ```
 
 ## When a plugin fails: a diagnosis table
@@ -344,12 +350,12 @@ sha256sum /evidence/dumps/2468.dmp
 
 - **Forgetting `--profile` in Volatility 2** — every command needs it; define `PROFILE=...` in your shell to reduce typos.
 - **Trusting `pslist` alone** — hidden processes need `psscan`; run both and diff the PIDs, then check whether the difference is an unlinked process or an exited one.
-- **Skipping `windows.info` in Volatility 3** — if symbols fail to download, plugins error out; verify with `windows.info` first, and use `--symbol-dir` when offline.
+- **Skipping `windows.info` in Volatility 3** — if symbols fail to download, plugins error out; verify with `windows.info` first, and use `--symbol-dirs` (or `-s`) when offline.
 - **Reading a failed plugin as a negative result** — a symbol or requirement error means you have no result, not a clean one.
 - **Assuming a plugin name from memory** — list your build's plugins and read `--help`; registry, scheduled-task and memory-scanning plugin paths have changed across releases.
 - **Treating `malfind` output as a verdict** — it flags executable private regions. Check whether the region is file-backed, and look at the process's whole behaviour.
 - **Analyzing on the same machine you acquired from** — never; that machine is contaminated evidence.
-- **Dumping gigabytes with no plan** — `memdump` on a big process is slow and huge; confirm the PID and target with the lighter plugins first.
+- **Dumping gigabytes with no plan** — `memmap` on a big process is slow and huge; confirm the PID and target with the lighter plugins first.
 - **Reading only one artifact** — a process name tells you little; combine `pstree` + `cmdline` + `netscan` + `malfind` before concluding anything.
 - **Forgetting anti-forensics** — memory can be tampered with by rootkits; correlate memory findings with disk artifacts and logs.
 - **Pasting credential output into a report** — it is sensitive evidence; reference it, minimize it, store it protected.
@@ -369,7 +375,7 @@ sha256sum /evidence/dumps/2468.dmp
 - [ ] I diffed `pslist` against `psscan` and can explain both a hidden process and an exited one.
 - [ ] I used `netscan` to correlate a network connection with a PID.
 - [ ] I ran `malfind` on a suspicious PID, then used `vadinfo` to check whether the region is file-backed.
-- [ ] I dumped a process (`memdump`) and a file (`dumpfiles`), inspected the result with `strings`, and hashed it.
+- [ ] I dumped a process (`memmap`) and a file (`dumpfiles`), inspected the result with `strings`, and hashed it.
 - [ ] I can name one limitation of `pslist` and the plugin that covers it.
 - [ ] I can state three reasons a memory finding should be corroborated with disk evidence.
 - [ ] I can explain why a memory snapshot makes presence strong evidence and absence weak evidence.
@@ -382,3 +388,23 @@ sha256sum /evidence/dumps/2468.dmp
 - RFC 3227 — *Guidelines for Evidence Collection and Archiving* (why memory is captured before disk) — rfc-editor.org/rfc/rfc3227.
 - Public, authorized practice dumps: the Volatility project samples and DFRWS challenge datasets — dfrws.org.
 - `vol --help` and each plugin's `--help` on your own installation: the authoritative list for the version you have.
+
+> **Verification:** executed against **Volatility 3 Framework 2.28.2** (Ubuntu 24.04 WSL) and
+> **yara-python 4.5.4**, on **2026-09-19**. `vol windows.memmap --help` prints
+> `usage: vol windows.memmap.Memmap [-h] [--pid PID] [--dump]`, with `--dump` documented as
+> "Extract listed memory segments" and taking no argument — `vol -f x -o /tmp windows.memmap --pid 1
+> --dump /evidence/dumps` fails with `vol: error: unrecognized arguments: /evidence/dumps`. The
+> output directory is the global `-o`, which must precede the plugin name (`vol -f x
+> windows.memmap --pid 1 --dump -o /tmp` → `unrecognized arguments: -o /tmp`; `vol -f x -o /tmp
+> windows.memmap --pid 1 --dump` is accepted and fails only on the missing image), and the dump is
+> written as `pid.<PID>.dmp` (`framework/plugins/windows/memmap.py`:
+> `self.open(f"pid.{pid}.dmp")`). `vol --help` prints `-s SYMBOL_DIRS, --symbol-dirs SYMBOL_DIRS`.
+> `ls volatility3/framework/plugins/windows/` lists `memmap.py` and `vadyarascan.py` and no
+> `memdump.py`. Running `vol yarascan --help` makes the chooser answer `yarascan matches multiple
+> plugins (linux.vmayarascan.VmaYaraScan, windows.vadyarascan.VadYaraScan, yarascan.YaraScan)` —
+> the full names, and no `windows.yarascan` anywhere in the plugin list. `vol yarascan.YaraScan
+> --help` shows `--yara-file` but no `--pid` (a flat scan), while `vol windows.vadyarascan --help`
+> shows `--yara-file` **and** `--pid [PID ...]`, which is the process attribution the section
+> promises. One note on the console name the examples use: on this install the entry point is **`vol`**
+> only (`command -v vol` → `/usr/local/bin/vol`) and there is **no `vol.py`** — exactly the variation
+> section 1 tells you to resolve by asking your own install rather than a tutorial.

@@ -70,15 +70,20 @@ know now?** Work from a fixed checklist so tired analysts skip nothing.
    monitoring. Record the decision and the reason.
 ```
 
-Never let an alert sit without a disposition. A useful severity model:
+Never let an alert sit without a disposition. Triaging an alert means assigning one level on the
+single scale defined in `01-preparation.md` (Severity Levels):
 
 ```text
 Severity = f(impact, scope, confidence)
-- SEV-3: suspected, limited to one low-value host, low confidence
-- SEV-2: confirmed on one or several real hosts; possible data impact
-- SEV-1: confirmed broad scope / critical systems / data exfiltration —
-         activate full IR immediately
+- SEV-3 / MEDIUM:   suspected, limited to one low-value host, low confidence
+- SEV-2 / HIGH:     confirmed on one or several real hosts; possible data impact
+- SEV-1 / CRITICAL: confirmed broad scope / critical systems / data exfiltration —
+                    activate full IR immediately
 ```
+
+An alert you dismiss because it proved benign is a **false positive**, not a severity: it leaves
+the scale rather than landing on SEV-3. Quote the numeric label and the word label together when
+you escalate, so the two cannot drift apart between the ticket and the bridge.
 
 ## Log and Telemetry Review
 
@@ -106,12 +111,18 @@ Get-WinEvent -FilterHashtable @{LogName='Security'; Id=1102} |
   Select TimeCreated, Message | Format-List
 ```
 
-On Linux hosts:
+On Linux hosts — **name the distribution**, because both the log path and the `ssh` unit name
+differ between families:
 
 ```bash
-# Authentication successes and failures
-journalctl -u ssh --since "7 days ago" | grep -E "Failed|Accepted password"
+# Journal (any systemd distribution). Debian/Ubuntu name the unit `ssh`; RHEL/Fedora `sshd`.
+# Confirm which your host has before trusting either line: systemctl list-unit-files 'ssh*'
+journalctl -u ssh  --since "7 days ago" | grep -E "Failed|Accepted password"
+journalctl -u sshd --since "7 days ago" | grep -E "Failed|Accepted password"
+
+# Auth log: Debian/Ubuntu use /var/log/auth.log, RHEL/Fedora/Rocky/Alma/SUSE /var/log/secure
 grep -E "Failed password|Accepted" /var/log/auth.log | tail -100
+sudo grep -E "Failed password|Accepted" /var/log/secure | tail -100
 
 # Recently modified files in world-writable staging areas
 find /tmp /var/tmp /dev/shm -type f -newermt "7 days ago" -ls 2>/dev/null
@@ -236,10 +247,22 @@ a new host, account, or data store enters the picture.
       and can name safer alternatives.
 - [ ] I can define dwell time and explain why it matters for scoping.
 
+> **Verification:** the Linux log-path split was executed on 2026-09-19 against Ubuntu 24.04.4
+> LTS in WSL — `/var/log/auth.log` exists (`syslog:adm`, non-empty) and `/var/log/secure` does
+> not, and `/usr/bin/journalctl` is present. The `ssh` versus `sshd` unit name was **checked
+> against the distribution's packaging convention and not observed**: this environment has no
+> `openssh-server` installed, so no `ssh.service` unit exists to query — hence the
+> `systemctl list-unit-files 'ssh*'` check in the block above. The Windows `Get-WinEvent`
+> examples are **unverified syntax references — not run** (no Windows host available), and the
+> NIST SP 800-61 Rev. 3 link was checked with `curl` on 2026-09-19 (HTTP 200).
+
 ## Further Resources
 
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for
+  Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) —
+  https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - NIST SP 800-83 Rev. 1, *Guide to Malware Incident Prevention and Handling* —
   https://csrc.nist.gov/publications/detail/sp/800-83/rev-1/final
 - MITRE ATT&CK — https://attack.mitre.org (technique-oriented detection and

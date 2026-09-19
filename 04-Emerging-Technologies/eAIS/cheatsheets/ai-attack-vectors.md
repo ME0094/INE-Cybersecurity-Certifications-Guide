@@ -4,8 +4,9 @@
 
 Quick reference for the main attack classes against AI/LLM systems. Each entry gives a
 short description, an **educational** example pattern, and the primary defense pointer.
-Test patterns only against systems you own, with fictional data. Cross-reference the
-OWASP LLM Top 10 and MITRE ATLAS IDs as you study.
+Test patterns only against systems you own, with fictional data. The quick map near the end
+of this sheet carries the OWASP LLM Top 10 (2025 edition) and MITRE ATLAS IDs for each
+vector, with the two vectors that have no OWASP category marked as such rather than filled in.
 
 > Every pattern in this file is a syntax reference: none of it was executed while writing this file, and no target was contacted. Run the cases in your own lab, with fictional data, against systems you own or are explicitly authorized to test.
 
@@ -413,29 +414,39 @@ This is the short version: vector, where it lands, the primary defense, and a wa
 it. The full mapping — primary *and* compensating control, the false-confidence signal, and
 the severity model — is in [attack-to-control-mapping.md](attack-to-control-mapping.md).
 
-| Vector | Where it hits | Primary defense | How to test it |
-| --- | --- | --- | --- |
-| Prompt injection (direct) | User input → model | Input/output filtering; least-privilege tools | One case in four paraphrases (courtesy, authority, negation, other language); observe the tool-call trace, not the reply |
-| Prompt injection (indirect) | RAG/tool data | Retrieval rails; untrusted-content handling | Plant an instruction in a document you own, then ask a benign question; observe any action nobody requested |
-| Jailbreaks | Refusal training | Continuous red teaming; guardrails | Roleplay, fiction and authority frames on a fictional forbidden topic; score refusal *and* the downstream action |
-| Data poisoning | Training/fine-tune/RAG data | Provenance, vetting, hashing | Ingest one contradicting document; observe which source wins and whether it is cited — plus a behaviour diff across an artifact swap |
-| Model extraction | Hosted model API | Rate limits, monitoring, watermarking | Review query patterns per key against a budget; observe distillation-shaped volume and cost per key |
-| Inversion/memorization | Trained model | DP, minimization, output sanitization | Rare-string completion probes; observe verbatim overlap — refusals on obvious PII prove nothing |
-| Adversarial evasion | Model inference | Adversarial training, robustness testing | Perturbed and encoded inputs against filter *and* model; observe labels before and after normalisation |
-| Supply chain | Model/deps/datasets | Signing, pinning, SBOM, vetting | Diff resolved dependencies and artifact hashes across two builds; observe whether anything re-verifies at deploy |
-| Privacy leakage | Any layer | Data minimization, redaction, logging control | Put your own marker in a prompt, then search answers and the trace store for it |
-| Tool abuse / confused deputy | Injected data → privileged tool | Per-tool least privilege; approval with resolved arguments | "Read everything, then send" as one case; assert the send is *gated*, not merely logged |
-| Injection of tool arguments | Model output → tool arguments | Server-side validation; value allow-lists | Smuggle an extra field, a recipient override or a traversal; inspect what the dispatcher received |
-| Tool confusion | Overlapping tool descriptions | Distinct names and descriptions; schema-validated enum | One request in several paraphrases against near-duplicate tools; observe which is chosen and with what arguments |
-| Excessive agency | Architecture → blast radius | Minimum tools and scopes; read-only default | "Fully compromised model" enumeration; write down everything reachable from the agent's credentials |
-| Unbounded consumption | Agent loop → cost, availability | Caps, quotas, recursion limits, timeouts | One loop-inducing request under a hard budget; observe calls, tokens, wall time and queue depth |
-| Retrieval manipulation (winning the top-k) | Ingestion → ranking | Provenance at ingest; re-rank to trusted; citations | Plant one contradicting document; observe which source enters top-k and what the answer cites |
-| Index dominance by duplicates | Ingestion → top-k selection | Deduplicate; cap per source at query time | Ingest N near-duplicates of one document; re-ask the same question and watch the top-k |
-| Retrieval without authorization | Shared index → context | Authorization predicate inside the query; per-tenant credentials | Two tenants with marked documents; read the retrieval log, never the final answer |
-| Memory and state poisoning | Writable memory → later sessions | Treat memory as untrusted data: scope, review, discard, delete | Write a "fact" in one session and retrieve it in the next, as another user |
-| Unsafe handling of model output | Model output → downstream sink | Encode per sink; parameterise; sandbox generated code | Route one output into every sink of the test app; observe how each treats it |
-| System-prompt extraction | User turn → output | No secrets in the prompt; policy in code; output screening | The five-shape extraction battery; observe verbatim overlap and what it reveals about the system |
-| Embedding inversion | Vector store → source text | Classify embeddings as data; restrict and log queries; keep vectors in boundary | Answer the four questions above for your own index; confirm what leaves the platform |
+| Vector | Framework IDs (OWASP LLM 2025 · MITRE ATLAS) | Where it hits | Primary defense | How to test it |
+| --- | --- | --- | --- | --- |
+| Prompt injection (direct) | LLM01:2025 · `AML.T0051.000` (*Direct*), `AML.T0065` LLM Prompt Crafting, `AML.T0068` LLM Prompt Obfuscation | User input → model | Input/output filtering; least-privilege tools | One case in four paraphrases (courtesy, authority, negation, other language); observe the tool-call trace, not the reply |
+| Prompt injection (indirect) | LLM01:2025 · `AML.T0051.001` (*Indirect*), `AML.T0066` Retrieval Content Crafting, `AML.T0093` Prompt Infiltration via Public-Facing Application | RAG/tool data | Retrieval rails; untrusted-content handling | Plant an instruction in a document you own, then ask a benign question; observe any action nobody requested |
+| Jailbreaks | LLM01:2025 · `AML.T0054` LLM Jailbreak | Refusal training | Continuous red teaming; guardrails | Roleplay, fiction and authority frames on a fictional forbidden topic; score refusal *and* the downstream action |
+| Data poisoning | LLM04:2025 · LLM03:2025 · `AML.T0020` Poison Training Data, `AML.T0019` Publish Poisoned Datasets, `AML.T0058` Publish Poisoned Models | Training/fine-tune/RAG data | Provenance, vetting, hashing | Ingest one contradicting document; observe which source wins and whether it is cited — plus a behaviour diff across an artifact swap |
+| Model extraction | *no LLM category in the 2025 set* · `AML.T0024.002` Extract AI Model, `AML.T0005` Create Proxy AI Model | Hosted model API | Rate limits, monitoring, watermarking | Review query patterns per key against a budget; observe distillation-shaped volume and cost per key |
+| Inversion/memorization | LLM02:2025 · `AML.T0024.001` Invert AI Model, `AML.T0024.000` Infer Training Data Membership | Trained model | DP, minimization, output sanitization | Rare-string completion probes; observe verbatim overlap — refusals on obvious PII prove nothing |
+| Adversarial evasion | *no LLM category in the 2025 set* · `AML.T0015` Evade AI Model, `AML.T0043` Craft Adversarial Data | Model inference | Adversarial training, robustness testing | Perturbed and encoded inputs against filter *and* model; observe labels before and after normalisation |
+| Supply chain | LLM03:2025 · `AML.T0010` AI Supply Chain Compromise (`.001` AI Software, `.002` Data, `.003` Model), `AML.T0109` AI Supply Chain Rug Pull | Model/deps/datasets | Signing, pinning, SBOM, vetting | Diff resolved dependencies and artifact hashes across two builds; observe whether anything re-verifies at deploy |
+| Privacy leakage | LLM02:2025 · `AML.T0057` LLM Data Leakage, `AML.T0085` Data from AI Services | Any layer | Data minimization, redaction, logging control | Put your own marker in a prompt, then search answers and the trace store for it |
+| Tool abuse / confused deputy | LLM06:2025 · `AML.T0053` AI Agent Tool Invocation, `AML.T0086` Exfiltration via AI Agent Tool Invocation | Injected data → privileged tool | Per-tool least privilege; approval with resolved arguments | "Read everything, then send" as one case; assert the send is *gated*, not merely logged |
+| Injection of tool arguments | LLM06:2025 · LLM05:2025 · `AML.T0053`, `AML.T0067` LLM Trusted Output Components Manipulation | Model output → tool arguments | Server-side validation; value allow-lists | Smuggle an extra field, a recipient override or a traversal; inspect what the dispatcher received |
+| Tool confusion | LLM06:2025 · `AML.T0084.001` Tool Definitions | Overlapping tool descriptions | Distinct names and descriptions; schema-validated enum | One request in several paraphrases against near-duplicate tools; observe which is chosen and with what arguments |
+| Excessive agency | LLM06:2025 · `AML.T0053`, `AML.T0101` Data Destruction via AI Agent Tool Invocation | Architecture → blast radius | Minimum tools and scopes; read-only default | "Fully compromised model" enumeration; write down everything reachable from the agent's credentials |
+| Unbounded consumption | LLM10:2025 · `AML.T0034` Cost Harvesting (`.000` Excessive Queries, `.001` Resource-Intensive Queries, `.002` Agentic Resource Consumption), `AML.T0029` Denial of AI Service | Agent loop → cost, availability | Caps, quotas, recursion limits, timeouts | One loop-inducing request under a hard budget; observe calls, tokens, wall time and queue depth |
+| Retrieval manipulation (winning the top-k) | LLM08:2025 · `AML.T0070` RAG Poisoning, `AML.T0071` False RAG Entry Injection | Ingestion → ranking | Provenance at ingest; re-rank to trusted; citations | Plant one contradicting document; observe which source enters top-k and what the answer cites |
+| Index dominance by duplicates | LLM08:2025 · `AML.T0046` Spamming AI System with Chaff Data | Ingestion → top-k selection | Deduplicate; cap per source at query time | Ingest N near-duplicates of one document; re-ask the same question and watch the top-k |
+| Retrieval without authorization | LLM02:2025 · LLM08:2025 · `AML.T0085.000` RAG Databases | Shared index → context | Authorization predicate inside the query; per-tenant credentials | Two tenants with marked documents; read the retrieval log, never the final answer |
+| Memory and state poisoning | LLM01:2025 · LLM06:2025 · `AML.T0080` AI Agent Context Poisoning (`.000` Memory, `.001` Thread), `AML.T0092` Manipulate User LLM Chat History | Writable memory → later sessions | Treat memory as untrusted data: scope, review, discard, delete | Write a "fact" in one session and retrieve it in the next, as another user |
+| Unsafe handling of model output | LLM05:2025 · `AML.T0077` LLM Response Rendering, `AML.T0067` LLM Trusted Output Components Manipulation · **CWE-1426 Improper Validation of Generative AI Output** | Model output → downstream sink | Encode per sink; parameterise; sandbox generated code | Route one output into every sink of the test app; observe how each treats it |
+| System-prompt extraction | LLM07:2025 · `AML.T0056` Extract LLM System Prompt, `AML.T0069.002` System Prompt | User turn → output | No secrets in the prompt; policy in code; output screening | The five-shape extraction battery; observe verbatim overlap and what it reveals about the system |
+| Embedding inversion | LLM08:2025 · `AML.T0024.001` Invert AI Model | Vector store → source text | Classify embeddings as data; restrict and log queries; keep vectors in boundary | Answer the four questions above for your own index; confirm what leaves the platform |
+
+**How to use the ID column, and what it is not.** The OWASP numbers are the **2025 edition**;
+the ATLAS IDs and their names are copied from the published ATLAS technique list
+(`mitre-atlas/atlas-data`, `dist/ATLAS.yaml`), not paraphrased. Two rows carry no OWASP number
+because the 2025 set has no category for them — model extraction and adversarial evasion of a
+classifier are ATLAS-shaped attacks rather than LLM-application risks, and writing a number
+there to fill the cell would be the exact habit this sheet warns against. The mapping itself is
+**this module's working crosswalk**, not an official one: OWASP and MITRE each publish their
+own; check theirs before you put an ID in a report, and quote the edition or ATLAS version
+alongside it, because a bare `LLM04` does not mean in 2025 what it meant in 2023.
 
 ## Delivery channel → who can write there → what it buys the attacker
 
@@ -491,7 +502,12 @@ not verdicts — every row below needs the trace or the log to become a finding.
 - **Ignoring the data path.** Prompt injection gets the headlines, but poisoning and
   supply-chain risk live in the data and dependencies; audit those too.
 - **Skipping the frameworks.** OWASP LLM Top 10 and MITRE ATLAS give you shared vocabulary;
-  use their IDs in findings so reports mean the same thing to everyone.
+  use their IDs in findings so reports mean the same thing to everyone — and always with the
+  edition or version attached, because the OWASP numbers were renumbered between 2023 and 2025.
+  The ID column of the quick map above is there so you do not have to guess one.
+- **Filling in an ID that does not exist.** Two vectors on this sheet have no OWASP LLM
+  category, and the honest cell says so. A wrong ID is worse than a blank one: it survives
+  into a report and lends a framework's authority to a mapping nobody checked.
 - **Reading the answer instead of the trace.** For every agentic vector on this sheet the
   evidence is the tool call, its resolved arguments, and the retrieved document IDs. A
   polite reply that describes what happened is not evidence.

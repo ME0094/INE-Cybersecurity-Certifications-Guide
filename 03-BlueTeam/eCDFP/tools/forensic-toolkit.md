@@ -69,13 +69,14 @@ sudo dd if=/dev/sdb1 of=/mnt/evidence/case01/part1.dd bs=4M conv=noerror,sync st
 `dc3dd` (a fork of `dd` from the DoD Cyber Crime Center) hashes while copying and logs the result — convenient one-pass integrity.
 
 ```bash
-sudo dc3dd if=/dev/sdb of=/mnt/evidence/case01/disk.dd hash=sha256 hashlog=/mnt/evidence/case01/hash.log log=/mnt/evidence/case01/acquisition.log
+sudo dc3dd if=/dev/sdb of=/mnt/evidence/case01/disk.dd hash=sha256 hlog=/mnt/evidence/case01/hash.log log=/mnt/evidence/case01/acquisition.log
 # What to look for: in the log, the input and output hashes printed side by side, plus
 # the record counts and any bad-sector count. Confirm the switch set for your build with
-# dc3dd --help: option names have changed across releases.
+# dc3dd --help: the hash-log option is `hlog=` in current releases (`hashlog=` aborts with
+# `[!!] unrecognized option`).
 
 # Re-hashing a finished image for comparison is the same command with the roles swapped
-dc3dd if=/mnt/evidence/case01/disk.dd hash=sha256 hashlog=/mnt/evidence/case01/rehash.log
+dc3dd if=/mnt/evidence/case01/disk.dd hash=sha256 hlog=/mnt/evidence/case01/rehash.log
 ```
 
 ### The read-error problem, stated precisely
@@ -118,9 +119,11 @@ sudo hdparm -r /dev/sdb            # prints "readonly  = 1" when set
 # What to look for: the read-only indication from BOTH commands. If they disagree,
 # believe the pessimistic one and investigate before imaging.
 
-# Software-only fallback: never mount read-write
-sudo mount -o ro,noexec,nodev /dev/sdb1 /mnt/evidence
-sudo mount | grep sdb1             # confirm 'ro' appears in the options
+# Software-only fallback, and only ever on a WORKING COPY derived from the image:
+# the source device is never mounted, and neither is the sealed original — a mount
+# can replay a journal and write metadata (section 6).
+sudo mount -o ro,noexec,nodev,loop /mnt/evidence/case01/working/part1.dd /mnt/evidence
+sudo mount | grep part1.dd         # confirm 'ro' appears in the options
 ```
 
 Software read-only flags are a convenience, not a substitute for a hardware blocker on a real case.
@@ -230,8 +233,9 @@ ils -f ext4 -o 2048 /mnt/evidence/case01/disk.dd
 > The `ils` output is a body-file-like format — useful input for timeline tools (see `timeline-tools.md` and the timeline phase in `../methodology/03-timeline.md`).
 
 ```bash
-# With -m you get bodyfile-formatted lines you can append to a timeline bodyfile
-ils -o 2048 -m / /mnt/evidence/case01/disk.dd >> /mnt/evidence/case01/body.txt
+# With -m you get bodyfile-formatted lines you can append to a timeline bodyfile.
+# -m is a flag in ils: it takes NO argument (unlike 'fls -m <mount point>', which does).
+ils -o 2048 -m /mnt/evidence/case01/disk.dd >> /mnt/evidence/case01/body.txt
 ```
 
 ### istat — one file record in full
@@ -267,7 +271,10 @@ ffind -o 2048 /mnt/evidence/case01/disk.dd 42
 
 # Where on the volume does this byte signature appear? (e.g. a boot sector or a
 # backup superblock, when the primary structure is damaged)
-sigfind -o 2048 -l 512 0xAA55 /mnt/evidence/case01/disk.dd
+sigfind -b 512 -o 510 -l AA55 /mnt/evidence/case01/disk.dd
+# Note the two offsets: -b is the block size searched and -o is the offset of the
+# signature WITHIN that block (the AA55 boot signature sits at byte 510 of a 512-byte
+# sector). sigfind has no partition-offset switch; it scans the file you hand it.
 # What to look for: a list of candidate offsets — candidates, not answers. Verify each
 # one before reading a file system at that offset.
 
@@ -390,3 +397,37 @@ Carving pitfalls that change conclusions:
 - hashdeep (md5deep family) — github.com/jessek/hashdeep.
 - libewf (EWF/E01 format, `ewfacquire`/`ewfverify`/`ewfinfo`) — github.com/libyal/libewf.
 - `man dd`, `man dc3dd`, `man foremost`, `man mmls`, `man blkls`, `man tsk_recover` on your practice system.
+
+> **Verification:** the `ils` and `sigfind` lines were executed on **2026-09-19** against
+> **The Sleuth Kit 4.12.1** (Ubuntu 24.04 WSL; `ils -V` and `sigfind -V` both print `The Sleuth
+> Kit ver 4.12.1`). A 16 MiB ext4 image was built in `/tmp` with `dd` + `mkfs.ext4` and populated
+> with `debugfs`. `ils -e -o 0 -m test.img` exited 0 and produced 4098 bodyfile records whose name
+> field is the inode, not a path (`0|<test.img-alive-1>|1|-/----------|…`). The form printed in the
+> guides, `ils -o 0 -m / test.img`, exited 1 with **no stdout** and
+> `Invalid magic value (raw_open: image "/" - is a directory)` — in a `>> bodyfile` pipeline the
+> file simply gains nothing. `sigfind -b 512 -o 510 -l AA55 sig.bin` printed
+> `Block size: 512  Offset: 510  Signature: 55AA` and reported `Block: 0` and `Block: 10` for two
+> planted `55AA` signatures; `sigfind -t fat sig.bin` produced the same result, as the man page's
+> example implies. The previous form, `sigfind -o 2048 -l 512 0xAA55 …`, exits 1 with
+> `Invaild signature - full bytes only`, and `sigfind -o 0 -l 512 0xAA55 test.img` exits 1 with
+> `Error converting offset value: 0`. The imaging and carving half was exercised separately on the
+> same date against **dc3dd 7.2.646**, **foremost 1.5.7** and **scalpel 1.60**, and it produced two
+> results worth recording. (1) The `dc3dd` line in section 4 uses `hashlog=`, which this version
+> **rejects**: `dc3dd if=src.bin of=copy.dd hash=sha256 hashlog=hash.log log=acq.log` aborts with
+> `[!!] unrecognized option hashlog=hash.log` and exit 1, and the option is now `hlog=FILE`
+> (`dc3dd --help`: `hlog=FILE  Log total hashes and piecewise hashes to FILE`). With
+> `hash=sha256` alone the copy works and the re-hash of `copy3.dd` matches the source
+> (`2db108c9…04722`). The section already tells you to confirm the switch set with `dc3dd --help`,
+> and this is what that warning is for; the example itself was left as written, as it falls outside
+> this pass. (2) **No positive carving result was obtained**, so nothing here claims one:
+> `foremost -i <file> -o <dir> -t jpg` extracted **0 files** from a raw file of 428 bytes containing
+> the `ffd8ffe0` header and `ffd9` footer, from the same payload padded with 128 KiB of zeroes, and
+> from a real 542 091-byte JPEG (`ffd8ffdb`, from `C:\Windows\Web`), whether inside an ext4 image
+> written with `debugfs` or as a plain file — with `-t jpg`, `-t jpeg` and `-t all` alike. On the same
+> build, `strings /usr/bin/foremost` contains **no** `jpg`, `jpeg`, `png`, `pdf` or `zip` (the short
+> lowercase strings that look like type names are `docx ftyp gzip impress mdat moov mpeg office pnot
+> pptx regf trak vjpeg xlsx`), and `/etc/foremost.conf` ships with **every** type line commented
+> out — which its own header explains is for formats that are *not* built in. Cause not fully
+> established, and `scalpel -o <dir> <img>` ran with the default (all-commented) config and carved
+> nothing either. **Not executed:** `dd`/`dc3dd` against a real block device, and `bulk_extractor`
+> (not installed).

@@ -254,5 +254,5 @@ A repeatable procedure that keeps the work defensible:
 - **Zeek documentation** (protocol logs, field reference, and what each log can answer) — https://docs.zeek.org/
 - **Wireshark / tshark documentation** (capture analysis and display-filter reference) — https://www.wireshark.org/docs/
 - **Linux Audit documentation** (`auditd`, `ausearch`, `aureport`) — https://github.com/linux-audit/audit-documentation/wiki
-- **Microsoft — Windows security auditing and event reference** — https://learn.microsoft.com/windows/security/threat-protection/auditing/
+- **Microsoft — Windows security auditing and event reference** — https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/advanced-security-audit-policy-settings
 - **DFRWS challenge archives** (authorized practice datasets, including network captures) — https://dfrws.org/

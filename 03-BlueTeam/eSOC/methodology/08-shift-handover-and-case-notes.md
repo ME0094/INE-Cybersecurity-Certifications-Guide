@@ -28,7 +28,7 @@ Six categories, every time. Anything not in one of them does not need to cross.
 | **Open actions with owners and deadlines** | Action, owner, due time, status | Verbal actions evaporate; unwritten owners do not act |
 | **Known conditions** | Active suppressions, planned change windows, expected noisy jobs, degraded sources | The next shift interprets a planned condition as an event, or an outage as calm |
 | **Collection and tooling health** | Sources down or lagging, agents not reporting, parsers broken, cases of missing data | A broken source looks identical to a quiet environment |
-| **Queue state** | Depth by severity, the oldest open alert and its age, any alert deliberately parked | Prius depth is the only way the next shift judges its own load honestly |
+| **Queue state** | Depth by severity, the oldest open alert and its age, any alert deliberately parked | Queue depth is the only way the next shift judges its own load honestly |
 
 ## 3. The Handover Note
 
@@ -82,7 +82,7 @@ The written note is the record; the conversation is where the reasoning transfer
 1. **Queue state and anything parked** (2 minutes) — depth, oldest alert, deliberate deferrals.
 2. **Open incidents, by severity** (3 minutes) — case ID, state, next action, who owns it now.
 3. **In-flight investigations** (4 minutes) — hypothesis and the one question the next shift must answer. Walk through the timeline, not the conclusion.
-4. **Actions and owners** (2 minutes) — confirm each open action out loud and confirm the owner acknowledges it. An action acknowledged aloud is nine times more likely to be done than one in a list nobody read.
+4. **Actions and owners** (2 minutes) — confirm each open action out loud and confirm the owner acknowledges it. An action acknowledged aloud by a named owner is more likely to be done than one in a list nobody read.
 5. **Known conditions and source health** (2 minutes) — suppressions in force, planned activity, broken sources.
 6. **Questions to the outgoing analyst** (2 minutes) — the incoming analyst's chance to challenge the state. This is where a wrong hypothesis gets caught before it is inherited.
 
@@ -94,7 +94,7 @@ A case note is read by: the next shift, tier 2, IR, possibly management after an
 
 | Rule | Why | Example |
 |---|---|---|
-| **Separate facts from assessment** | The difference between what is known and what is believed must survive the handoff | `FACT: svchost.exe spawned powershell.exe at 02:12:40Z (4688). ASSESSMENT: probable service-based execution, confidence medium - svchost as a shell parent is uncommon here` |
+| **Separate facts from assessment** | The difference between what is known and what is believed must survive the handoff | `FACT: svchost.exe spawned powershell.exe at 02:12:40Z (4688). ASSESSMENT: the parent is unremarkable - Task Scheduler and WMI launch children from svchost.exe - so the finding rests on the child's arguments: an encoded command no scheduled task or agent on this host explains, confidence medium` |
 | **Timestamp in UTC, first, consistently** | Timelines merge across sources; local time does not | `2025-06-01 02:12:40Z`, never "just after 2" |
 | **Reference the evidence, do not paste the world** | A note is an index into the data, not a copy of it | "Event 4688, host WIN-FIN-07 (raw event id `abc123`)" rather than a wall of XML |
 | **Write as you go** | Reasoning reconstructed hours later loses the questions you discarded | Record the query you ran and its result at the moment you run it |
@@ -137,7 +137,8 @@ The most expensive handover failure, and the one with the clearest minimum stand
 In-flight handover, condensed (paper example, no live data):
   SCOPE      WIN-FIN-07, CORP\m.lopez, 198.51.100.9, 203.0.113.77
   HYPOTHESIS The 02:11 UTC logon is a stolen credential: six failures from a public
-             address followed by a success, then encoded PowerShell with a shell parent.
+             address followed by a success, then encoded PowerShell whose parent is
+             svchost.exe - a task/WMI launch, so the anomaly is the arguments, not the parent.
              Falsifiable by: the source being an approved VPN egress (verify with Network team).
   VERIFIED   4625 x6 then 4624 type 3 at 02:12:01Z; 4688 encoded PowerShell 02:12:40Z;
              three TCP sessions to one address at ~60 s intervals from 02:13Z.
@@ -185,7 +186,7 @@ The pattern in every strong version: **what happened, how it is known, who owns 
 ## Further Resources
 
 - NIST SP 800-61r3 — incident response lifecycle, documentation, and communication expectations: https://csrc.nist.gov/pubs/sp/800/61/r3/final
-- NIST SP 800-92 — log management, retention, and the records an analyst relies on: https://csrc.nist.gov/pubs/sp/800/92/upd1/final
+- NIST SP 800-92 — log management, retention, and the records an analyst relies on: https://csrc.nist.gov/pubs/sp/800/92/final
 - MITRE ATT&CK — technique vocabulary for hypotheses that other analysts can interpret: https://attack.mitre.org
 - TheHive Project — case and task management model for documenting investigations: https://thehive-project.org/
 - CISA — incident response resources and coordination guidance: https://www.cisa.gov/resources-tools

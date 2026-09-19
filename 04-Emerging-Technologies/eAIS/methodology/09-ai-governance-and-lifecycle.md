@@ -62,6 +62,53 @@ The same table, seen from the module's side: what each phase of eAIS produces, a
 | [08-evaluation-and-continuous-red-teaming.md](08-evaluation-and-continuous-red-teaming.md) | Versioned corpus, metric convention, cadence, and the sign-off record with its limits | **Measure** — and **Govern**, which consumes the cadence and the ownership |
 | This file | Ownership, gates, change control, decision rights, evidence and retention rules | **Govern** — and it consumes the other three to decide what to require |
 
+## Two other frameworks a governance conversation runs into
+
+The AI RMF is the frame this module uses, but a review will name two others, and knowing what
+each of them actually is prevents the two commonest errors: treating a management-system
+standard as a security control, and treating a regulation's date as a security deadline.
+
+**ISO/IEC 42001:2023 — *Information technology — Artificial intelligence — Management
+system*.** This is a certifiable *management-system* standard, built on the same
+plan-do-check-act shape as ISO/IEC 27001, not a list of controls or a maturity score. What it
+asks an organisation to have is what this phase has already asked for in different words: a
+defined scope, an AI policy, named roles and responsibilities, documented objectives, an
+internal audit, a corrective-action process, and management review with records. If a
+governance programme can produce the inventory and the gate table above with dates and owners,
+most of the 42001 evidence set already exists as a by-product; if it cannot, an ISO 42001
+certificate would certify the paperwork rather than the system. The module links no ISO page
+because ISO's own catalogue sits behind bot protection and the standard is not freely
+downloadable — cite it by number and year, and read the clause text through your own licensed
+copy rather than a summary.
+
+**Regulation (EU) 2024/1689 — the EU AI Act.** A regulation, not a framework: it creates legal
+obligations with dates, and its application is staged rather than simultaneous. Article 113 is
+the article that says when, and it is worth quoting rather than paraphrasing, because a
+governance calendar is built from it: the Regulation **applies from 2 August 2026**, *except*
+that (a) Chapters I and II apply from **2 February 2025** — which includes the Article 5
+prohibited practices and the Article 4 AI-literacy duty; (b) Chapter III Section 4, Chapter V
+(general-purpose AI models), Chapter VII (governance), Chapter XII and Article 78 apply from
+**2 August 2025**; and (c) Article 6(1) and its corresponding obligations — high-risk
+classification for AI that is a safety component of, or is itself, a product covered by the
+Annex I harmonisation legislation — apply from **2 August 2027**. Two security-relevant
+consequences follow directly from the text: for a system that is high-risk, risk management,
+technical documentation, logging and post-market monitoring are *obligations* rather than good
+practice you may defer; and a *serious incident* carries a reporting clock, which is why the
+incident playbook in this phase should name who classifies an event as reportable rather than
+assuming that question can be answered during the incident.
+
+Neither framework makes a system secure, and a mapping table is not a control. Treat both as
+requirements to *satisfy with the evidence this phase already produces*: the inventory row, the
+gate record, the evaluation result, and the incident log are what an auditor or a regulator
+asks to see, and they are the same artefacts that make a finding actionable at 02:00.
+
+> **Not legal advice.** The paragraphs above describe what the documents say and when parts of
+> the regulation apply; they are study notes, not a compliance opinion. Scoping a specific
+> system — whether it is high-risk, who is the provider versus the deployer, what must be
+> documented in which jurisdiction — is a question for your legal function, and the dates have
+> been amended before and may be again. Verify against the official text on EUR-Lex before you
+> put a date in a plan.
+
 ## AI system inventory
 
 The register is **one row per AI system**, not per component and not per data plane: the component inventory for a single application lives in [01-ai-models.md](01-ai-models.md) and the data planes in [07-privacy-and-data-leakage.md](07-privacy-and-data-leakage.md). The register's job is to be the thing you can read at 02:00 without opening a repository.
@@ -303,4 +350,20 @@ This phase supplies the decisions and the records; commands, procedures, and com
 - [MITRE ATLAS](https://atlas.mitre.org/) — adversarial technique landscape for AI systems, for threat-informed gate requirements.
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) — the govern / map / measure / manage structure this phase maps onto.
 - [NIST AI 600-1 — Generative AI Profile](https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1) — the profile that tailors the framework to generative-AI systems.
+- **ISO/IEC 42001:2023**, *Information technology — Artificial intelligence — Management system* — the certifiable management-system standard whose evidence set overlaps this phase's artefacts. Cite it by number and year; the standard is not freely downloadable.
+- [Regulation (EU) 2024/1689 (the EU AI Act), consolidated text on EUR-Lex](https://eur-lex.europa.eu/eli/reg/2024/1689/oj) — Article 113 is the staged-application article quoted above; Article 5 is the prohibitions. Read the regulation, not a summary of it, and take scoping questions to your legal function.
 - [INE Security — eAIS (AI Systems Security Specialist) official certification page](https://ine.com/security/certifications/eais-certification) — the credential this module supports.
+
+> **Verification:** the EU AI Act dates and scope in the section above were read from the
+> official consolidated text on EUR-Lex on **2026-09-19** (`curl -L` of
+> `https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401689` → HTTP 200), where
+> Article 113 states: *"It shall apply from 2 August 2026. However: (a) Chapters I and II shall
+> apply from 2 February 2025; (b) Chapter III Section 4, Chapter V, Chapter VII and Chapter XII
+> and Article 78 shall apply from 2 August 2025, with the exception of Article 101; (c) Article
+> 6(1) and the corresponding obligations in this Regulation shall apply from 2 August 2027."*
+> **CWE-1426 — Improper Validation of Generative AI Output** was confirmed against
+> `https://cwe.mitre.org/data/definitions/1426.html` in the same session (HTTP 200; the page
+> title reads *"CWE-1426: Improper Validation of Generative AI Output (4.20)"*). The ISO/IEC
+> 42001 entry carries **no** link because `iso.org` answers HTTP 403 to automated requests, so
+> it could not be verified here — the number and year are the citation, and that limit is
+> stated rather than papered over.

@@ -139,8 +139,12 @@ Use them only against your own lab targets.
 | `-oN file` | Normal text | Human reading |
 | `-oX file` | XML | Scripting and tools (Metasploit `db_import`) |
 | `-oG file` | Greppable | Quick `grep`/`awk` pipelines |
-| `-oJ file` | JSON | Programmatic parsing |
-| `-oA base` | All of the above | Always prefer this for engagements |
+| `-oS file` | Script kiddie | Novelty (l33t-speak post-processing) |
+| `-oA base` | Normal + greppable + XML | Always prefer this for engagements |
+
+Nmap has **no JSON output**: the accepted formats are `-oN`, `-oX`, `-oS`,
+`-oG` and `-oA`. When a tool wants JSON, consume the XML instead — convert it
+with `xmltodict`, `xsltproc` or an equivalent XML-to-JSON step.
 
 ```bash
 # One run, three files: full.nmap, full.gnmap, full.xml
@@ -223,6 +227,8 @@ against a whole subnet.
 - [ ] I can produce `-oA` output and extract live hosts from the `.gnmap` file.
 - [ ] I know when to use `-Pn`, `-n`, `-T4`, and `--min-rate`.
 - [ ] I can run `-sU` against a short list of top UDP ports.
+
+> **Verification:** commands checked against `nmap --help` (Nmap 7.94SVN) on 2026-09-19: the only output options are `-oN/-oX/-oS/-oG` and `-oA`, so there is no JSON format. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

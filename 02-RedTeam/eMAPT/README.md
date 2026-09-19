@@ -96,7 +96,7 @@ A repeatable 90-minute practice session that keeps skills sharp:
 3. **Tool rotation (20 min):** use one tool you rarely touch — objection instead
    of raw Frida, Ghidra instead of jadx — so no tool goes rusty.
 4. **Write-up (15 min):** record one verified finding with evidence in your
-   notes, including the MASVS control it maps to.
+   notes, including the MASVS control ID it maps to.
 
 Tracking which drills you have completed lives in `labs/practice-exercises.md`;
 this module's progress checklist is below. A fast "is the lab alive" smoke
@@ -120,9 +120,13 @@ adb shell pm list packages -3   # test apps present?
    capture app traffic. Learn to recognize and bypass pinning on test apps.
 4. **Week 4 — Dynamic analysis.** Drive Frida from the command line, then
    objection's high-level commands. Hook functions and change app behavior.
-5. **Week 5 — iOS basics.** On a Mac (or a Linux/Windows box with a
-   jailbroken device), practice iOS concepts: app bundle structure, class
-   dumps, Ghidra triage, and simulator testing — within authorized constraints.
+5. **Week 5 — iOS basics.** Split the work by platform you actually have.
+   *On a Mac:* the simulator (`simctl`), `class-dump`, `otool`, `plutil`, and
+   Xcode — simulator binaries are unencrypted and need no jailbreak.
+   *From Linux/Windows with a jailbroken device:* Frida/objection over USB
+   (`iproxy`), `frida-ios-dump`, and Ghidra triage of the decrypted binary —
+   but not `class-dump`/`otool`/Xcode, which are macOS-only. Do both within
+   authorized constraints.
 6. **Week 6 — Integration.** Run the full practice-exercise set end to end and
    write short reports per drill with evidence (screenshots, commands, output).
 7. **Ongoing — Drill the cheatsheet.** Re-type commands from
@@ -152,7 +156,10 @@ adb shell pm list packages -3   # test apps present?
 - [ ] Complete `labs/practice-exercises.md` and record expected outcomes
 - [ ] Review `cheatsheets/mobile-commands.md` and mark commands you cannot yet type from memory
 - [ ] Practice iOS steps on whatever hardware you have (simulator, jailbroken device, or a rented/authorized lab) without breaking platform rules
-- [ ] Re-read the OWASP MASVS control groups and map your findings to them
+- [ ] Re-read the OWASP MASVS categories (`MASVS-STORAGE`, `MASVS-CRYPTO`,
+      `MASVS-AUTH`, `MASVS-NETWORK`, `MASVS-PLATFORM`, `MASVS-CODE`,
+      `MASVS-RESILIENCE`, `MASVS-PRIVACY`) and map each finding to a control ID
+      (see the mapping table in `labs/practice-exercises.md`)
 - [ ] Confirm you have only ever tested apps/devices you own or are authorized to assess
 
 ## Legal and Ethical Baseline
@@ -163,9 +170,20 @@ adb shell pm list packages -3   # test apps present?
   use alternatives (simulator, public test apps, managed labs) rather than
   bypassing vendor terms or testing devices you do not control.
 
+> **Verification:** the MASVS category names and control IDs quoted in this
+> module were read from the primary source on 2026-09-19 —
+> <https://mas.owasp.org/MASVS/controls/> lists eight categories
+> (`MASVS-STORAGE`, `MASVS-CRYPTO`, `MASVS-AUTH`, `MASVS-NETWORK`,
+> `MASVS-PLATFORM`, `MASVS-CODE`, `MASVS-RESILIENCE`, `MASVS-PRIVACY`) and 24
+> controls. The iOS platform split was checked against the MASTG UnCrackable
+> Level 1 IPA (`sg.vp.UnCrackable1`, `iphoneos`-only slices): `class-dump`,
+> `otool` and the simulator need macOS, while Frida, `iproxy` and Ghidra work
+> from Linux/Windows against a jailbroken device. No mobile toolchain was
+> executed here — no `adb`, no `frida`, no macOS.
+
 ## Further Resources
 
-- OWASP Mobile Application Security Testing Guide (MASTG) — https://owasp.org/www-project-mobile-security-testing-guide/
+- OWASP Mobile Application Security Testing Guide (MASTG) — https://mas.owasp.org/MASTG/
 - OWASP MASVS — https://mas.owasp.org/
 - Android developer command-line documentation — https://developer.android.com/studio/command-line
 - Frida — https://frida.re/docs/

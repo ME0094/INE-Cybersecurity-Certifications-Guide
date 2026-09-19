@@ -327,19 +327,15 @@ Each sibling lab in this module takes one of those threads much further.
 | Lab | What it adds on top of this introductory session |
 | --- | --- |
 | [injection-lab.md](injection-lab.md) | Injection in depth: direct instruction override, encoding and obfuscation variants, multi-turn splitting, indirect delivery through a retrieved document, hidden content in a document, and an honest re-measurement after you quarantine the input. |
-| `rag-data-leakage-lab.md` | The retrieval path: what a document can expose, permissions evaluated at retrieval time, and leakage that arrives through a summary rather than through a direct question. |
+| [rag-data-leakage-lab.md](rag-data-leakage-lab.md) | The retrieval path: what a document can expose, permissions evaluated at retrieval time, and leakage that arrives through a summary rather than through a direct question. |
 | [agent-tool-abuse-lab.md](agent-tool-abuse-lab.md) | The action plane: a permissions inventory before you attack, confused deputy, tool confusion, argument injection, tool output treated as instruction, unbounded consumption, then hardening and re-measurement. |
-| `data-poisoning-lab.md` | The data path: contaminating training, fine-tuning, and retrieved content, and how a poisoning defect surfaces long after the data was written. |
+| [data-poisoning-lab.md](data-poisoning-lab.md) | The data path: contaminating training, fine-tuning, and retrieved content, and how a poisoning defect surfaces long after the data was written. |
 | [guardrail-evaluation-lab.md](guardrail-evaluation-lab.md) | The control, measured: block rate, false-positive rate, bypass rate against held-out variants, fail-open versus fail-closed, cost and latency, and a regression gate for CI. |
 
 Order matters: each one assumes the lab target and the labelling discipline you built here.
 
-> Two rows above name labs that are still being written in this module as this file is
-> updated (`rag-data-leakage-lab.md`, `data-poisoning-lab.md`). They are listed so the
-> reading order is complete; follow them once they exist in your checkout.
-
-Related reading: `../methodology/05-defensive-controls.md`, `../tools/evaluation-and-guardrails.md`,
-`../tools/ai-testing-tools.md`.
+Related reading: [../methodology/05-defensive-controls.md](../methodology/05-defensive-controls.md), [../tools/evaluation-and-guardrails.md](../tools/evaluation-and-guardrails.md),
+[../tools/ai-testing-tools.md](../tools/ai-testing-tools.md).
 
 ## Common Mistakes & Tips
 

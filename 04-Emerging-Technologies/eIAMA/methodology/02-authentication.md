@@ -132,13 +132,39 @@ Implementation tips: mark cookies `HttpOnly; Secure; SameSite`; bind sessions to
 
 NIST defines three **authenticator assurance levels (AAL)** describing the confidence in the authentication event (note: separate from IAL — identity *proofing* — and FAL — federation, Phase 05).
 
-| Level | Minimum authenticator requirements | Example posture |
-|---|---|---|
-| **AAL1** | Single factor; replay-resistant session | Password or any single factor; low-risk internal tools |
-| **AAL2** | Two distinct factors using approved cryptographic methods; verifier-impersonation resistant (challenge-response) | Password + TOTP/push/FIDO2; standard enterprise access |
-| **AAL3** | Two factors with a hardware/phishing-resistant authenticator; verifier-compromise resistance (private key never leaves secure hardware) | FIDO2 security key + PIN, PIV/smart card; admins, high-value roles |
+> **Which revision these come from.** The current edition is **SP 800-63B-4 (revision 4)**, which
+> states that it *supersedes* SP 800-63B — that is, revision 3. The requirements below are
+> quoted from **revision 4**; where revision 3 said something materially different it is noted,
+> because a study note that mixes the two silently changes what "AAL2" means. The reference
+> text is published as HTML at
+> <https://pages.nist.gov/800-63-4/sp800-63b.html> (revision 3 remains at
+> <https://pages.nist.gov/800-63-3/sp800-63b.html>).
 
-AAL is about the **whole protocol**, not just the factor count: replay resistance, session binding, and (at AAL3) hardware-bound keys all count. When the exam-style scenario asks "what should a privileged admin use?", the answer profile is *phishing-resistant, hardware-backed, MFA — AAL3-style* for the most sensitive roles and AAL2 for general staff.
+| Level | Minimum authenticator requirements (rev. 4) | Example posture |
+|---|---|---|
+| **AAL1** | "Only single-factor authentication using a wide range of available authentication technologies"; approved cryptography; authenticated protected channels. Rev. 4 *recommends* offering multi-factor options here but does not require them — and it does **not** require a replay-resistant session at AAL1 | Password or any single factor; low-risk internal tools |
+| **AAL2** | Two distinct authentication factors, approved cryptography — and two normative requirements that are easy to collapse into one: *"At least one authenticator used at AAL2 SHALL be replay-resistant"*, and the verifier *"SHALL offer at least one phishing-resistant authentication option at AAL2"*. **Offering** it is required; the user's actual second factor need not be phishing-resistant | Password + TOTP or push does satisfy AAL2 — neither of those is phishing-resistant, which is exactly why the standard only requires the option to exist. A passkey or a FIDO2 key is the phishing-resistant option; standard enterprise access |
+| **AAL3** | Two distinct factors, where authentication "is based on the proof of possession of a key through the use of a public-key cryptographic protocol" and "requires a phishing-resistant authenticator with a non-exportable authentication key" | FIDO2 security key + PIN, PIV/smart card; admins, high-value roles |
+
+**Two corrections this table exists to make.** First, **replay resistance is an AAL2
+requirement, not an AAL1 one** — at AAL1 the standard asks for single factor and approved
+cryptography, and nothing about replay. Second, **"verifier-impersonation resistance" is not an
+AAL2 property, and it is not even the current name.** Revision 4 says plainly: *"Phishing
+attacks, previously referred to in SP 800-63B as 'verifier impersonation,' …"* — the concept was
+renamed to **phishing resistance**, and in revision 3 it was an **AAL3** requirement ("AAL3
+authentication requires a hardware-based authenticator and an authenticator that provides
+verifier impersonation resistance"). Revision 4 kept it at the top: an AAL3 authenticator must be
+phishing-resistant with a non-exportable key. TOTP and push are not phishing-resistant at
+either revision, so an AAL2 posture built on them is correct *and* phishable at the same time —
+which is the whole reason rev. 4 pushes phishing resistance into the AAL2 requirement as an
+option the verifier must offer.
+
+AAL is about the **whole protocol**, not just the factor count: replay resistance, session
+binding, authentication intent, and (at AAL3) a non-exportable key all count. When the
+exam-style scenario asks "what should a privileged admin use?", the answer profile is
+*phishing-resistant, hardware-backed, MFA — AAL3-style* for the most sensitive roles and AAL2
+for general staff — and if you want the general staff to be phishing-resistant too, that is a
+policy choice above the minimum, not a requirement you can quote.
 
 ## Common Mistakes & Tips
 
@@ -162,8 +188,20 @@ AAL is about the **whole protocol**, not just the factor count: replay resistanc
 
 ## Further Resources
 
-- NIST SP 800-63B, *Digital Identity Guidelines: Authentication and Lifecycle Management*: https://doi.org/10.6028/NIST.SP.800-63b
+- NIST SP 800-63B-4 (revision 4, current), *Digital Identity Guidelines: Authentication and Authenticator Management* — official reference HTML at <https://pages.nist.gov/800-63-4/sp800-63b.html>; revision 3 remains at <https://pages.nist.gov/800-63-3/sp800-63b.html> for comparison
+- NIST SP 800-63-4, *Digital Identity Guidelines* (the umbrella volume; IAL and FAL live in 63A and 63C): <https://pages.nist.gov/800-63-4/>
 - FIDO Alliance — passkeys: https://fidoalliance.org/passkeys/
 - W3C WebAuthn specification: https://www.w3.org/TR/webauthn-3/
 - OpenID Foundation (OIDC session/logout concepts): https://openid.net/developers/specs/
 - Microsoft Entra ID documentation (MFA and Conditional Access concepts): https://learn.microsoft.com/en-us/entra/identity/
+
+> **Verification:** the three AAL summaries and the normative AAL1/AAL2 requirement sentences
+> quoted above were read from the official reference HTML of **SP 800-63B-4** on **2026-09-19**
+> (`https://pages.nist.gov/800-63-4/sp800-63b.html`, HTTP 200; revision 3 at
+> `https://pages.nist.gov/800-63-3/sp800-63b.html`, HTTP 200). The revision-4 text read:
+> *"At least one authenticator used at AAL2 SHALL be replay-resistant"*, *"Verifiers SHALL offer
+> at least one phishing-resistant authentication option at AAL2"*, and *"Phishing attacks,
+> previously referred to in SP 800-63B as 'verifier impersonation,' …"*. The revision-3 text
+> read: *"AAL3 authentication requires a hardware-based authenticator and an authenticator that
+> provides verifier impersonation resistance."* Neither revision states a replay-resistance
+> requirement at AAL1.

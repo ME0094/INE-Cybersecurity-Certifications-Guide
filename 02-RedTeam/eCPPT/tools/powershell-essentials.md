@@ -211,13 +211,15 @@ minimize noise and coordinate with the blue team.
 
 ## Checklist / Self-Test
 
-- [ ] I can explain the four scopes of execution policy and set a per-process Bypass
+- [ ] I can explain the five execution-policy scopes (`MachinePolicy`, `UserPolicy`, `Process`, `CurrentUser`, `LocalMachine`, as listed by `Get-ExecutionPolicy -List`) and set a per-process Bypass
 - [ ] I can discover an unknown cmdlet with `Get-Command` and read its help
 - [ ] I can build a `Get-X | Where-Object | Sort-Object | Select-Object` pipeline from memory
 - [ ] I can run `Invoke-Command` and `Enter-PSSession` against a lab host with explicit credentials
 - [ ] I can write, dot-source, and invoke a function with parameters
 - [ ] I can load a remote `.ps1` into memory and call one of its functions
 - [ ] I can name the main PowerShell defensive logs (4104/4103) and what AMSI/CLM do
+
+> **Verification:** commands checked against `Get-ExecutionPolicy -List`, executed on Windows 10.0.26200 in Windows PowerShell 5.1.26100.8521 and also checked in PowerShell 7.6.6 on 2026-09-19 — both list five scopes: `MachinePolicy`, `UserPolicy`, `Process`, `CurrentUser`, `LocalMachine`. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

@@ -20,7 +20,9 @@ reading the others):
 
 Asset / endpoint:  POST /api/v1/export  (export-svc, Node 18, internal LB)
 Category:          A10:2021 Server-Side Request Forgery
-CVSS 3.1:          7.5 (AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N)
+CVSS 3.1:          7.7 (AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N)
+                   PR:L matches step 1 of the reproduction (the endpoint needs
+                   a session); S:C carries the cross-boundary reach.
                    — chained with ID-02 (heapdump key leak) -> 9.1, see §3.4
 
 Summary (2-3 sentences): the export endpoint accepts a url parameter and the
@@ -34,7 +36,7 @@ Reproduction (numbered, copy-paste-able):
    4. Repeat with http://169.254.169.254/... on the lab instance to confirm
       cloud-metadata reach (Excerpt C, redacted).
 
-Impact: unauthenticated/internal reach... chained with ID-02 gives cloud keys.
+Impact: authenticated internal reach... chained with ID-02 gives cloud keys.
 Remediation: allow-list egress destinations... (with code sketch, below).
 References: OWASP SSRF; PortSwigger SSRF.
 ```
@@ -206,6 +208,15 @@ first.
       delivery.
 - [ ] I can defend each rating by walking through the CVSS vector and scope
       lines without resorting to assertion.
+
+> **Verification:** the base scores were recomputed on 2026-09-19 with the CVSS
+> v3.1 formulas as published by FIRST
+> (<https://www.first.org/cvss/specification-document>) in a Python 3.12 script,
+> cross-checked against four reference vectors (9.8, 6.1, 7.8, 7.5 — all
+> reproduced). `AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N` = **8.6**, not 7.5; 7.5 is
+> the `S:U` variant; with `PR:L` — the precondition of step 1 — the same vector
+> is **7.7**: ISS 0.5600, Impact (S:C) 3.9928, Exploitability 3.1096,
+> Roundup(1.08 × 7.1024) = 7.7.
 
 ## Further Resources
 

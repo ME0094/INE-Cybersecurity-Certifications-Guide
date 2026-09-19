@@ -325,7 +325,10 @@ kape.exe --tsource E: --target <TargetName> --tdest C:\Evidence\collect
 
 :: Modules only: parse what was collected — one output folder per module, holding that parser's CSV/JSON
 kape.exe --msource C:\Evidence\collect --module <ModuleName> --mdest C:\Evidence\parsed
-kape.exe --help   :: the installed build is the authority on the switch set
+:: To discover the switch set, use the documented route: build the command in gKAPE and read the
+:: command line it produces (section 15 above), or the KAPE documentation. This file does not
+:: assert `kape.exe --help` — it is not in the KAPE docs, and no installed build was available to
+:: test it.
 ```
 
 **Why a targets collection is triage evidence, not an acquisition.**
@@ -417,3 +420,13 @@ kape.exe --help   :: the installed build is the authority on the switch set
 - Forensics Wiki — per-artefact reference pages, including the on-disk structures of the formats above: forensics.wiki.
 - Microsoft Learn — Windows security auditing and event reference, the authority for the events these parsers surface: learn.microsoft.com/windows/security/threat-protection/auditing.
 - Official eCDFP page on the INE website for current, authoritative details about the certification.
+
+> **Verification:** checked against source, not executed — **no KAPE binary was available**. On
+> **2026-09-19** `Get-Command kape.exe` returned nothing on the Windows host used for this pass, so
+> no switch could be run. The claim that `--help` is not a documented switch was checked against
+> the repository's own catalogue of the tool,
+> `scripts/utilities/tool-specs/kape.json`, whose `provenance.sources` are the KAPE documentation
+> pages (KapeDocs, fetched 2026-09-19) and whose `longFlags` list contains no `--help`; the same
+> catalogue records `--tsource`, `--target`, `--tdest`, `--msource`, `--module` and `--mdest`,
+> which section 15 uses. Section 15's own pointer to `gKAPE` as the way to discover switches is
+> the documented route and is what the example now says.

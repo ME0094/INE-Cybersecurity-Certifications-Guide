@@ -157,8 +157,10 @@ Get-WinEvent -FilterHashtable @{
 ```
 
 ```text
-# Kibana/KQL shape for the same hunt
-event.category : "process" and process.command_line : (*-enc* or *EncodedCommand* or *-nop*)
+# Kibana/KQL shape for the same hunt. Query process.args — the tokenised argument array — rather
+# than leading-wildcarding the whole command line: ECS already splits it into arguments, so the
+# switch is its own value, and a leading wildcard is slow and can be silently truncated.
+event.category : "process" and process.args : ("-enc" or "-EncodedCommand" or "-nop")
 ```
 
 7. Hunt the Linux side and close the loop with file-level evidence:
@@ -598,7 +600,9 @@ sudo ausearch -k exec -ts recent -i | grep -E "a0=|exe=" | head -30
 
 **Steps.**
 
-1. Confirm the capture is running and note its start time. Beacon analysis needs a window long enough to contain many connections — at least twenty intervals per candidate pair is a reasonable floor.
+1. Confirm the capture is running and note its start time. Beacon analysis needs a window long
+   enough to contain many connections — **twenty intervals per candidate pair is the floor used
+   throughout this module**. Below that, a standard deviation is not a measurement, it is noise.
 
 2. Emulate a beacon and seal your note. On the Windows victim:
 
@@ -633,16 +637,18 @@ For a DNS variant, add a lab-only name that only your range resolves, and query 
 cat conn.log | zeek-cut id.orig_h id.resp_h id.resp_p duration orig_bytes resp_bytes \
   | sort | uniq -c | sort -nr | head -20
 
-# Inter-arrival deltas per conversation (low spread = a machine-like interval)
+# Inter-arrival deltas per conversation. The column that decides is the coefficient of
+# variation (stddev / mean), not the stddev: a 30 s beacon with 0.4 s of spread and a 600 s
+# beacon with 8 s of spread are both machine-like, while 4 s with 2 s of spread is not.
 cat conn.log \
   | zeek-cut id.orig_h id.resp_h id.resp_p ts \
   | sort -k1,1 -k2,2 -k3,3n -k4,4n \
   | awk '{ key=$1" "$2" "$3; if (key==prev) { d=$4-last;
              if (key in n) { n[key]++; s[key]+=d; ss[key]+=d*d } else { n[key]=1; s[key]=d; ss[key]=d*d } }
            prev=key; last=$4 }
-         END { for (k in n) if (n[k]>=10) { m=s[k]/n[k]; v=ss[k]/n[k]-m*m; if (v<0) v=0;
-                 printf "%d conns  mean_sec %.1f  stddev_sec %.1f  %s\n", n[k]+1, m, sqrt(v), k } }' \
-  | sort -k6,6n | head -20
+         END { for (k in n) if (n[k]>=20) { m=s[k]/n[k]; v=ss[k]/n[k]-m*m; if (v<0) v=0; sd=sqrt(v);
+                 printf "%d conns  mean_sec %.1f  stddev_sec %.1f  cv %.3f  %s\n", n[k]+1, m, sd, (m>0 ? sd/m : 0), k } }' \
+  | sort -k8,8n | head -20
 ```
 
 4. Score it with RITA, which does the same statistics over a whole log set and ranks candidates for you:
@@ -674,18 +680,20 @@ Get-SysmonEvent -Id 22 | Where-Object { $_.QueryName -match 'lab\.internal' } |
 ```
 
 ```spl
-// Splunk: the same hunt over proxy logs, for environments with no packet capture
+// Splunk: the same hunt over proxy logs, for environments with no packet capture.
+// The filter is on the coefficient of variation (stdev / mean), never on an absolute stdev.
 index=proxy
 | sort 0 + _time
 | streamstats current=f last(_time) as prev by src_ip, dest_host
 | eval delta = _time - prev
 | stats count avg(delta) as avg_delta stdev(delta) as jitter sum(bytes_out) as uploaded by src_ip, dest_host
-| where count > 20 and jitter < 5
+| eval cv = jitter / avg_delta
+| where count >= 20 and cv < 0.1
 ```
 
 **What you should find.**
 
-- For the beacon pair, a connection count in the tens, a **mean inter-arrival close to your 30-second sleep**, and a **standard deviation small relative to the mean**. The ratio (coefficient of variation) is the number to quote in your finding — not the raw count.
+- For the beacon pair, a connection count in the tens, a **mean inter-arrival close to your 30-second sleep**, and a **standard deviation small relative to the mean**. Quote the ratio — the **coefficient of variation** — in your finding, not the raw count and not the raw deviation. It is a ratio because the same absolute spread means opposite things at different speeds: 30 s ± 0.4 s and 600 s ± 8 s are both beacons, while 4 s ± 2 s is not. The starting threshold used across this module is `cv < 0.1`.
 - Nearly identical `orig_bytes`/`resp_bytes` per connection and a very short `duration`: a beacon that connects, checks in, and disconnects. Compare with the range's legitimate traffic, which varies.
 - The destination is your **attacker VM inside the lab**, which is why this drill can be scored exactly: you know the ground truth. In a real environment, replace that certainty with corroboration from proxy logs, threat intel, and the owning process.
 - Sysmon ID 3 attributing the connection to `powershell.exe` (or to whatever you launched), with `Initiated = true`. This is the step that converts a network lead into a finding — the network alone never says *which process*.
@@ -767,9 +775,10 @@ index=proxy method=POST
 4. Look at the DNS channel as an alternative egress path:
 
 ```bash
-# Long query names (encoded data) and many unique subdomains per domain
+# Long query names (encoded data) and many unique subdomains per domain.
+# `sort -u` before the counting awk: without it the number counts QUERIES, not distinct names.
 cat dns.log | zeek-cut query | awk '{ print length($0), $0 }' | sort -nr | head -20
-cat dns.log | zeek-cut query | awk -F. 'NF>=2 { d=$(NF-1)"."$NF; c[d]++ } END { for (k in c) print c[k], k }' | sort -nr | head -20
+cat dns.log | zeek-cut query | sort -u | awk -F. 'NF>=2 { d=$(NF-1)"."$NF; c[d]++ } END { for (k in c) print c[k], k }' | sort -nr | head -20
 ```
 
 5. Attribute the volume to a process and a user:
@@ -942,12 +951,23 @@ gap that blocked the analysis.
 - [ ] I reverted the range to its verified baseline after the final exercise.
 - [ ] Every action I took was against a system I own or am authorized to test.
 
+> **Verification:** the beacon awk, the `sort -u` DNS awk and the twenty-interval floor were
+> executed on 2026-09-19 against synthetic `conn.log` and `dns.log` data in WSL Ubuntu 24.04. The
+> absolute-stdev rule admitted a fast jittery pair (σ 2.3 s, CV 0.52) and rejected a genuine slow
+> beacon (σ 11.4 s, CV 0.019); the CV rule inverted both. The query-counted DNS awk reported 90
+> and 50 "subdomains" for a log holding 30 and 1 distinct names, and 30 / 1 after `sort -u`.
+> `zeek` and `zeek-cut` are **not installed** in that environment, so the projected fields were
+> reproduced with `awk` on the tab-separated log body. The RITA URL was checked with `curl` on
+> 2026-09-19: `github.com/activecm/rita` returns HTTP 200, the previous
+> `github.com/activecountermeasures/rita` returns HTTP 404. The PowerShell, SPL and KQL examples
+> are **unverified syntax references — not run**: no Windows host, Splunk or Kibana was available.
+
 ## Further Resources
 
 - MITRE ATT&CK — attack.mitre.org (the technique vocabulary these hypotheses are written in).
 - Atomic Red Team (technique emulation with ATT&CK IDs) — github.com/redcanaryco/atomic-red-team.
 - Zeek log reference — docs.zeek.org/en/current/script-reference/log-files.html.
-- RITA — github.com/activecountermeasures/rita.
+- RITA — github.com/activecm/rita.
 - Sigma rules for turning findings into detections — github.com/SigmaHQ/sigma.
 - Hayabusa and Chainsaw for EVTX triage — github.com/Yamato-Security/hayabusa, github.com/WithSecureLabs/chainsaw.
 - The range used by these drills — `hunting-range-setup.md`.

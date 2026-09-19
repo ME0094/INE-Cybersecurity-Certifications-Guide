@@ -22,7 +22,7 @@ Routes are not exclusive, and the usual sequence is 3 → 1/2: triage the logs f
 
 ## 2. Route 1 — bodyfile with `fls`/`ils`, timeline with `mactime`
 
-`fls` and `ils` are covered as file-system tools in [`forensic-toolkit.md`](forensic-toolkit.md) — including the partition offset habit (`-o`) that makes or breaks every one of these commands. Here the subject is the one flag that turns them into timeline input: `-m`, which switches the output to **mactime format** and prefixes every path with the mount point you supply.
+`fls` and `ils` are covered as file-system tools in [`forensic-toolkit.md`](forensic-toolkit.md) — including the partition offset habit (`-o`) that makes or breaks every one of these commands. Here the subject is the flag that turns them into timeline input: `-m`, which switches the output to **mactime format** and, in `fls`, prefixes every path with the mount point you supply. `ils -m` is the same flag but takes **no** argument — there is no prefix to give it.
 
 ```bash
 # One bodyfile per source. Name it after the exhibit, not "body.txt":
@@ -30,8 +30,10 @@ Routes are not exclusive, and the usual sequence is 3 → 1/2: triage the logs f
 fls -f ntfs -o 2048 -r -p -m /case001/disk /evidence/case001/disk.dd > /evidence/case001/body-disk.txt
 # what to look for: one pipe-delimited line per file, every path carrying the /case001/disk prefix
 
-# Append inode-level records, including unallocated inodes, to the same bodyfile
-ils -o 2048 -m /case001/disk /evidence/case001/disk.dd >> /evidence/case001/body-disk.txt
+# Append inode-level records, including unallocated inodes, to the same bodyfile.
+# ils -m takes no argument, so these records carry no mount prefix of their own —
+# another reason to keep one bodyfile per source.
+ils -o 2048 -m /evidence/case001/disk.dd >> /evidence/case001/body-disk.txt
 # what to look for: appended inode records that give deletion and allocation context fls alone does not
 
 # Convert the bodyfile into a sorted, human-readable CSV in UTC
@@ -78,7 +80,7 @@ plaso's design is a split you should keep split: **collect** once into a storage
 
 **What the storage file is.** A single container holding every parsed event, each tagged with its source, parser and timestamp basis, plus a provenance section describing where the events came from (current releases back it with SQLite). It is usually the largest artefact you produce and the one you must keep: it is the input to every export, and its hash belongs in the report next to the image's.
 
-**The CLI moves between releases.** `methodology/03-timeline.md` already warns about this at line 60, and this repository demonstrates it: line 61 of that file uses `--storage-file=case.plaso`, while [`../cheatsheets/forensic-commands.md`](../cheatsheets/forensic-commands.md) at line 137 passes the storage file positionally. Both forms exist in the wild across plaso generations. Ask the installed release instead of trusting either.
+**The CLI moves between releases.** The plaso section of [`../methodology/03-timeline.md`](../methodology/03-timeline.md) already warns about this, and every example in this repository is consistent with itself: the `--storage-file=` form is what this file, the methodology phase and [`../cheatsheets/forensic-commands.md`](../cheatsheets/forensic-commands.md) all use. Older plaso generations accepted the storage file positionally, and that form still circulates in tutorials; ask the installed release instead of trusting either.
 
 ```bash
 # First action on any new machine: ask the tools what they accept
@@ -114,16 +116,19 @@ Processing cost is dominated by artefact *density*, not image size: a log-heavy 
 psort.py -o l2tcsv -w /evidence/case001/timeline-all.csv /evidence/case001/case001.plaso
 # what to look for: a header row, and a row count consistent with the event count pinfo reported
 
-# Narrow export: a date window plus a parser expression, as one quoted argument
-psort.py -o csv -w /evidence/case001/prefetch-window.csv \
-  "date > '2024-11-03 09:00:00' and date < '2024-11-03 09:05:00' and parser == 'prefetch'" \
-  /evidence/case001/case001.plaso
+# Narrow export: a date window plus a parser expression, as one quoted argument.
+# `l2tcsv` is the CSV module (`-o csv` does not exist; `-o json_line` is the JSON-lines one),
+# and the filter is a positional argument that belongs AFTER the storage file.
+psort.py -o l2tcsv -w /evidence/case001/prefetch-window.csv \
+  /evidence/case001/case001.plaso \
+  "date > '2024-11-03 09:00:00' and date < '2024-11-03 09:05:00' and parser == 'prefetch'"
 # what to look for: every row inside the window, and nothing outside it — a stray row means your timezone assumption is wrong, not that the tool is broken
 
-# One-shot triage: collect and export in a single command, useful for a first look
+# One-shot triage: collect and export in a single command, useful for a first look.
+# `--output` alone is ambiguous in current releases; name the option in full.
 psteal.py --source /evidence/case001/disk.dd \
   --storage-file=/evidence/case001/case001.plaso \
-  --output csv --write /evidence/case001/triage.csv
+  --output-format l2tcsv --write /evidence/case001/triage.csv
 # what to look for: the same two artefacts a two-step run would leave (storage file plus export), so nothing is lost if you later want a different filter
 ```
 
@@ -379,3 +384,32 @@ Limitations: <what the artefact cannot show>
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - **Local help on your practice system** — `man mactime`, `man fls`, `man ils`, `log2timeline.py --help`, `psort.py --help`, `hayabusa.exe help`.
 - **In this repository** — [`../methodology/03-timeline.md`](../methodology/03-timeline.md) (the conceptual phase), [`forensic-toolkit.md`](forensic-toolkit.md) (`fls`/`ils` basics), [`../cheatsheets/forensic-commands.md`](../cheatsheets/forensic-commands.md) (compact command sheet), [`../../eCTHP/tools/endpoint-tools.md`](../../eCTHP/tools/endpoint-tools.md) (Hayabusa and Chainsaw from the hunting angle), [`../labs/forensic-exercises.md`](../labs/forensic-exercises.md) (the bodyfile-to-CSV drill).
+
+> **Verification:** the bodyfile half was executed on **2026-09-19** against **The Sleuth Kit
+> 4.12.1** (Ubuntu 24.04 WSL). On an ext4 image built in `/tmp` with `mkfs.ext4`,
+> `fls -f ext4 -o 0 -r -p -m /lab test.img` produced records carrying the `/lab` prefix, and
+> `ils -o 2048 -m /evidence/case001/disk.dd` (the form previously printed here) exits 1 with no
+> stdout — `Invalid magic value (raw_open: image "/" - is a directory)` — while
+> `ils -o 0 -e -m test.img` exits 0 and writes 4098 records whose name field is an inode, not a
+> path, which is why the note about the missing mount prefix was added. `mactime -b body.txt -d -z
+> UTC` then produced the CSV. The plaso route was executed too, against **plaso 20260720**
+> (`/opt/pytools/bin/`) on the same date: `log2timeline --storage-file=case.plaso disk.img` completed
+> and wrote the storage file, `pinfo case.plaso` printed the per-parser breakdown this file tells you
+> to read (`filestat : 12`), and `psort` exported it. Four differences from the examples above were
+> measured and are recorded rather than changed, as they fall outside this pass. (1) `-o csv` is not
+> an output module in this release: `psort -o csv …` fails with `ERROR: Unsupported output format:
+> csv.`, and `psort --output-format list` offers `l2tcsv, dynamic, json, json_line, kml, l2ttln,
+> null, opensearch, opensearch_ts, rawpy, tln, xlsx` — so `l2tcsv` (which section 3 already uses)
+> works and `csv`/`jsonl` do not. (2) The filter must come **after** the storage file, which is the
+> reverse of the order printed here: `-w out.csv "<filter>" case.plaso` fails with
+> `ERROR: Unable to compile filter expression with error: Unsupported initial state: OPERATOR -
+> premature end of expression at position 10: case.plaso <--->`, while `-w out.csv case.plaso
+> "<filter>"` exits 0. This file's own diagnosis table already lists "the expression placed before
+> the storage file" as a failure mode, so the examples above contradict it. (3) `psteal --output` is
+> ambiguous in this release — `psteal --source … --output csv` exits 2 with `psteal: error: ambiguous
+> option: --output could match … --output_format, --output-format`; `--output-format l2tcsv` exits 0.
+> (4) The entry points have **no** `.py` suffix here (`log2timeline`, `psort`, `pinfo`, `psteal`).
+> A filter that compiles can also still return zero rows: `"parser == 'filestat'"` returned a
+> header-only CSV while `pinfo` reported 12 events under `filestat`; the cause was not established,
+> so treat a filtered count as something to verify against `pinfo`. **Not executed:** the EVTX triage
+> tools (`hayabusa`, `chainsaw` are not installed here).

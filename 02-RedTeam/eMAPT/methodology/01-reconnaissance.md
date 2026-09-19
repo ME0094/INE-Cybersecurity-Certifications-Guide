@@ -158,8 +158,10 @@ adb devices
 adb root          # restart adbd as root on emulator/debug builds
 adb shell id      # uid=0(root)
 
-# Push frida-server matching the device arch, e.g. arm64
-adb push frida-server-16.x.x-android-arm64 /data/local/tmp/frida-server
+# Push frida-server matching the device arch (e.g. arm64) AND the host client:
+# the version must equal `frida --version` — a mismatch fails with "unable to
+# communicate" (see 03-dynamic-analysis.md).
+adb push frida-server-<version from frida --version>-android-arm64 /data/local/tmp/frida-server
 adb shell "chmod 755 /data/local/tmp/frida-server"
 adb shell "/data/local/tmp/frida-server &"
 frida-ps -U       # list processes from the host to verify connectivity
@@ -201,6 +203,12 @@ details live in the communication-analysis phase.
       to `frida-ps -U`.
 - [ ] Proxy and CA are staged so the app can be launched instrumented later.
 - [ ] My test accounts and scope boundaries are confirmed and documented.
+
+> **Verification:** the `frida-server` filename placeholder was aligned with the
+> host client on 2026-09-19: the release assets are named
+> `frida-server-<version>-android-<arch>`, so the version must equal
+> `frida --version` (`frida-tools` 14.10.4 on PyPI). No `adb` or device is
+> present in this lab, so the push was not executed — primary documentation only.
 
 ## Further Resources
 

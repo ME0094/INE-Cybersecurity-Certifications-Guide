@@ -163,7 +163,7 @@ Frameworks overlap heavily, so defenders map between them (auditors love this). 
 
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework) — CSF 2.0, quick-start guides, and informative references.
 - [NIST SP 800-37 Rev. 2 (RMF)](https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final) — the authoritative RMF publication.
-- [NIST SP 800-53](https://csrc.nist.gov/publications/detail/sp/800-53/rev/5/final) — the control catalog RMF selects from.
+- [NIST SP 800-53](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) — the control catalog RMF selects from.
 - [ISO/IEC 27001](https://www.iso.org/standard/27001.html) — official standard page.
 - [CIS Controls](https://www.cisecurity.org/controls) — the 18 controls, IGs, and companion guides.
 - [ISACA — COBIT](https://www.isaca.org/resources/cobit) — governance framework resources.

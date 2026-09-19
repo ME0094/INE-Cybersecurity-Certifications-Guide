@@ -47,7 +47,7 @@ index=windows EventCode=4688
 | sort - _time
 ```
 
-```text
+```esql
 // Elastic ES|QL - aggregation without leaving the search bar (8.11+)
 FROM logs-windows.sysmon_operational-*
 | WHERE event.code == "1" AND process.name == "powershell.exe"
@@ -96,14 +96,20 @@ sequence by host.name with maxspan=30s
 ```
 
 ```spl
-# Splunk: inter-arrival time per (host, destination), the classic beacon measurement
+# Splunk: inter-arrival time per (host, destination), the classic beacon measurement.
+# The deltas are computed on the RAW event time, before anything aggregates it:
+# binning _time first rounds every event to the start of its bucket, so every
+# delta becomes a multiple of the span, the spread collapses towards zero and
+# every host looks perfectly regular. Sort first (streamstats needs ordered
+# input), keep the events with eventstats, and only aggregate deltas at the end.
 index=proxy earliest=-24h
-| bin _time span=1m
-| stats count by host, dest_ip, _time
-| streamstats current=f last(_time) as prev by host, dest_ip
-| eval delta = _time - prev
-| stats avg(delta) as mean_delta, stdev(delta) as sd, count by host, dest_ip
-| where count > 20
+| eventstats count as connections by host, dest_ip
+| where connections > 20
+| sort 0 host, dest_ip, _time
+| streamstats current=f last(_time) as prev_time by host, dest_ip
+| eval delta = _time - prev_time
+| stats count(delta) as intervals, avg(delta) as mean_delta, stdev(delta) as sd,
+        perc95(delta) as p95 by host, dest_ip
 | eval jitter_ratio = round(sd / mean_delta, 3)
 | sort jitter_ratio
 ```
@@ -186,7 +192,8 @@ The third line is the part analysts skip and the part that makes the note usable
 - **Mistake:** writing a query against field names you never confirmed. *Tip:* expand one real document first; a wrong field name produces an empty result that looks like good news.
 - **Mistake:** leaving the time range to the UI default. *Tip:* set the window deliberately and record it — "no results" in a five-minute window means nothing.
 - **Mistake:** treating a regular connection as C2 without a process. *Tip:* interval regularity is a shape; the owning process is what turns it into a finding.
-- **Mistake:** hiding the beacon tail behind an average. *Tip:* report `stdev` and `p95` alongside the mean, or you cannot claim "regular" with evidence.
+- **Mistake:** hiding the beacon tail behind an average. *Tip:* report `stdev` and `p95` alongside the mean, and compute the deltas from raw event times rather than from time buckets — a one-minute bucket makes every interval a multiple of 60 s, so the spread collapses and every host looks perfectly regular.
+- **Mistake:** bucketing timestamps before measuring intervals. *Tip:* `bin` is for counting ("how many per hour?"), `streamstats` over raw `_time` is for measuring ("how far apart?"). Using the counting tool for the measuring job produces a confident zero-jitter result for traffic that has none.
 - **Mistake:** keeping the winning query in a screenshot. *Tip:* paste queries verbatim into the case note with their time range and what they showed.
 
 ## Checklist / Self-Test

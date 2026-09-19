@@ -42,6 +42,10 @@ curl -k -X POST "https://thehive.local/api/v1/case" \
       }'
 ```
 
+TheHive's own `severity` field is a 1–4 scale on which 3 means *High*. Record the platform's
+number **and** this module's label (`SEV-2 / HIGH`, from `../methodology/01-preparation.md`)
+rather than assuming the two numbers mean the same thing.
+
 ## Case Documentation: The Written Record
 
 Discipline beats memory. Open a case file immediately and keep it current, because a
@@ -52,7 +56,7 @@ CASE 2025-014
 ──────────────────────────────────────────────
 Opened : 2025-06-02 09:14 UTC by M. Chen (IR lead)
 Status : CONTAINMENT
-Severity: HIGH (candidate ransomware, single host confirmed)
+Severity: SEV-2 / HIGH (candidate ransomware, single host confirmed)
 Assets : WS-042 (Windows 11, user K. Roy), corp-dc01 (suspect logins)
 
 SYNOPSIS
@@ -62,11 +66,12 @@ SYNOPSIS
 TIMELINE (oldest first; UTC)
   2025-06-02 08:03  Alert 8812 fired (file-write volume anomaly)
   2025-06-02 08:20  Analyst confirms ransom-note file on WS-042 (hash logged)
-  2025-06-02 08:45  Host isolated on quarantine VLAN; memory captured
+  2025-06-02 08:38  Volatile state captured on WS-042 (memory, process list, connections)
+  2025-06-02 08:45  Host isolated on quarantine VLAN
   ...
 
 EVIDENCE LOG
-  E-001 WS-042 memory dump (winpmem)  SHA256 9f2c...  M. Chen 08:47 UTC
+  E-001 WS-042 memory dump (winpmem)  SHA256 9f2c...  M. Chen 08:38 UTC
   E-002 WS-042 KAPE collection        SHA256 41ab...  M. Chen 09:05 UTC
 
 ACTIONS LOG
@@ -82,6 +87,13 @@ Conventions that keep case files usable:
 
 - **One case number everywhere** — ticketing system, evidence IDs, emails, file names.
 - **UTC timestamps** in logs; convert for human summaries.
+- **One severity scale** — the `SEV-1/CRITICAL` … `SEV-4/LOW` table in
+  `../methodology/01-preparation.md` (Severity Levels). A benign alert is closed as a *false
+  positive*, which is not a severity level, and the case file must not conflate the two.
+- **Capture volatile state before containment, and show it in the timeline.** Isolation and
+  power-off destroy memory, process and connection state, so an incident record whose isolation
+  timestamp precedes its memory-capture timestamp documents a mistake rather than a decision. If
+  the order genuinely had to be inverted (exfiltration in progress), write the reason beside it.
 - **Decisions recorded with rationale** ("disabled account X because..."), not just actions.
 - **Every finding tied to evidence** ("Prefetch shows x.exe → see E-002").
 - **Ownership explicit** — one incident commander, one comms lead, one scribe.
@@ -93,7 +105,7 @@ or platform fields) with one row per exhibit:
 
 | Exhibit | Source | Type | Tool + version | Hash (SHA-256) | Collected by | Date/Time (UTC) | Location |
 | ------- | ------ | ---- | -------------- | -------------- | ------------ | --------------- | -------- |
-| E-001 | WS-042 | Memory dump | winpmem 3.3 | 9f2c… | M. Chen | 2025-06-02 08:47 | \ev\case-014 |
+| E-001 | WS-042 | Memory dump | winpmem 3.3 | 9f2c… | M. Chen | 2025-06-02 08:38 | \ev\case-014 |
 | E-002 | WS-042 | Artifacts | KAPE 1.3 | 41ab… | M. Chen | 2025-06-02 09:05 | \ev\case-014 |
 
 Rules:
@@ -112,7 +124,7 @@ Communications are part of the response, not an afterthought. Adapt these freely
 ```text
 Subject: [IR-2025-014] ACTIVE INCIDENT — suspected ransomware, WS-042 isolated
 
-Severity: HIGH     Status: CONTAINMENT     Updated: <UTC timestamp>
+Severity: SEV-2 / HIGH   Status: CONTAINMENT   Updated: <UTC timestamp>
 
 Summary: SOC alert 8812 — possible ransomware on WS-042 (user K. Roy). Files
 renamed with .locked extension; ransom note present. No confirmed spread yet.
@@ -201,9 +213,17 @@ review and update the playbook — the loop that makes the next incident cheaper
 - [ ] I can state the TLP label policy and when external parties must be engaged.
 - [ ] I have a personal habit of logging actions and decisions contemporaneously during drills.
 
+> **Verification:** the case-file example was corrected so the memory capture precedes isolation,
+> which is the order stated in `cheatsheets/ir-playbook.md` and
+> `methodology/03-containment.md`; every timestamp in the example is illustrative, not observed.
+> The NIST SP 800-61 Rev. 3 link was checked with `curl` on 2026-09-19 (HTTP 200). The TheHive
+> REST example is an **unverified syntax reference — not run**, and the platform's field shapes
+> vary by version as the text says.
+
 ## Further Resources
 
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* (communications and coordination chapters) — https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) — https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - FIRST PSIRT Services Framework — https://www.first.org/standards/frameworks/psirts/
 - MITRE ATT&CK (for scoping/communication of behaviors) — https://attack.mitre.org/
 - TheHive project — https://thehive-project.org/

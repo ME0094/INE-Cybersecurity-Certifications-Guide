@@ -27,9 +27,13 @@ The eCIR sits in INE's blue-team / defensive track and centers on **incident res
 and handling**: what an organization does before, during, and after a security
 incident to limit damage, recover, and improve. The publicly described domain spans:
 
-- The **incident response lifecycle** — preparation, detection & analysis,
-  containment, eradication & recovery, and lessons learned (the classic NIST SP
-  800-61 model).
+- The **incident response lifecycle** — SP 800-61 **Rev. 2** defines four phases
+  (Preparation; Detection and Analysis; Containment, Eradication and Recovery;
+  Post-Incident Activity). This module splits the third phase into separate
+  containment and eradication files, which is where its **five** phase files come
+  from. Rev. 3 (April 2025) drops the phase model and frames response around CSF 2.0
+  functions instead; the familiar **six**-step PICERL sequence is the SANS teaching
+  model. Quote the model you are using — the numbers are not interchangeable.
 - **Evidence handling fundamentals** — identifying, preserving, collecting, and
   documenting digital evidence without destroying it.
 - **Host and artifact triage** — quickly examining endpoints (Windows/Linux) for
@@ -123,7 +127,9 @@ A suggested 4–6 week plan (adjust to your pace):
 
 ## Checklist / Self-Test
 
-- [ ] I can explain the six IR lifecycle phases and what each one produces.
+- [ ] I can explain the five IR lifecycle phases this module uses and what each one produces —
+      and name the model whenever I quote a different count (NIST Rev. 2: four phases;
+      SANS/PICERL: six steps).
 - [ ] I can name the ordering rule of evidence work: preserve first, analyze copies.
 - [ ] I can list at least five Windows and five Linux artifacts useful for triage.
 - [ ] I can build a timeline from a disk image and explain its key events.
@@ -132,10 +138,16 @@ A suggested 4–6 week plan (adjust to your pace):
 - [ ] I have completed at least three scenario drills and written a case file for one.
 - [ ] I can explain to a non-technical audience what happened and what we are doing.
 
+> **Verification:** the phase counts were **checked against the NIST SP 800-61 Rev. 3 publication
+> page** (`https://csrc.nist.gov/pubs/sp/800/61/r3/final`, HTTP 200 via `curl` on 2026-09-19) and
+> against this module's own file list. The Rev. 2 four-phase structure and the SANS/PICERL
+> six-step attribution are **documentation references, not executed checks**.
+
 ## Further Resources
 
 - INE Security — eCIR certification page and official syllabus: <https://ine.com/security/certifications/ecir-certification>
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* — https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) — https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - NIST SP 800-86, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - MITRE ATT&CK — https://attack.mitre.org/
 - CISA Incident Response resources — https://www.cisa.gov/resources-tools/resources/incident-response

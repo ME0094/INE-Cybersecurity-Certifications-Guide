@@ -75,8 +75,8 @@ def queueRequests(target, wordlists):
                            requestsPerConnection=100,
                            pipeline=False)
     for _ in range(30):
-        engine.queue(target.req)
-    engine.openGate()                            # release all at once
+        engine.queue(target.req, gate='race1')
+    engine.openGate('race1')                     # release the whole gate at once
 ```
 
 Rules of thumb: start with a small run and watch response codes before scaling up; respect the lab or target's rate expectations; use `handleResponse` to filter noise instead of dumping everything; remember that Turbo Intruder reuses connections, so server-side rate limiters keyed per connection behave differently than they do per request.
@@ -163,6 +163,15 @@ Other integration patterns:
 - [ ] I have installed one BApp extension and checked its Output/Errors tabs; I can describe what family it belongs to.
 - [ ] I can configure a scoped match/replace rule and explain why static replaces are wrong for dynamic values.
 - [ ] I can route `curl` and a Python script through Burp's proxy and locate their traffic in HTTP history.
+
+> **Verification:** the gate pattern was checked on 2026-09-19 against Turbo
+> Intruder's own documentation and shipped examples — `docs/race-conditions.md`
+> ("The `gate` parameter withholds requests until `openGate()` is called") and
+> `resources/examples/race-single-packet-attack.py`, which uses
+> `engine.queue(target.req, gate='race1')` + `engine.openGate('race1')`
+> (<https://github.com/PortSwigger/turbo-intruder>). Turbo Intruder runs inside
+> Burp Suite, which is not installed here, so the script was not executed —
+> primary documentation only.
 
 ## Further Resources
 

@@ -207,6 +207,6 @@ The measurable output of this story is not "we reduced noise". It is: a document
 - Sigma specification (rule structure and modifiers): https://github.com/SigmaHQ/sigma-specification
 - MITRE ATT&CK — technique coverage as the vocabulary of a use case catalog: https://attack.mitre.org
 - MITRE ATT&CK Navigator — visual coverage tracking per technique: https://mitre-attack.github.io/attack-navigator/
-- NIST SP 800-92 — Guide to Computer Security Log Management (source validation and retention): https://csrc.nist.gov/pubs/sp/800/92/upd1/final
+- NIST SP 800-92 — Guide to Computer Security Log Management (source validation and retention): https://csrc.nist.gov/pubs/sp/800/92/final
 - Elastic Security — detection rule management, exceptions, and rule monitoring: https://www.elastic.co/guide/en/security/current/index.html
 - Splunk — correlation search and alert tuning documentation: https://docs.splunk.com/

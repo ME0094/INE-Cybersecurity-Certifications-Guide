@@ -12,7 +12,7 @@ Prompt injection is the LLM equivalent of injection attacks in classic web secur
 
 LLMs cannot inherently distinguish between instructions that came from the developer (system prompt) and text that came from a user, a retrieved document, or an email. When a model is asked to *obey* content that it should merely *process*, the distinction between "data" and "commands" collapses.
 
-A prompt-injection finding is **OWASP LLM01** ("Prompt Injection") in the OWASP Top 10 for LLM Applications and maps to techniques such as *Indirect Prompt Injection* in MITRE ATLAS.
+A prompt-injection finding is **LLM01:2025 Prompt Injection** in the OWASP Top 10 for LLM Applications (2025 edition) and maps to **MITRE ATLAS *LLM Prompt Injection* (`AML.T0051`)**. The indirect delivery mode this phase covers is a sub-technique, not a separate technique: **`AML.T0051.001` (*Indirect*)**, alongside `AML.T0051.000` (*Direct*) and `AML.T0051.002` (*Triggered*).
 
 ### Direct injection
 
@@ -256,9 +256,9 @@ The most common outcome of a first injection test is nothing. Before concluding 
 
 ## Further Resources
 
-- OWASP Top 10 for Large Language Model Applications (LLM01 Prompt Injection) — https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- OWASP Top 10 for Large Language Model Applications (2025 edition; LLM01:2025 Prompt Injection) — https://owasp.org/www-project-top-10-for-large-language-model-applications/
 - OWASP GenAI Security Project — https://genai.owasp.org/
-- MITRE ATLAS (adversarial techniques, incl. indirect prompt injection) — https://atlas.mitre.org/
+- MITRE ATLAS (adversarial techniques; the injection technique is *LLM Prompt Injection*, `AML.T0051`, with `AML.T0051.001` *Indirect* as the sub-technique — not a technique of its own) — https://atlas.mitre.org/
 - NIST AI Risk Management Framework — https://www.nist.gov/itl/ai-risk-management-framework
 - NIST AI 600-1, *Generative AI Profile* — https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-600-1
 - OWASP Cheat Sheet Series (LLM-related cheat sheets) — https://cheatsheetseries.owasp.org/

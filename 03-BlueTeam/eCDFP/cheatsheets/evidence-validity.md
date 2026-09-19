@@ -168,6 +168,11 @@ Write the claim at the level you can support: "the account was used from this ad
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final
 - **ISO/IEC 27037**, *Guidelines for identification, collection, acquisition and preservation of digital evidence* — https://www.iso.org/standard/44381.html
 - **RFC 3227**, *Guidelines for Evidence Collection and Archiving* (order of volatility, and why acquisition order constrains what you can later claim) — https://www.rfc-editor.org/rfc/rfc3227
-- **NIST SP 800-101 Rev. 1**, *Guidelines on Mobile Phone Forensics* (acquisition levels and what each yields) — https://csrc.nist.gov/publications/detail/sp/800-101/rev-1/final
+- **NIST SP 800-101 Rev. 1**, *Guidelines on Mobile Device Forensics* (acquisition levels and what each yields) — https://csrc.nist.gov/publications/detail/sp/800-101/rev-1/final
 - **The Sleuth Kit / Autopsy documentation** (what each file-system structure records) — https://www.sleuthkit.org/
 - **Forensics Wiki** (per-artefact references and known limitations) — https://forensics.wiki/
+
+> **Verification:** checked against source, not executed — **no command in this sheet was run**. The
+> publication title was corrected on **2026-09-19** against the NIST CSRC record, which names
+> SP 800-101 Rev. 1 *Guidelines on Mobile Device Forensics*, not "Mobile Phone Forensics":
+> https://csrc.nist.gov/pubs/sp/800/101/r1/final.

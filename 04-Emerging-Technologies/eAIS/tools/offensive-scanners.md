@@ -106,18 +106,26 @@ pip install garak
 
 # The invocation form used in this module's lab: an OpenAI-compatible target and the
 # prompt-injection probe family.
-garak --model_type openai --model_name gpt-3.5-turbo --probes promptinject
+garak --target_type openai --target_name gpt-3.5-turbo --spec probes.promptinject
 
 # Ask this build which target types, probes, and detectors it actually has.
 garak --help
+garak --list_generators      # the values --target_type accepts
 ```
 
-> Every name in that second line is version-dependent: `--model_type` values differ between
-> hosted providers and local/OpenAI-compatible servers, and probe and detector identifiers are
-> added, renamed, and split over time. `--probes promptinject` is the form this module's lab
-> uses and the one to start from; confirm the rest with `garak --help` and the README for your
-> release, and check how that release points at a *local* endpoint before assuming the hosted
-> form transfers.
+> **Two renames, and one of them is only half a rename.** `--model_type`/`--model_name` are
+> the *old* spellings; the current names are **`--target_type`/`--target_name`**. In garak
+> **0.17.0** (checked 19 September 2026) the old spellings still appear in `--help` as
+> aliases, so a line that uses them is legacy rather than broken — write the new pair in
+> anything you keep. Separately, **`--probes` has been deprecated since 0.15.1.pre1** in
+> favour of `--spec probes.<module>`, which is why the command above uses the `--spec` form;
+> `--probes promptinject` still runs and prints a deprecation notice. Everything else is
+> version-dependent: `--target_type` values differ between hosted providers and
+> local/OpenAI-compatible servers (`openai`, `ollama`, `rest`, `test` and
+> `openai.OpenAICompatible` were the ones this build listed), and probe and detector
+> identifiers are added, renamed, and split over time. Confirm the rest with `garak --help`,
+> `--list_probes`, `--list_generators` and the README for your release, and check how that
+> release points at a *local* endpoint before assuming the hosted form transfers.
 
 A workflow that keeps runs cheap and interpretable:
 
@@ -234,7 +242,11 @@ version-specific.
 #   4. orchestrator the loop that sends, reads the reply, and decides what to try next
 #   5. scorer       the rule that labels a reply as success or failure
 #   6. export       write prompt, response, converter, and score to your own results file
-from pyrit.orchestrator import RedTeamingOrchestrator  # concept, not a copy-paste snippet
+#
+# `pyrit.orchestrator.RedTeamingOrchestrator` — the import this file used to show — no longer
+# exists: the attack layer now lives under `pyrit.executor.attack`. Verify the real path and
+# class name against the release you install; this is a concept sketch, not a snippet.
+from pyrit.executor.attack import AttackExecutor      # verify in your release
 ```
 
 Before writing any of it, answer the four questions in section 7 on paper. The third one
@@ -584,3 +596,33 @@ is a token bill.
 - In-repo: `ai-testing-tools.md` (categories and tool selection), `../labs/llm-testing.md` (the
   local lab and drills), `../cheatsheets/ai-attack-vectors.md` (the case pool), and
   `../methodology/05-defensive-controls.md` (what to do with what you find).
+
+> **Verification:** garak was available and was run on **2026-09-19** under Ubuntu 24.04 /
+> Python 3.12.3: `garak --help` reports **v0.17.0** and defines both spellings —
+> `--target_type …, --model_type …` and `--target_name …, --model_name …` — so the old pair is
+> an alias rather than a removal, and the note above says exactly that. The same help text
+> marks `--probes` as `DEPRECATED, use --spec`, and a real invocation of
+> `garak --target_type openai --target_name gpt-3.5-turbo --probes promptinject` printed
+> `DEPRECATION: --probes on CLI is deprecated since version 0.15.1.pre1` before stopping on the
+> missing `OPENAI_API_KEY` — the flag was parsed, the target was built, and the run needed a
+> credential, which is all this machine was asked to establish. `--list_generators` reported
+> `openai`, `openai.OpenAICompatible`, `ollama`, `rest`, `websocket`, `watsonx`, `rasa` and
+> `test`.
+>
+> **PyRIT 1.1.0 *is* installed** — in the `/opt/pytools/bin` virtualenv, which is not on the
+> system interpreter's path. That distinction matters: a bare
+> `python3 -c "import pyrit"` answers `ModuleNotFoundError: No module named 'pyrit'` on this
+> machine even though PyRIT is present, so "PyRIT is not installed" is the wrong conclusion to
+> draw from that command alone. The import this file used to show fails for the reason stated
+> above, and the failure is literal:
+>
+> ```
+> $ /opt/pytools/bin/python -c "from pyrit.orchestrator import RedTeamingOrchestrator"
+> ModuleNotFoundError: No module named 'pyrit.orchestrator'
+> ```
+>
+> The replacement path **was executed**: `import pyrit.executor.attack` resolves to
+> `…/site-packages/pyrit/executor/attack/__init__.py` and exposes `AttackExecutor`,
+> `AttackStrategy`, `AttackScoringConfig`, `CrescendoAttack` and `PAIRAttack` among others.
+> Verify the exact class and its constructor against your release — the module path is
+> confirmed, the API surface inside it is not.

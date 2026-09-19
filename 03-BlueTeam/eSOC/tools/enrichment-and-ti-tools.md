@@ -179,6 +179,8 @@ Look for: registration date, registrar, registrant country and privacy service, 
 | User account | Directory, HR context via the proper channel, sign-in logs | Role, department, service-account flag, recent travel | A role that cannot explain the behaviour |
 | URL or mail sender | URL analysis, header analysis, MISP, domain age | A redirect chain, a newly registered lookalike domain, a mismatched sender | A credential-harvesting pattern or a spoofed internal sender |
 
+> ⚖️ **Privacy and proportionality (the "User account" row is the risky one).** Enriching a *person* is personal-data processing: it needs a documented **purpose** (this investigation, stated), an **authorization** (written policy or a named approver, plus any employee-representation agreement), and **proportionality** — ask the narrowest question that can change your verdict, and prefer account attributes (service-account flag, role, privileged group) over human ones. HR, travel and location data goes through the owner of that data with a written question; it is not a lookup you run. Apply a **retention** limit to what you export out of these services, and keep the case note to evidence: no medical, family, religious, union or private-travel detail, and no personal data of users who were never in scope. Note also that submitting an internal artefact to a public multi-scanner (section 3) is a *disclosure* decision, which is a policy question before it is a technical one.
+
 ## 7. Diagnostics: When Enrichment Fails
 
 | Situation | What to do |
@@ -216,7 +218,7 @@ Look for: registration date, registrar, registrant country and privacy service, 
 ## Further Resources
 
 - MISP Project — documentation, data model, and REST API reference: https://www.misp-project.org/documentation/
-- MISP — warning lists and their purpose: https://www.misp-project.org/warninglists/
+- MISP — warning lists and their purpose (maintained list set): https://misp.github.io/misp-warninglists/
 - PyMISP — official Python client: https://github.com/MISP/PyMISP
 - VirusTotal — API v3 reference (endpoints, identifiers, rate limits): https://docs.virustotal.com/reference/overview
 - Shodan — API documentation and search filters: https://developer.shodan.io/api

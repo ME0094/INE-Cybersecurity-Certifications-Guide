@@ -120,6 +120,25 @@ Log retention is a preparation decision with direct detection impact: if you
 retain 30 days of logs but your average dwell time is 60 days, you are blind
 to half of every incident. Align retention with your threat model and
 compliance obligations, and keep an immutable copy of the critical sources.
+## Severity Levels
+One scale, used everywhere in this module. The numeric `SEV-n` form and the word label are the
+**same** scale — pick whichever your tooling speaks, and quote both when you escalate.
+
+| Level | Label | Meaning | First response |
+| --- | --- | --- | --- |
+| SEV-1 | CRITICAL | Confirmed broad scope, critical systems, or data exfiltration | Activate full IR immediately; notify executives inside the SLA |
+| SEV-2 | HIGH | Confirmed on one or several real hosts; possible data impact | Full IR for the affected scope; executives within the hour |
+| SEV-3 | MEDIUM | Suspected, limited to one low-value host, low confidence | Investigate during business hours; no external notification |
+| SEV-4 | LOW | Minor policy violation, no evidence of compromise | Routine ticket |
+
+> **A false positive is not a severity level.** An alert that proves benign is closed as a false
+> positive — or as a true positive with no impact — and it leaves the scale entirely. It is never
+> "a SEV-3". Mixing the two turns a detection-tuning metric into an incident category, and the
+> incident-commander succession plan ends up being exercised on noise.
+
+Phase 2 (`02-detection.md`) assigns the level during triage and Phase 3 onward inherits it. Where
+a tool carries its own numeric scale (TheHive's `severity: 1–4`, for example), record the tool's
+value **and** its mapping here, so two systems cannot disagree silently.
 ## Communication Channels
 Incidents need communication that the attacker cannot read or block. Prepare:
 - An **internal incident channel** (out-of-band if the corporate chat may
@@ -133,14 +152,16 @@ Incidents need communication that the attacker cannot read or block. Prepare:
 
 ```markdown
 ## Escalation matrix (example)
-Severity 1 (enterprise-wide ransomware, confirmed data breach):
+Severity 1 / CRITICAL (enterprise-wide ransomware, confirmed data breach):
 - IR team: immediately | Executives: 15 min | Legal: 30 min
 - Customers: per legal | Regulators: per law (e.g., GDPR: 72 hours)
-Severity 2 (single-host malware, no data impact):
+Severity 2 / HIGH (single-host malware, no data impact):
 - IR team: immediately | Executives: 1 hour
 - Legal: notify only if breach of personal data is possible
-Severity 3 (false positive, minor policy violation):
+Severity 3 / MEDIUM (suspected, one low-value host, low confidence):
 - IR team: within business hours | No external notification
+Severity 4 / LOW (minor policy violation, no evidence of compromise):
+- Routine ticket | No external notification
 ```
 ## Training and Tabletop Exercises
 People forget procedures they do not rehearse. Build a training calendar:
@@ -222,6 +243,9 @@ offline for forensics while BC wants them restored — the decision framework
 ## Further Resources
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for
+  Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) —
+  https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - NIST SP 800-184, *Guide for Cybersecurity Event Recovery* —
   https://csrc.nist.gov/publications/detail/sp/800-184/final
 - MITRE ATT&CK — https://attack.mitre.org (framework for adversary behavior;

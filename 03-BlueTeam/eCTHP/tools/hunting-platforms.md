@@ -199,13 +199,16 @@ index=windows EventCode=4625
 ```
 
 ```spl
-// Beaconing candidate: regular intervals per source/destination pair
+// Beaconing candidate: regular intervals per source/destination pair.
+// Filter on the coefficient of variation (stdev / mean): a fixed absolute stdev both misses a
+// slow beacon and admits fast jittery traffic.
 index=proxy
 | sort 0 + _time
 | streamstats current=f last(_time) as prev by src_ip, dest_host
 | eval delta = _time - prev
 | stats count avg(delta) as avg_delta stdev(delta) as jitter by src_ip, dest_host
-| where count > 20 and jitter < 5
+| eval cv = jitter / avg_delta
+| where count >= 20 and cv < 0.1
 ```
 
 ### EQL (Elastic Security)
@@ -236,7 +239,10 @@ WHERE CommandLine =~ "(?i)-enc(odedcommand)?\\s"
 ```
 
 ```sql
--- Files dropped into a staging directory (OSPath; older releases call this FullPath)
+-- Files dropped into a staging directory. `OSPath` is the canonical name in current releases;
+-- pre-rename builds expose the same value as `FullPath`. Check which one your build has
+-- (`velociraptor vql list`, or the release notes for your version) before copying a query
+-- between versions — the field silently returns nothing when the name does not exist.
 SELECT OSPath, Size, Mtime FROM glob(globs="C:/Windows/Temp/**")
 ```
 

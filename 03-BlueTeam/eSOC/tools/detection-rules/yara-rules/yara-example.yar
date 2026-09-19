@@ -6,13 +6,20 @@
  * plus a Boolean condition: when the condition is true for a scanned
  * object, the rule "fires" (matches).
  *
- * DETECTS: a Windows PE file or memory image holding credential-dumping
- * strings such as "mimikatz", "sekurlsa::", "privilege::debug", or a
- * reference to lsass.exe -- a strong hint of a credential-theft tool.
+ * DETECTS: two rules over the same string set, such as "mimikatz",
+ * "sekurlsa::", "privilege::debug", or a reference to lsass.exe.
+ *   - Suspicious_CredDump_Strings_PE      -- fires only on a real PE file (or
+ *     a memory image holding one) that also carries the strings: a strong
+ *     hint of a credential-theft tool.
+ *   - Suspicious_CredDump_Strings_AnyFile -- the same strings with no file
+ *     type required, so it is the rule that fires on the harmless .txt the
+ *     drill below has you create. Low signal on its own: a note someone
+ *     saved reads the same as a staged payload at this level.
  *
  * STUDY ONLY: test it in your lab against a harmless text file you create
  * that contains those words; never run real malware without authorization.
- *   $ yara yara-example.yar suspicious.txt
+ *   $ yara yara-example.yar suspicious.txt     # matches ..._AnyFile only
+ *   $ yara yara-example.yar some-unsigned.exe  # what ..._PE is there for
  *
  * Syntax: block comments (slash-star ... star-slash) and // line comments;
  * rule names must start with a letter or underscore.
@@ -63,6 +70,42 @@ rule Suspicious_CredDump_Strings_PE
 }
 
 /*
+ * The same string set, with no PE requirement at all. This is the rule the
+ * drills in ../../../labs/soc-scenarios.md and ../../../labs/sigma-rule-tuning.md
+ * exercise against a harmless text file: the match they promise is reachable
+ * only because nothing here constrains the file type. YARA has no way to share
+ * a strings block between two rules in one file, so the set is repeated --
+ * deliberately, rather than by accident.
+ *
+ * Read a hit from this rule as a lead, never as a verdict: a saved note and a
+ * staged payload match identically here, which is exactly why the PE rule above
+ * exists next to it.
+ */
+rule Suspicious_CredDump_Strings_AnyFile
+{
+    meta:
+        author = "Your Name (example for study)"
+        description = "Any file (text, script, log, binary) carrying common credential-dumping tool strings - low signal on its own, educational example"
+        date = "2024/06/01"
+        reference = "https://attack.mitre.org/techniques/T1003/001/"
+        severity = "low"
+
+    strings:
+        $s1 = "mimikatz" ascii wide nocase
+        $s2 = "sekurlsa" ascii wide nocase
+        $s3 = "logonpasswords" ascii wide nocase
+        $s4 = "privilege::debug" ascii wide nocase
+        $s5 = "lsass.exe" ascii wide nocase
+        $h1 = { 4D 69 6D 69 6B 61 74 7A }
+
+    // No pe.is_pe term: this condition is what makes a plain .txt match. The
+    // minimum count of 3 still keeps a single generic word from firing it.
+    condition:
+        3 of ($s*)
+        or $h1
+}
+
+/*
  * Bonus: a 'private' rule cannot fire on its own; other rules reference it
  * by name to reuse shared logic, e.g. "IsWindowsExecutable and <...>".
  */
@@ -74,3 +117,21 @@ private rule IsWindowsExecutable
         // Windows PE file -- a cheap PE check that needs no module.
         uint16(0) == 0x5A4D
 }
+
+/*
+ * VERIFICATION -- executed with yara 4.5.0 on 2026-09-19, against files created
+ * under /tmp (nothing was written inside the repository):
+ *
+ *   $ yara yara-example.yar suspicious.txt       -> Suspicious_CredDump_Strings_AnyFile
+ *   $ yara yara-example.yar pe-with-strings.exe  -> Suspicious_CredDump_Strings_PE
+ *                                                   Suspicious_CredDump_Strings_AnyFile
+ *   $ yara yara-example.yar notepad.exe          -> no match
+ *   $ yara yara-example.yar benign.txt           -> no match
+ *   $ yara yara-example.yar fake-pe.bin          -> Suspicious_CredDump_Strings_AnyFile only
+ *                                                   (starts with 'MZ' but is not a valid PE)
+ *
+ * The same suspicious.txt returned NO match under the earlier single-rule
+ * version of this file, because that condition required pe.is_pe: a plain text
+ * file could never satisfy it. That is the defect the second rule fixes.
+ * Not verified: Windows-side behaviour (this ran under WSL Ubuntu 24.04).
+ */

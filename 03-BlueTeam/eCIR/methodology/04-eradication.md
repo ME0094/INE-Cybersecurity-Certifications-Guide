@@ -163,9 +163,15 @@ Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 10
 ```
 
 ```bash
-# Linux: list upgradable packages, then patch
+# Debian / Ubuntu — the `apt` family
 apt list --upgradable
 sudo apt update && sudo apt upgrade -y
+
+# RHEL / Fedora / Rocky / Alma — the `dnf` family
+sudo dnf check-update && sudo dnf upgrade -y
+
+# SUSE — `zypper`
+sudo zypper list-updates && sudo zypper patch
 ```
 
 Credential rotation belongs in eradication too: rotate every password, token,
@@ -174,7 +180,16 @@ service accounts and, if a domain compromise is suspected, the `krbtgt`
 account (reset twice, per Microsoft's guidance for a compromised domain).
 ## Recovery Steps
 Eradication hands off to recovery when the environment is verified clean.
-Recovery (a distinct NIST phase that follows eradication) includes:
+
+> **Attribution, because this one is easy to get wrong.** Recovery is treated as a step of its
+> own here, but it is **not a separate NIST phase.** In SP 800-61 **Rev. 2**, containment,
+> eradication and recovery are a *single* phase — "Containment, Eradication, and Recovery".
+> SP 800-61 **Rev. 3** (April 2025, *Incident Response Recommendations and Considerations for
+> Cybersecurity Risk Management: A CSF 2.0 Community Profile*) drops the phase model altogether
+> and frames response around CSF 2.0 functions. The five phase files in this module are this
+> repository's own study organisation (see [`../README.md`](../README.md)), not a NIST taxonomy.
+
+Recovery includes:
 1. **Restore from clean backups** — verify integrity and restore into a
    quarantined network first; scan restored data for malware before release.
 2. **Reconnect systems in priority order** — critical business systems first,
@@ -236,9 +251,22 @@ If any gate fails -> stay in eradication/recovery; do not resume normal ops.
       operations.
 - [ ] I understand when and why `krbtgt` password rotation is required after
       a suspected domain compromise.
+
+> **Verification:** the phase attribution was **checked against the NIST SP 800-61 Rev. 3
+> publication page** (`https://csrc.nist.gov/pubs/sp/800/61/r3/final`, HTTP 200 via `curl` on
+> 2026-09-19), whose title is *Incident Response Recommendations and Considerations for
+> Cybersecurity Risk Management: A CSF 2.0 Community Profile*, and against this repository's own
+> eCDFP module for the counterpart wording. The Rev. 2 phase structure was **not** re-read from
+> the PDF — the four-phase model is quoted from the secondary literature and from the module's
+> own prior text, so treat the Rev. 2 sentence as documentation rather than an executed check.
+> The `apt`, `dnf` and `zypper` blocks are **unverified syntax references — not run**.
+
 ## Further Resources
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+- NIST SP 800-61 Rev. 3, *Incident Response Recommendations and Considerations for
+  Cybersecurity Risk Management: A CSF 2.0 Community Profile* (April 2025) —
+  https://csrc.nist.gov/pubs/sp/800/61/r3/final
 - NIST SP 800-83 Rev. 1, *Guide to Malware Incident Prevention and Handling* —
   https://csrc.nist.gov/publications/detail/sp/800-83/rev-1/final
 - MITRE ATT&CK — https://attack.mitre.org (Persistence, Defense Evasion, and

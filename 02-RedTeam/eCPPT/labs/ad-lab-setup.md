@@ -121,9 +121,13 @@ enable them intentionally:
 Add-LocalGroupMember -Group "Administrators" -Member "CORP\bob"
 Add-LocalGroupMember -Group "Administrators" -Member "CORP\svc_sql"
 
-# --- Misconfig 2: Same local Administrator password on every host ---------
-# (Run on DC01 and SRV01): mimics the classic pass-the-hash playground
+# --- Misconfig 2: Same local Administrator password on every member host ---
+# (Run on SRV01 and WS01 — member servers/workstations do have local accounts):
 Set-LocalUser -Name Administrator -Password (ConvertTo-SecureString "LocalAdm!2024" -AsPlainText -Force)
+# A domain controller has NO local accounts, so there is nothing for Set-LocalUser
+# to change on DC01: its built-in Administrator is the *domain* account. If you
+# want the same password there, it is a domain operation instead:
+# Set-ADAccountPassword -Identity Administrator -NewPassword (ConvertTo-SecureString "LocalAdm!2024" -AsPlainText -Force)
 
 # --- Misconfig 3: WDigest plaintext storage (mimikatz sekurlsa practice) ---
 # (On SRV01, then reboot and log users on)
@@ -171,21 +175,43 @@ WS01 at least once so session data exists for BloodHound later.
 ## 6. Attack box (Kali) and tooling
 
 ```bash
-# Kali on the same host-only network; static IP, DNS -> DC
-sudo tee /etc/network/interfaces.d/lab <<'EOF'
-auto eth0
-iface eth0 inet static
-    address 10.0.0.50
-    netmask 255.255.255.0
-    gateway 10.0.0.1
-    dns-nameservers 10.0.0.10
-EOF
+# Kali on the same host-only network: static IP, and DNS pointing at the DC.
+# Current Kali images manage networking with NetworkManager, so an
+# /etc/network/interfaces.d/ stanza is not applied — set the connection with
+# nmcli (or the desktop GUI). Check which stack you are on before editing files.
+nmcli device status                         # is NetworkManager managing your NIC?
+nmcli connection show                       # then find your connection name
 
-# Tools used by the labs and simulations
+sudo nmcli connection modify "Wired connection 1" \
+    ipv4.method manual \
+    ipv4.addresses 10.0.0.50/24 \
+    ipv4.gateway 10.0.0.1 \
+    ipv4.dns 10.0.0.10 \
+    ipv4.dns-search corp.local \
+    ipv4.ignore-auto-dns yes
+sudo nmcli connection up "Wired connection 1"
+
+# Verify before going further
+ip -brief addr show
+nmcli device show | grep -i dns
+
+# Tools used by the labs and simulations.
+# netexec provides the nxc command — the successor of CrackMapExec, whose old
+# crackmapexec/cme command name is gone.
 sudo apt update
 sudo apt install -y bloodhound bloodhound-python neo4j impacket-scripts \
                     netexec evil-winrm hashcat seclists
 ```
+
+**Why DNS must point at the DC and not at your router:** Active Directory
+publishes the locator records Kerberos and domain joins depend on
+(`_ldap._tcp.dc._msdcs.corp.local`, `_kerberos._tcp.corp.local`, …) only in its
+own zone. A router or public resolver cannot answer for a private `corp.local`
+zone, so tools that resolve the domain by name (`impacket-psexec -k`,
+`evil-winrm`, `xfreerdp` with a hostname, `nltest /dsgetdc`) fail with
+name-resolution or `KDC_ERR_*` errors even though the IP is reachable. Set
+`ipv4.dns 10.0.0.10` **and** `ipv4.ignore-auto-dns yes`, or DHCP hands you the
+gateway's resolver back.
 
 Check reachability and name resolution:
 
@@ -241,10 +267,12 @@ nmap -Pn -p 53,88,135,139,389,445,5985 10.0.0.10   # DC ports open?
 - **Joining clients with DNS pointing at the router** — the #1 "can't find the
   domain" cause; DNS must point at the DC.
 
+> **Verification:** the `nmcli` property names were checked against the NetworkManager reference (<https://networkmanager.dev/docs/api/latest/nm-settings-nmcli.html> — `ipv4.method`, `ipv4.addresses`, `ipv4.gateway`, `ipv4.dns`, `ipv4.dns-search`, `ipv4.ignore-auto-dns`) on 2026-09-19; `nmcli` itself was not installed in the verification environment, so the invocation was not executed. Corrections applied from the 19 Sep 2026 audit.
+
 ## Further Resources
 
 - [Microsoft Learn — Install Active Directory Domain Services](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-)
-- [Microsoft Learn — Active Directory administrative center / ADUC](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/active-directory-administrative-center)
+- [Microsoft Learn — Active Directory administrative center / ADUC](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/adac/active-directory-administrative-center)
 - [Microsoft Learn — Windows Server evaluation downloads](https://www.microsoft.com/en-us/evalcenter/)
 - [Kali Linux — documentation](https://www.kali.org/docs/)
 - [HackTricks — Active Directory methodology](https://book.hacktricks.wiki/en/windows-hardening/active-directory-methodology.html)

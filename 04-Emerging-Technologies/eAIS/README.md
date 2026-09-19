@@ -11,23 +11,31 @@ penetration-testing certification attacks servers and web apps, eAIS is about at
 and defending the AI application layer: the prompts, the models, the data they are
 trained or retrieved from, and the tools and agents they can invoke.
 
-Public information from INE describes the certification as building practical AI security
-readiness and highlights areas such as:
+INE's public material for eAIS describes it as building practical, hands-on AI security
+readiness. **It does not publish an official domain list for this credential**, and this
+repository does not invent one: the five areas below are **this module's own scope** — the
+map *we* chose for the material, derived from the public description and from what the labs
+actually exercise. Treat them as a study plan, not as an exam blueprint, and read the
+official certification page for anything authoritative.
+
+The scope this module covers:
 
 - **Prompt injection** — tricking a model into ignoring its instructions or acting on
-  attacker-controlled text.
+  attacker-controlled text. Phases 02 and the injection lab.
 - **Retrieval-Augmented Generation (RAG) security** — poisoning or abusing the documents
-  and vector stores an application retrieves answers from.
+  and vector stores an application retrieves answers from. Phases 03 and 07, plus the
+  RAG-leakage and poisoning labs.
 - **Tool and agent misuse** — abusing the functions, plugins, or APIs an AI application is
-  allowed to call.
+  allowed to call. Phase 06 and the agent-abuse lab.
 - **Data and model poisoning** — contaminating training, fine-tuning, or prompt data to
-  steer behavior.
-- **Safe operational use of AI** — the controls, monitoring, and review practices that
-  keep AI applications safe in production.
+  steer behavior. Phase 03 and the poisoning lab.
+- **Safe operational use of AI** — the controls, monitoring, review, and governance that
+  keep AI applications safe in production. Phases 05, 08, and 09.
 
-The spirit of the certification is *hands-on*: you are expected to understand the attack
+The spirit of the credential is *hands-on*: you are expected to understand the attack
 surface of an AI application, reproduce representative attacks in a sanctioned lab, and
-recommend proportionate defenses.
+recommend proportionate defenses. That much the public description does support, and it is
+the shape this module is built around.
 
 > **NDA note:** INE exams are protected. This repository intentionally describes only the
 > *public* skill areas and general practice of AI security — never specific exam

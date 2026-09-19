@@ -226,7 +226,9 @@ A concrete pass through the baseline → enforce → verify cycle on a Linux web
      FIX      Something the image or the config should already have set.
               Fix the image/config, not the host, or it will drift back.
      DEVIATE  A rule that cannot apply (an unused subsystem, a vendor requirement).
-              Tailor it out with a documented reason and an owner.
+              Tailor it out with a documented reason and an owner — with
+              `autotailor` (OpenSCAP 1.3+) or by hand in an overlay file;
+              `oscap xccdf generate` has no tailoring-file submodule.
      ACCEPT   A rule whose remediation would break the application. This is a risk
               acceptance with an expiry date, not a silent exception.
 
@@ -350,7 +352,7 @@ Question 10 is the one designs usually omit, and it is where a surprising amount
 - CIS Benchmarks: https://www.cisecurity.org/cis-benchmarks
 - NIST SP 800-123 (server security guide) and SP 800-125 (hypervisor): https://csrc.nist.gov/publications
 - NIST Cryptographic Standards (FIPS 140, SP 800-52 TLS guidance): https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines
-- OWASP — secure design principles and cheat sheets: https://owasp.org/www-project-cheat-sheets/
+- OWASP — secure design principles and cheat sheets: https://cheatsheetseries.owasp.org/
 - MITRE ATT&CK (for detection engineering and logging priorities): https://attack.mitre.org
 - Microsoft — baseline security policies and Active Directory security guidance: https://learn.microsoft.com/en-us/security/
 - ENISA — network and information security guidance: https://www.enisa.europa.eu

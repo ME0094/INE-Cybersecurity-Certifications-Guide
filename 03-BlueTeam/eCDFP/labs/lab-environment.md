@@ -267,12 +267,10 @@ sha256sum ~/lab/case-01/evidence/disk.dd
 ```
 
 ```bash
-# The E01 alternative: a container with its own integrity metadata
-sudo ewfacquire /dev/sdb \
-  -t ~/lab/case-01/evidence/disk.E01 \
-  -u "case-01-exhibit-1" \
-  -e "Case 01, Exhibit 1: win-lab system disk" \
-  -m fixed
+# The E01 alternative: a container with its own integrity metadata.
+# -u is unattended mode (no argument) and -t takes the target WITHOUT extension.
+sudo ewfacquire -u -C "case-01" -D "win-lab system disk" -e "your name" \
+  -m fixed -t ~/lab/case-01/evidence/disk /dev/sdb
 # What to look for: a completed acquisition summary and no read-error count you
 # cannot explain. Confirm the switch set with ewfacquire -h on your build.
 

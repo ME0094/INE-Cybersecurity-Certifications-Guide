@@ -73,7 +73,8 @@ adb root && adb shell "/data/local/tmp/frida-server &"
 
 # Host side
 frida-ps -Uai                             # list apps on USB device
-frida -U -f com.example.app -l hook.js --no-pause   # spawn + script
+frida -U -f com.example.app -l hook.js    # spawn + script (main thread resumes)
+frida -U -f com.example.app -l hook.js --pause   # spawn held at the entry point
 frida -U com.example.app -l hook.js       # attach to running app
 ```
 
@@ -174,6 +175,12 @@ frida-ps -Uai | grep -i bank                      # find app's process name
 - [ ] I know the iOS commands that apply to my hardware (simctl / dump.py / class-dump)
 - [ ] I can install Burp's CA on Android and iOS from memory
 
+> **Verification:** the `frida` spawn flags (`--pause`; no `--no-pause`) were
+> checked against `frida_tools/repl.py` lines 119-126 in `frida-tools` main
+> (<https://raw.githubusercontent.com/frida/frida-tools/main/frida_tools/repl.py>,
+> 2026-09-19). No `frida` binary on this host, so nothing was run — primary
+> documentation only.
+
 ## Further Resources
 
 - adb reference — https://developer.android.com/studio/command-line/adb
@@ -182,4 +189,4 @@ frida-ps -Uai | grep -i bank                      # find app's process name
 - Frida — https://frida.re/docs/
 - objection — https://github.com/sensepost/objection
 - Burp Suite documentation — https://portswigger.net/burp/documentation
-- OWASP MASTG — https://owasp.org/www-project-mobile-security-testing-guide/
+- OWASP MASTG — https://mas.owasp.org/MASTG/

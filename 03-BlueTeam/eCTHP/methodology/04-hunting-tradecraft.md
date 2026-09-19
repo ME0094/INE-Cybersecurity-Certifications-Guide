@@ -89,7 +89,11 @@ Field names differ by add-on: the Sysmon add-on provides `Image`, `CommandLine`,
 
 ```powershell
 velociraptor.exe query "SELECT Pid, Ppid, Name, Exe, CommandLine FROM pslist() WHERE Name =~ 'powershell'"
-velociraptor.exe query "SELECT FullPath, Size, Mtime FROM glob(globs='C:/Windows/System32/Tasks/**')"
+# `OSPath` is the canonical field name for a glob() result in current releases; pre-rename
+# builds expose the same value as `FullPath`. Confirm on your own build with `velociraptor vql
+# list` before copying a query between versions — an unknown field name yields an empty column,
+# not an error, so the mistake is silent.
+velociraptor.exe query "SELECT OSPath, Size, Mtime FROM glob(globs='C:/Windows/System32/Tasks/**')"
 velociraptor.exe query "SELECT * FROM Artifact.Windows.System.Pslist()"
 ```
 

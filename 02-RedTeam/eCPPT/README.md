@@ -80,9 +80,12 @@ folders are meant to be used in order:
 - **[cheatsheets/](cheatsheets/)** — fast lookup material:
   [Active Directory commands](cheatsheets/ad-commands.md).
 
-Suggested flow: read the methodology notes → skim the tool guides → build the
-lab → run the attack simulations → use the cheatsheets during practice and
-review.
+Suggested flow: read the methodology notes → skim the tool guides → **build the
+[AD lab](labs/ad-lab-setup.md) before running anything hands-on** → run the
+[attack simulations](labs/attack-simulations.md) → use the cheatsheets during
+practice and review. The methodology phases quote the lab's own domain and
+accounts (`corp.local`, `bob`, `da.smith`, `DC01`, `10.0.0.x`), so their commands
+only resolve once that lab exists — the phase notes link back to it.
 
 ## Practical exam context (public information only)
 
@@ -125,7 +128,7 @@ A suggested order of attack for this module:
 - [ ] Complete at least four attack simulations from scratch
 - [ ] Drill the ad-commands cheatsheet until command syntax is automatic
 - [ ] Write one practice penetration test report from a lab run
-- [ ] Review the official exam objectives and confirm current version/policies on inecp.com
+- [ ] Review the official exam objectives and confirm the current version and policies on the [eCPPT product page](https://ine.com/security/certifications/ecppt-certification)
 
 ## Common Mistakes & Tips
 
@@ -141,6 +144,8 @@ A suggested order of attack for this module:
 - **Ignoring the defensive view** — knowing how logging, AMSI, Credential
   Guard, and EDR react to your tooling makes you a better (and more careful)
   operator.
+
+> **Verification:** the eCPPT product-page URL used above was confirmed to resolve (HTTP 200) on 2026-09-19. Corrections applied from the 19 Sep 2026 audit.
 
 ## Further Resources
 

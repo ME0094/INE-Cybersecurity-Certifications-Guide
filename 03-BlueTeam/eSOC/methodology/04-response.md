@@ -275,7 +275,8 @@ Also worth writing once, while it is fresh: **what you would do differently**, p
 
 ## Further Resources
 
-- NIST SP 800-61 Rev. 3 — Computer Security Incident Handling Guide: https://csrc.nist.gov/pubs/sp/800/61/r3/final
+- NIST SP 800-61 Rev. 3 — *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile*: https://csrc.nist.gov/pubs/sp/800/61/r3/final
+  - The *Preparation → Detection and Analysis → Containment, Eradication and Recovery → Post-Incident Activity* cycle this file's structure follows is from **Rev. 2** (*Computer Security Incident Handling Guide*, now withdrawn). Rev. 3 no longer defines those four phases: it recasts incident response as risk management aligned to the CSF 2.0 functions. The cycle is kept here as shared vocabulary, and Rev. 3 is the current source for everything else.
 - CISA — Incident Response resources and best practices: https://www.cisa.gov/resources-tools
 - MITRE ATT&CK — technique context for containment and detection decisions: https://attack.mitre.org
 - SANS Incident Handlers' Handbook (defensible process guidance): https://www.sans.org/white-papers/33901/

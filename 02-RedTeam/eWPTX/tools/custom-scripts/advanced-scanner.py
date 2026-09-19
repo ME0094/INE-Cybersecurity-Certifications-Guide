@@ -37,6 +37,15 @@ COMMON_PATHS = (
 
 WEAK_COOKIE_FLAGS = ("secure", "httponly", "samesite")
 
+# Paths whose mere exposure is itself a finding, with the severity it deserves.
+# An exposed repository config outranks a robots.txt hit: it hands over source
+# and history, not a route list.
+SENSITIVE_PATHS = {
+    ".git/config": "high",
+    "robots.txt": "low",
+    "sitemap.xml": "low",
+}
+
 
 @dataclass
 class Finding:
@@ -44,6 +53,18 @@ class Finding:
     check: str
     detail: str
     extra: dict = field(default_factory=dict)
+
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Decline every 3xx so checks observe the raw outcome.
+
+    build_opener() installs HTTPRedirectHandler by default, which silently
+    follows 301/302 and would make the redirect branch of
+    check_common_paths() unreachable.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 class Scanner:
@@ -57,7 +78,7 @@ class Scanner:
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE
             handlers.append(urllib.request.HTTPSHandler(context=ctx))
-        self.opener = urllib.request.build_opener(*handlers)
+        self.opener = urllib.request.build_opener(NoRedirect, *handlers)
 
     def request(self, url: str, extra_headers: dict | None = None) -> tuple[int, dict, bytes]:
         headers = {"User-Agent": "advanced-scanner/0.1"}
@@ -94,10 +115,22 @@ class Scanner:
     def check_cors(self) -> None:
         try:
             _, headers, _ = self.request(self.base + "/", {"Origin": "https://evil.example"})
-            acao = headers.get("Access-Control-Allow-Origin")
-            if acao and acao.strip() == "https://evil.example":
-                self.findings.append(Finding("high", "cors",
-                                             "ACAO reflects the Origin (open CORS)"))
+            acao = headers.get("Access-Control-Allow-Origin", "")
+            if acao.strip() != "https://evil.example":
+                return
+            # A reflected origin is only a credential-theft primitive when the
+            # browser is also told to send credentials.
+            acac = headers.get("Access-Control-Allow-Credentials", "").strip().lower()
+            if acac == "true":
+                self.findings.append(Finding(
+                    "high", "cors",
+                    "ACAO reflects the Origin with Access-Control-Allow-Credentials: "
+                    "true (credentialed cross-origin read)"))
+            else:
+                self.findings.append(Finding(
+                    "low", "cors",
+                    "ACAO reflects the Origin but Access-Control-Allow-Credentials "
+                    "is not 'true' (no credentialed read)"))
         except RuntimeError:
             pass
 
@@ -108,8 +141,9 @@ class Scanner:
                 status, _, body = self.request(url)
             except RuntimeError:
                 continue
-            if status == 200 and path in ("robots.txt", "sitemap.xml"):
-                self.findings.append(Finding("low", "paths",
+            level = SENSITIVE_PATHS.get(path)
+            if status == 200 and level:
+                self.findings.append(Finding(level, "paths",
                                              f"{path} is accessible", {"bytes": len(body)}))
             elif status in (200, 301, 302, 403):
                 self.findings.append(Finding("info", "paths",

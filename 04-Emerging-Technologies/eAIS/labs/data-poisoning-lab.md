@@ -48,13 +48,22 @@ Documents are plain `.txt`; retrieval ranks by term overlap and returns the top 
 
 ```python
 # retrieve.py — keyword retrieval + baseline capture. Written here, never executed: run it.
-#   python retrieve.py baseline            # BEFORE you touch the corpus (Drill 1)
-#   python retrieve.py ask "..."           # one ad-hoc question, logged like the rest
-import hashlib, json, os, sys, time
+#   python retrieve.py baseline                        # BEFORE you touch the corpus (Drill 1)
+#   python retrieve.py baseline --out baseline_after.jsonl   # after planting (Drill 2)
+#   python retrieve.py ask "..."                       # one ad-hoc question, logged like the rest
+#
+# `--out` names the capture file and is the ONLY way the file is chosen. Drill 2 needs a
+# second file (`baseline_after.jsonl`) and the earlier CLI had no way to ask for one: it
+# always appended to baseline.jsonl, so the "after" capture landed on top of the "before"
+# and the diff was impossible. The capture is also TRUNCATED at the start of a run and every
+# row carries the run id and the capture start time, so running the capture twice replaces
+# the file instead of silently doubling it with two rows per question, indistinguishable.
+import argparse, hashlib, json, os, sys, time
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(BASE, "lab_poisoning_data")
 CORPUS, TOP_K = os.path.join(DATA, "corpus"), 3
+RUN_ID = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())     # one id per process
 
 def rank(query):
     """Score every document by term overlap. No vectors: the drill is about the rank."""
@@ -68,29 +77,44 @@ def rank(query):
                            "sha256": hashlib.sha256(text.encode()).hexdigest()[:12], "text": text})
     return sorted(scored, key=lambda d: -d["score"])[:TOP_K]
 
-def ask(qid, query, out_file=None):
+def ask(qid, query):
     hits = rank(query)
     with open(os.path.join(DATA, "retrieval-log.jsonl"), "a", encoding="utf-8") as fh:
-        fh.write(json.dumps({"ts": time.time(), "id": qid, "query": query,
+        fh.write(json.dumps({"ts": time.time(), "run": RUN_ID, "id": qid, "query": query,
                              "top_k": [{"doc": h["doc"], "score": h["score"],
                                         "sha256": h["sha256"]} for h in hits]}) + "\n")
     answer = " | ".join(h["text"].strip().split(".")[0] for h in hits)
-    rec = {"id": qid, "answer": answer, "sources": [h["doc"] for h in hits]}
-    if out_file:                      # one write per record: the baseline must not be duplicated
-        with open(os.path.join(DATA, out_file), "a", encoding="utf-8") as fh:
+    return {"run": RUN_ID, "id": qid, "answer": answer,
+            "sources": [h["doc"] for h in hits]}
+
+def capture(out_file, questions=None):
+    """Write one capture file from scratch: truncate first, so a re-run cannot duplicate."""
+    path = os.path.join(DATA, out_file)
+    with open(path, "w", encoding="utf-8") as fh:       # "w", not "a": one run, one file
+        for line in open(os.path.join(DATA, questions or "questions.jsonl"), encoding="utf-8"):
+            if not line.strip():
+                continue
+            q = json.loads(line)
+            rec = ask(q["id"], q["question"])            # retrieval log and capture, once
+            rec["expected_answer"], rec["expected_source"] = q["expected_answer"], q["expected_source"]
             fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
-    return rec
+    print(f"captured {out_file} as run {RUN_ID}")
 
 if __name__ == "__main__":
-    if sys.argv[1] == "baseline":
-        for line in open(os.path.join(DATA, "questions.jsonl"), encoding="utf-8"):
-            q = json.loads(line)
-            rec = ask(q["id"], q["question"])            # retrieval log only
-            rec["expected_answer"], rec["expected_source"] = q["expected_answer"], q["expected_source"]
-            with open(os.path.join(DATA, "baseline.jsonl"), "a", encoding="utf-8") as fh:
-                fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    parser = argparse.ArgumentParser(description="keyword retrieval + capture")
+    sub = parser.add_subparsers(dest="command", required=True)
+    cap = sub.add_parser("baseline", help="capture every question in questions.jsonl")
+    cap.add_argument("--out", default="baseline.jsonl",
+                     help="capture file under lab_poisoning_data/ (Drill 2: baseline_after.jsonl)")
+    cap.add_argument("--questions", default="questions.jsonl")
+    adhoc = sub.add_parser("ask", help="one ad-hoc question, logged like the rest")
+    adhoc.add_argument("question")
+    args = parser.parse_args()
+
+    if args.command == "baseline":
+        capture(args.out, args.questions)
     else:
-        print(json.dumps(ask("adhoc", sys.argv[2]), ensure_ascii=False, indent=2))
+        print(json.dumps(ask("adhoc", args.question), ensure_ascii=False, indent=2))
 ```
 
 The evaluation set is the other half of the reference: for every question you must know the answer *and* the document it should come from, or you cannot tell a wrong answer from a wrong source.
@@ -112,13 +136,13 @@ The evaluation set is the other half of the reference: for every question you mu
 
 **Objective.** Fix the reference point, and prove the retriever is stable before you call any later change *drift*.
 
-**Setup.** Nothing planted. `questions.jsonl` filled in, `baseline.jsonl` empty.
+**Setup.** Nothing planted. `questions.jsonl` filled in. `baseline.jsonl` does not exist yet — the capture creates it.
 
 **Steps.**
 
-1. Run `python retrieve.py baseline`, then read `baseline.jsonl`: one record per question with the observed answer, the observed sources, and the expected answer and source beside them.
+1. Run `python retrieve.py baseline` (which writes `baseline.jsonl`), then read it: one record per question with the observed answer, the observed sources, and the expected answer and source beside them. Every row carries the `run` id, so two captures are never confusable.
 2. Check the expected source is the **top hit** for every question on the clean corpus. If a question's expected source sits at rank 2 or falls outside the top 3, fix the corpus or the question **now** — you cannot attribute drift that was already there.
-3. Run the capture a second time and compare: with keyword ranking the result is deterministic, so any difference means the corpus changed between runs, not that the system is noisy. Record that as an advantage of this simplification, and as a limitation if you later swap in a model.
+3. Run the capture a second time (`python retrieve.py baseline --out baseline_rerun.jsonl` — a *different* file) and compare: with keyword ranking the result is deterministic, so any difference means the corpus changed between runs, not that the system is noisy. Record that as an advantage of this simplification, and as a limitation if you later swap in a model.
 4. Hash every document and start `ingest.jsonl` from your own notes (path, sha256, added, author, source, review status). This is the file Drill 5 reviews.
 
 **What you should observe.** Baseline lines where observed source equals expected source for all five questions — or an explicit list of the questions where it does not, which is a *lab defect to fix*, not a finding. Also a retrieval log whose `top_k` scores you can compare against later: the score column is what makes rank movement visible.
@@ -135,7 +159,8 @@ The evaluation set is the other half of the reference: for every question you mu
 
 **Steps.**
 
-1. Capture the poisoned state into `baseline_after.jsonl` (same runner, different output file).
+1. Capture the poisoned state with the same runner into a different file:
+   `python retrieve.py baseline --out baseline_after.jsonl`. The file is truncated at the start of the run, so this is a clean capture of the poisoned corpus and not an append to `baseline.jsonl`.
 2. For each question, compare: answer changed? cited source changed? and where did the legitimate document sit — still rank 1, pushed down, or out of the top 3?
 3. Classify per question as `influenced` (the poisoned document is in `top_k`) and separately as `adopted` (the answer changed). Count both; they are different numbers.
 4. Read the score column in `retrieval-log.jsonl`: a document that parrots the query terms scores high for a reason you can point at.
@@ -369,3 +394,14 @@ A usable poisoning finding names the **ingest gate** rather than the payload, qu
 - Poisoning mechanics this lab deliberately does not repeat — [../methodology/03-model-poisoning.md](../methodology/03-model-poisoning.md).
 - Local model, runner and labelling rubric — [llm-testing.md](./llm-testing.md); retriever-side concepts ([phase 07 of this module](../methodology/07-privacy-and-data-leakage.md)) and defensive controls — [../methodology/05-defensive-controls.md](../methodology/05-defensive-controls.md).
 - Attack vocabulary — [../cheatsheets/ai-attack-vectors.md](../cheatsheets/ai-attack-vectors.md); evaluation tooling for larger runs — [../tools/ai-testing-tools.md](../tools/ai-testing-tools.md).
+
+> **Verification:** `retrieve.py` was extracted **verbatim from the block above** and executed
+> on **2026-09-19** under Ubuntu 24.04 / Python 3.12.3 against a synthetic four-document
+> fictional corpus in `/tmp` (not the lab's own corpus, which is yours to write). `python3
+> retrieve.py baseline` produced `baseline.jsonl` with five rows and a `run` id; a second run
+> of the same command left the file at **five rows, not ten**, with one run id — the earlier
+> CLI appended, so the file silently held two indistinguishable rows per question. `python3
+> retrieve.py baseline --out baseline_after.jsonl` produced the second capture Drill 2 asks
+> for, which the earlier CLI could not: `--out` existed on `ask()` but was never wired to the
+> `baseline` command. The poisoned document was `influenced` and `adopted` on all five
+> questions of this synthetic corpus. `python3 -m py_compile retrieve.py` passed.
