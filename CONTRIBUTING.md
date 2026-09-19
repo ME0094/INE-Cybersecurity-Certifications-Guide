@@ -32,8 +32,13 @@ All content in this repository is written in **English**.
   <https://ine.com/certifications> before adding or renaming a module.
 - **Never invent a product-page URL.** Link the `…-certification` page only if it has been
   fetched and resolves; otherwise link the catalogue at <https://ine.com/certifications>.
-  A guessed slug is worse than no link. Note that `https://ine.com/security/certifications`
-  (no slug) is dead — it returns 404.
+  A guessed slug is worse than no link. Note the shape of the parent path:
+  `https://ine.com/security/certifications` (no slug) returns **404**, while the twelve
+  product pages under that same prefix — the `…-certification` slugs this repository links —
+  all return **200** (both re-checked page by page on 19 September 2026). The prefix is not
+  dead; it has no index. So: link a product page directly, link the catalogue at
+  <https://ine.com/certifications> when you need a hub, and never link the bare prefix as a
+  fallback, because that is the one URL under it that does not resolve.
 - **Index every note you write.** A module's `README.md` is its index: a `.md` file that no
   README links is invisible to readers. `check-catalog.mjs` fails on orphans, and that is
   the check that caught real orphans in this repository.
@@ -71,20 +76,21 @@ All content in this repository is written in **English**.
 1. Fork the repository and create a descriptive branch
    (`feat/eWPT-methodology`, `fix/eJPT-broken-link`, …).
 2. Make small, focused changes with clear, descriptive commit messages.
-3. Run the two checks described below — they catch the mistakes that actually happen here.
+3. Run the three checks described below — they catch the mistakes that actually happen here.
 4. Open a pull request describing what you add and why.
 5. If you add a certification, update the root `README.md` index (areas table,
    repository tree, and status) and this file's area mapping.
 
 ## Checks that must pass
 
-Two dependency-free Node scripts verify the things that break in practice. Run them before
+Three dependency-free Node scripts verify the things that break in practice. Run them before
 opening a pull request; CI runs the same commands on every push and pull request
 (`.github/workflows/docs-check.yml`):
 
 ```console
 $ node scripts/utilities/check-catalog.mjs .
 $ node scripts/utilities/check-links.mjs .
+$ node scripts/utilities/check-commands.mjs .
 ```
 
 - **`check-catalog.mjs`** compares the catalog in `README.md` with what is on disk. It fails
@@ -95,12 +101,43 @@ $ node scripts/utilities/check-links.mjs .
 - **`check-links.mjs`** fails on a relative link that does not resolve and on an in-repo
   anchor (`file.md#a-heading`) whose heading no longer exists. Fenced code blocks are
   stripped first, so a `#` comment inside a shell example is never mistaken for a heading.
+- **`check-commands.mjs`** compares every flag, subcommand and plugin name used in a guide
+  against a catalogue extracted from that tool's own documentation
+  (`scripts/utilities/tool-specs/*.json`). A catalogue is not a guess: each one records the
+  URL it came from, the version and the date. The check reads fenced blocks in shell-ish
+  languages and inline code spans that look like a command — it does **not** read tables of
+  flags, pseudocode, or plugin-specific options, and it does not check flag arity. Those
+  limits are stated at the top of the script and in `AUDIT-2026-09-19.md`.
 - **`check-links.mjs . --external`** additionally makes network requests to every external
   URL. It runs weekly in `.github/workflows/external-links.yml` and never on pull requests:
   a vendor site being down should not block your work.
 
-Both exit `0` when clean and `1` when something is wrong, so they work as a pre-commit hook
-or a CI gate without extra tooling. Node 18 or newer is the only requirement.
+All three exit `0` when clean and `1` when something is wrong, so they work as a pre-commit
+hook or a CI gate without extra tooling. Node 18 or newer is the only requirement.
+
+### Say how you checked it
+
+When you change a command, a query or a script, record what you did with it. The convention
+is a single blockquote before `## Further Resources`:
+
+```markdown
+> **Verification:** executed against Volatility 3.2.0 (symbol tables downloaded 2026-09-19)
+> on 2026-09-19; the corrected invocation is the one shown above.
+```
+
+Use `executed` only when you ran it, `checked against <source> <URL>` when you compared it
+with primary documentation, and `unverified syntax reference — not run` when you could not
+run it. `check-commands.mjs` counts how many files carry a record (today that number is
+printed on every run, not enforced) — a file that says nothing is read as "nobody checked".
+
+Put the blockquote just before `## Further Resources`; at the end of the file is also
+accepted, and both are counted. Two rules keep it honest:
+
+- If a record has to quote an invocation that is **wrong on purpose** — "this fails with
+  `invalid choice`" — end that line with `<!-- check-commands: ignore -->`. The checker reads
+  inline code spans, so without the marker it reports the counter-example as a defect.
+- Do not grow the record into a changelog. One blockquote, the tool and version, the date,
+  and what you actually ran.
 
 ## Keeping the catalog current
 

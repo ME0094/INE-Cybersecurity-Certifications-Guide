@@ -19,15 +19,24 @@
 > de qué trata cada guía. Para cualquier dato autoritativo —temario, formato del examen,
 > precio, inscripción— usa siempre **https://ine.com/certifications**.
 
-## 📅 Última verificación contra el catálogo público de INE: **18 de septiembre de 2026**
+## 📅 Última verificación contra el catálogo público de INE: **19 de septiembre de 2026**
 
-Ese día se comprobó cada nombre, cada página de producto y cada anuncio de versión que cita
-la guía, contra las páginas de INE: las doce páginas de producto respondieron **HTTP 200**,
-se enumeró el sitemap de INE para confirmar que esas doce son todo el portfolio de seguridad
-y cada nota de versión se contrastó con la página que la anuncia. Lo que **no** cubre esa
-fecha: la logística del examen (número de preguntas, duración, precio, nota de corte, listas
-oficiales de dominios). Cambia a menudo y **no** se reproduce aquí a propósito: cada módulo
-enlaza la página oficial en su lugar.
+Ese día se comprobó que las doce páginas de producto listadas abajo responden **HTTP 200**, y
+que el índice sin slug (`https://ine.com/security/certifications`) devuelve **404** — por eso
+esta guía nunca enlaza el índice, sino la página de cada certificación. También se corrigieron
+dos notas de versión: eCTHP recibió una **segunda** actualización anunciada el 20 de noviembre
+de 2025 (la de julio de 2025 no era la última) y eSOC tiene anuncio de lanzamiento del 3 de
+marzo de 2026, que antes aparecía en blanco.
+
+Lo que **no** cubre esa fecha: la logística del examen (número de preguntas, duración, precio,
+nota de corte, listas oficiales de dominios). Cambia a menudo y **no** se reproduce aquí a
+propósito: cada módulo enlaza la página oficial en su lugar.
+
+> **Esta página no es la traducción del índice.** Es una portada de orientación: el índice de
+> referencia es [`README.md`](README.md), que además lleva la tabla de profundidad (fases,
+> guías de herramientas, laboratorios, cheatsheets y líneas de notas de cada módulo), la
+> columna de páginas oficiales y la sección de scripts. Aquí están las tablas de área, los
+> enlaces a los recursos y las mismas garantías sobre lo que el repositorio no incluye.
 
 **Nota de mantenimiento.** La guía se mantiene con el mejor esfuerzo posible y sin
 compromiso de seguir todos los cambios de INE. Si la fecha de arriba tiene más de unos
@@ -72,9 +81,11 @@ cheatsheets.
 | [eAIS](04-Emerging-Technologies/eAIS/README.md) | AI Systems Security Specialist | Entender la superficie de ataque de sistemas de IA, probarla y defenderla. |
 | [eIAMA](04-Emerging-Technologies/eIAMA/README.md) | Certified Identity & Access Management Technologist | Implantar y operar gestión de identidades y accesos, y razonar su arquitectura. |
 
-Todas las certificaciones enlazan su **página de producto verificada**. Este repositorio
-**nunca inventa** una URL profunda: un slug equivocado parece oficial y lleva a otro sitio.
-El catálogo completo de INE, que incluye también sus certificaciones no relacionadas con
+Todas las certificaciones tienen su **página de producto verificada**, y el enlace directo a
+cada una está en la tabla del índice inglés ([`README.md`](README.md)) y en
+[`resources/official-links.md`](resources/official-links.md). Este repositorio **nunca
+inventa** una URL profunda: un slug equivocado parece oficial y lleva a otro sitio. El
+catálogo completo de INE, que incluye también sus certificaciones no relacionadas con
 seguridad, está en **https://ine.com/certifications**.
 
 ## Certificaciones retiradas por INE
@@ -118,9 +129,15 @@ INE-Cybersecurity-Certifications-Guide/
 ├── 03-BlueTeam/                 # eEDA, eSOC, eCIR, eCDFP, eCTHP
 ├── 04-Emerging-Technologies/    # eAIS, eIAMA
 ├── resources/                   # enlaces oficiales, lecturas, vídeos, mapa, consejos
-├── scripts/                     # scripts de automatización y comprobaciones
-├── README.md                    # portada en inglés (el índice principal)
-└── README.es.md                 # esta portada
+├── scripts/                     # automatización, utilidades y los catálogos de herramientas
+├── .github/workflows/           # las comprobaciones automáticas y el barrido semanal
+├── README.md                    # portada en inglés (el índice principal, con las cifras)
+├── README.es.md                 # esta portada de orientación
+├── CONTRIBUTING.md              # guía para contribuir (en inglés)
+├── AUDIT-2026-09-18.md          # auditoría adversarial de los doce módulos
+├── AUDIT-2026-09-19.md          # qué se corrigió después y cómo se comprobó cada arreglo
+├── LICENSE                      # licencia MIT
+└── .gitignore
 ```
 
 Cada módulo repite la misma convención: `README.md`, `methodology/` (fases numeradas),
@@ -128,9 +145,11 @@ Cada módulo repite la misma convención: `README.md`, `methodology/` (fases num
 
 ## Estado y mantenimiento
 
-**Estado: completo.** Los doce módulos están terminados, con metodología, herramientas,
-laboratorios y cheatsheets. La profundidad varía entre módulos y cada README declara lo que
-cubre; ninguno es un esqueleto vacío.
+**Estado: completo, con profundidad desigual.** Los doce módulos están terminados, con
+metodología, herramientas, laboratorios y cheatsheets, pero **no todos pesan lo mismo**: la
+tabla de [`README.md`](README.md) mide fases, guías, laboratorios, cheatsheets y líneas de
+notas de cada uno, y el repositorio lo dice en vez de disimularlo. Cada README de módulo
+declara lo que cubre y ninguno es un esqueleto vacío.
 
 Lo que este repositorio **no** contiene, y por qué:
 
@@ -139,11 +158,18 @@ Lo que este repositorio **no** contiene, y por qué:
 - **Credenciales retiradas.** No hay módulos de eCPTX, eCXD, eCMAP, eCRE ni eWDP.
 - **Contenido de examen.** Sin dumps, sin preguntas reales, sin material bajo NDA.
 
-Dos comprobaciones automáticas se ejecutan en cada push a `main` y en cada pull request para
+Tres comprobaciones automáticas se ejecutan en cada push a `main` y en cada pull request para
 que el repositorio no se descomponga: que el catálogo del README coincida con las carpetas que
-existen de verdad, y que no se rompa ningún enlace relativo, ancla interna ni ruta prometida.
-Un tercer trabajo semanal revisa que las URLs externas sigan respondiendo (y se salta a
-propósito las URLs de laboratorio que la guía te dice que abras en tu propia máquina).
+existen de verdad, que no se rompa ningún enlace relativo, ancla interna ni ruta prometida, y
+que cada flag, subcomando y plugin que usan las guías exista en un catálogo extraído de la
+documentación de la propia herramienta. Un cuarto trabajo semanal revisa que las URLs externas
+sigan respondiendo (y se salta a propósito las URLs de laboratorio que la guía te dice que
+abras en tu propia máquina, y las que el repositorio cita precisamente porque están muertas).
+
+Quien corrija un comando deja constancia de cómo lo comprobó, con una línea
+`> **Verification:**` que nombra la herramienta, la versión y la fecha. Los dos registros de
+auditoría del repositorio están en [`AUDIT-2026-09-18.md`](AUDIT-2026-09-18.md) (los 112
+hallazgos) y [`AUDIT-2026-09-19.md`](AUDIT-2026-09-19.md) (los arreglos y su verificación).
 
 ## Contribuir
 

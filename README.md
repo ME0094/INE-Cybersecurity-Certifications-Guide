@@ -28,14 +28,21 @@ study guide covering methodology, tool references, hands-on lab exercises, and
 quick-reference cheatsheets, so the project works as an open, structured
 companion while you prepare for these exams.
 
-> ## 📅 Last verified against INE's public catalog: **18 September 2026**
+> ## 📅 Last verified against INE's public catalog: **19 September 2026**
 >
-> On that date every certification name, product page and version announcement referenced
-> below was checked against INE Security's own pages: all twelve product pages were fetched
-> and answered **HTTP 200**, INE's sitemap was enumerated to confirm that these twelve are
-> the whole security portfolio, and each version note was matched to the page that
-> announces it. What this date does **not** cover: exam logistics (question counts,
-> durations, prices, passing scores, official domain lists). Those change often and are
+> On that date all twelve product pages listed below were fetched and answered **HTTP 200**,
+> and the same check confirmed what this repository already warned about: the bare index
+> `https://ine.com/security/certifications` returns **404**, so that index is never linked
+> here — each module links its own product page. INE's wider catalogue is at
+> <https://ine.com/certifications>, and it also hosts preparation products for third-party
+> credentials (CompTIA Security+, CISSP) that are **not** INE certifications.
+>
+> Two version notes were corrected on that date: eCTHP received a **further** update
+> announced on 20 November 2025 (the July 2025 announcement is not the latest), and eSOC has
+> a launch announcement from **3 March 2026** that this table previously left blank.
+>
+> What this date does **not** cover: exam logistics (question counts, durations, prices,
+> passing scores, official domain lists). Those change often and are
 > deliberately **not** stated in this repository — confirm them on the official page for
 > each certification before you book anything.
 >
@@ -81,10 +88,10 @@ tables below links to that module's `README.md`, which acts as its index.
 | Certification | Full official name | Official page | Latest public update |
 |---|---|---|---|
 | [eEDA](03-BlueTeam/eEDA/README.md) | Enterprise Defense Administrator | [dedicated page](https://ine.com/security/certifications/eeda-certification) | — |
-| [eSOC](03-BlueTeam/eSOC/README.md) | SOC Analyst | [dedicated page](https://ine.com/security/certifications/esoc-certification) | — |
+| [eSOC](03-BlueTeam/eSOC/README.md) | SOC Analyst | [dedicated page](https://ine.com/security/certifications/esoc-certification) | Certification launch announced 3 Mar 2026 |
 | [eCIR](03-BlueTeam/eCIR/README.md) | Certified Incident Responder | [dedicated page](https://ine.com/security/certifications/ecir-certification) | Next-generation certification announced 3 Sep 2025 |
 | [eCDFP](03-BlueTeam/eCDFP/README.md) | Certified Digital Forensics Professional | [dedicated page](https://ine.com/security/certifications/ecdfp-certification) | — |
-| [eCTHP](03-BlueTeam/eCTHP/README.md) | Certified Threat Hunting Professional | [dedicated page](https://ine.com/security/certifications/ecthp-certification) | Updated certification announced 24 Jul 2025 |
+| [eCTHP](03-BlueTeam/eCTHP/README.md) | Certified Threat Hunting Professional | [dedicated page](https://ine.com/security/certifications/ecthp-certification) | Updated certification announced 24 Jul 2025; further update announced 20 Nov 2025 |
 
 ### Emerging Technologies — [`04-Emerging-Technologies/`](04-Emerging-Technologies)
 
@@ -137,9 +144,13 @@ INE-Cybersecurity-Certifications-Guide/
 ├── 03-BlueTeam/                 # eEDA, eSOC, eCIR, eCDFP, eCTHP
 ├── 04-Emerging-Technologies/    # eAIS, eIAMA
 ├── resources/                   # official links, reading lists, videos, study tips
-├── scripts/                     # automation and utility scripts
+├── scripts/                     # automation, utility scripts and the tool catalogues
+├── .github/workflows/           # the checks below, and the weekly external-link sweep
 ├── README.md                    # this index
+├── README.es.md                 # Spanish orientation page (the index of record is this one)
 ├── CONTRIBUTING.md              # contributor guide
+├── AUDIT-2026-09-18.md          # adversarial audit of all twelve modules
+├── AUDIT-2026-09-19.md          # what that audit's fixes changed, and how each one was checked
 ├── LICENSE                      # MIT license
 └── .gitignore
 ```
@@ -188,35 +199,40 @@ Review any script before running it in your own environment.
 **Status: complete, with uneven depth.** All twelve certification modules are finished study
 guides written in English — every one has an index, numbered methodology phases, tool
 references, hands-on labs and cheatsheets. They are **not the same size**, and this
-repository says so instead of pretending otherwise. Measured on 18 Sep 2026:
+repository says so instead of pretending otherwise. Measured on 19 Sep 2026 (after the fix
+pass recorded in [`AUDIT-2026-09-19.md`](AUDIT-2026-09-19.md); counts are `.md` files under
+each folder, recursively, and *Lines of notes* is every line of every `.md` in the module,
+blank lines included — a different convention gives different numbers):
 
 | Module | Phases | Tool guides | Labs | Cheatsheets | Lines of notes |
 |---|---|---|---|---|---|
-| [eJPT](01-Fundamentals/eJPT/README.md) | 5 | 3 | 2 | 1 | 2,735 |
-| [eCPPT](02-RedTeam/eCPPT/README.md) | 5 | 3 | 2 | 1 | 2,152 |
-| [eWPT](02-RedTeam/eWPT/README.md) | 5 | 2 | 2 | 1 | 2,247 |
-| [eWPTX](02-RedTeam/eWPTX/README.md) | 5 | 2 | 1 | 1 | 1,976 |
-| [eMAPT](02-RedTeam/eMAPT/README.md) | 5 | 3 | 2 | 1 | 2,441 |
-| [eEDA](03-BlueTeam/eEDA/README.md) | 9 | 5 | 3 | 1 | 4,603 |
-| [eSOC](03-BlueTeam/eSOC/README.md) | 8 | 6 | 3 | 1 | 4,314 |
-| [eCIR](03-BlueTeam/eCIR/README.md) | 5 | 2 | 1 | 1 | 2,179 |
-| [eCDFP](03-BlueTeam/eCDFP/README.md) | 8 | 5 | 6 | 3 | 7,527 |
-| [eCTHP](03-BlueTeam/eCTHP/README.md) | 5 | 3 | 2 | 2 | 4,900 |
-| [eAIS](04-Emerging-Technologies/eAIS/README.md) | 9 | 5 | 6 | 4 | 9,173 |
-| [eIAMA](04-Emerging-Technologies/eIAMA/README.md) | 5 | 1 | 1 | 1 | 1,612 |
+| [eJPT](01-Fundamentals/eJPT/README.md) | 5 | 3 | 2 | 1 | 2,751 |
+| [eCPPT](02-RedTeam/eCPPT/README.md) | 5 | 3 | 2 | 1 | 2,233 |
+| [eWPT](02-RedTeam/eWPT/README.md) | 5 | 2 | 2 | 1 | 2,251 |
+| [eWPTX](02-RedTeam/eWPTX/README.md) | 5 | 2 | 1 | 1 | 2,097 |
+| [eMAPT](02-RedTeam/eMAPT/README.md) | 5 | 3 | 2 | 1 | 2,574 |
+| [eEDA](03-BlueTeam/eEDA/README.md) | 9 | 5 | 3 | 1 | 4,675 |
+| [eSOC](03-BlueTeam/eSOC/README.md) | 8 | 6 | 3 | 1 | 4,398 |
+| [eCIR](03-BlueTeam/eCIR/README.md) | 5 | 2 | 1 | 1 | 2,424 |
+| [eCDFP](03-BlueTeam/eCDFP/README.md) | 8 | 5 | 6 | 3 | 7,859 |
+| [eCTHP](03-BlueTeam/eCTHP/README.md) | 5 | 3 | 2 | 2 | 5,014 |
+| [eAIS](04-Emerging-Technologies/eAIS/README.md) | 9 | 5 | 6 | 4 | 9,691 |
+| [eIAMA](04-Emerging-Technologies/eIAMA/README.md) | 5 | 1 | 1 | 1 | 1,822 |
 
 Two of them are deliberately thin: eJPT is a first credential, and eIAMA is a young,
 standards-driven certification whose content is protocols rather than procedures. The
 deepest are eAIS, eCDFP and eCTHP. Each module's own README states what it covers, and its
 checklist tells you what you should be able to produce before moving on.
 
-Two automated checks keep the repository from rotting, and they run on every push to `main`
-and on every pull request (`.github/workflows/docs-check.yml`); a third sweeps external links
-weekly and deliberately ignores the lab-local URLs the guides tell the reader to open at home:
+Three automated checks keep the repository from rotting, and they run on every push to `main`
+and on every pull request (`.github/workflows/docs-check.yml`); a fourth sweep runs weekly,
+checks external links and deliberately ignores the lab-local URLs the guides tell the reader
+to open at home:
 
 - [x] Catalog matches the repository — no module on disk that `README.md` does not link, no table row pointing at a folder that moved, no note that is orphaned from its module index
 - [x] Every relative link, in-repo anchor and promised path resolves
-- [x] Catalog, names, areas and version notes verified against INE's own pages (18 Sep 2026)
+- [x] Every flag, subcommand and plugin name in the guides exists in a catalogue extracted from the tool's own documentation (what that check cannot see is stated in its header and in `AUDIT-2026-09-19.md`)
+- [x] Catalog, names, areas and version notes verified against INE's own pages (19 Sep 2026)
 
 What this repository deliberately does **not** contain, and why:
 
@@ -227,12 +243,24 @@ What this repository deliberately does **not** contain, and why:
   [above](#certifications-ine-has-retired).
 - **Exam content.** No dumps, no "practice questions" taken from a live item pool, no
   NDA-protected material.
-- **Validated commands.** The commands and queries in the modules are documented syntax,
-  not captured output: this repository has no SIEM, no lab range and no forensic images in
-  it, and several tool/lab files say so explicitly.
+- **Validated commands.** The commands and queries in the modules are documented syntax
+  rather than captured output, with one stated exception: the eEDA tool notes reproduce
+  output from the workstation where that module was written, and say so in place. Where a
+  command was executed during a review pass, the file carries a `> **Verification:**` line
+  naming the tool, the version and the date; where it was only compared with documentation,
+  the line says that instead. `AUDIT-2026-09-19.md` records which claims were executed and
+  which were not.
 
 Found a mistake — a wrong certification name, a moved link, a version that has since
 changed — open an issue or a pull request. See [Contributing](#contributing).
+
+**Two audit records, kept as they were written.** [`AUDIT-2026-09-18.md`](AUDIT-2026-09-18.md)
+is the adversarial read of all twelve modules: 112 findings, from commands that cannot run to
+claims that contradict each other. [`AUDIT-2026-09-19.md`](AUDIT-2026-09-19.md) records what
+was corrected afterwards, how each correction was checked (a real tool where one could be
+installed, a parser or primary documentation where it could not), and what is still open.
+Both are snapshots, not living documents: findings stay listed after they are fixed so a
+later reader can see what the material used to say.
 
 ## Contributing
 

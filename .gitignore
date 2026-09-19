@@ -1,4 +1,4 @@
-# ── Sistema operativo ────────────────────────────────────────────────
+# ── Operating system ─────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -6,7 +6,7 @@ desktop.ini
 *.swp
 *.tmp
 
-# ── Editores / IDE ───────────────────────────────────────────────────
+# ── Editors / IDE ────────────────────────────────────────────────────
 .vscode/
 .idea/
 *.code-workspace
@@ -19,20 +19,25 @@ venv/
 env/
 .python-version
 
-# ── Entornos y secretos (nunca subir) ────────────────────────────────
+# ── Node (the repository checks use Node, so a stray install is possible) ──
+node_modules/
+
+# ── Environments and secrets (never commit) ──────────────────────────
+# *.pem and *.key stay ignored on purpose: the guides never ask you to version
+# a private key, and a lab key that lands here by accident is worse than one
+# you have to add with `git add -f`.
 .env
 .env.*
 *.pem
 *.key
 *.token
 
-# ── Artefactos de laboratorio / salidas ──────────────────────────────
+# ── Lab artefacts and command output ─────────────────────────────────
 *.log
 logs/
 out/
 artifacts/
 *.ovpn
 
-# ── Scripts (resultados intermedios) ─────────────────────────────────
+# ── Script output (intermediate results) ─────────────────────────────
 reports/
-*.html.tmp

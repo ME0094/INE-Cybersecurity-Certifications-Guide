@@ -4,10 +4,14 @@ name: docs-check
 #   1. the catalog in README.md drifting away from what is on disk (a moved or renamed
 #      module that no table links to, or a table row pointing at a folder that is gone);
 #   2. a relative link or an in-repo anchor that no longer resolves;
-#   3. a command in a guide that cannot run, because the flag does not exist.
+#   3. a command in a guide that cannot run, because the flag, subcommand or plugin
+#      does not exist.
 # The first two are cheap structural checks. The third compares every command line against a
-# catalogue downloaded from each tool's own documentation (scripts/utilities/tool-specs) —
-# it is the check that catches `nmap -oJ` and `frida --no-pause`, which no proofreader sees.
+# catalogue downloaded from each tool's own documentation (scripts/utilities/tool-specs).
+# It reads fenced blocks in shell-ish languages and inline code spans that look like a
+# command; it does not read tables of flags, pseudocode blocks or standalone scripts, and it
+# does not check flag arity — those limits are listed at the top of check-commands.mjs and
+# in AUDIT-2026-09-19.md, which is the pair of audit records this repository keeps.
 # All three are plain Node scripts with no dependencies, so they run anywhere.
 
 on:
