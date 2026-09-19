@@ -159,6 +159,8 @@ Frameworks overlap heavily, so defenders map between them (auditors love this). 
 - [ ] I can map one concrete requirement across CIS, ISO 27001, and CSF without looking anything up.
 - [ ] I can explain the difference between a CSF profile and an implementation tier.
 
+> **Verification:** checked against the NIST pages on 2026-09-19: https://www.nist.gov/cyberframework is the CSF 2.0 overview this guide describes, and https://csrc.nist.gov/pubs/sp/800/37/r2/final is titled *Risk Management Framework for Information Systems and Organizations: A System Life Cycle Approach for Security and Privacy* — the RMF cited above. The ISO/IEC 27001:2022 control counts (93 in four themes) and COBIT's 40 objectives were **not** re-counted: iso.org answers 403 to this client and COBIT is paywalled, so those two figures come from their published summaries.
+
 ## Further Resources
 
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework) — CSF 2.0, quick-start guides, and informative references.

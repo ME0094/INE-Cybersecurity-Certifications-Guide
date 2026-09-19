@@ -76,7 +76,7 @@ All content in this repository is written in **English**.
 1. Fork the repository and create a descriptive branch
    (`feat/eWPT-methodology`, `fix/eJPT-broken-link`, …).
 2. Make small, focused changes with clear, descriptive commit messages.
-3. Run the three checks described below — they catch the mistakes that actually happen here.
+3. Run the four checks described below — they catch the mistakes that actually happen here.
 4. Open a pull request describing what you add and why.
 5. If you add a certification, update the root `README.md` index (areas table,
    repository tree, and status) and this file's area mapping.
@@ -90,7 +90,7 @@ opening a pull request; CI runs the same commands on every push and pull request
 ```console
 $ node scripts/utilities/check-catalog.mjs .
 $ node scripts/utilities/check-links.mjs .
-$ node scripts/utilities/check-commands.mjs .
+$ node scripts/utilities/check-commands.mjs . --require-verification
 $ node scripts/utilities/check-code.mjs .
 ```
 
@@ -108,9 +108,9 @@ $ node scripts/utilities/check-code.mjs .
   URL it came from, the version and the date. The check reads fenced blocks in shell-ish
   languages, inline code spans that look like a command, and tables of flags when the table's
   context names exactly one catalogued tool — so a row such as `| -oJ file | JSON |` in a note
-  about nmap is a claim it can test. It does **not** read pseudocode, plugin-specific options or
-  standalone scripts, and it does not check flag arity. Those limits are stated at the top of
-  the script and in `AUDIT-2026-09-19.md`.
+  about nmap is a claim it can test. It does **not** read pseudocode, plugin-specific options,
+  standalone scripts, ASCII diagrams or directory trees, and it does not check flag arity.
+  Those limits are stated at the top of the script and in `AUDIT-2026-09-19.md`.
 - **`check-code.mjs`** closes the other half of that gap: every fenced block must be closed (an
   unclosed fence swallows the rest of the document), and every `python` or `js` block, and every
   `.py`/`.mjs` file, must parse. Nothing is executed — Python is parsed with `ast.parse` and
@@ -135,8 +135,10 @@ is a single blockquote before `## Further Resources`:
 
 Use `executed` only when you ran it, `checked against <source> <URL>` when you compared it
 with primary documentation, and `unverified syntax reference — not run` when you could not
-run it. `check-commands.mjs` counts how many files carry a record (today that number is
-printed on every run, not enforced) — a file that says nothing is read as "nobody checked".
+run it. `check-commands.mjs --require-verification` — the form CI runs — fails on a file that
+contains commands and declares no record, so a file that says nothing is read as "nobody
+checked" and blocks the build. That enforcement went on in September 2026, once every file
+with commands carried a record; before that the number was only printed on every run.
 
 Put the blockquote just before `## Further Resources`; at the end of the file is also
 accepted, and both are counted. Two rules keep it honest:
@@ -159,7 +161,7 @@ that has worked so far:
 3. Add a version note with the date and a link to the announcement, so a later reader can
    tell *when* that was true. Do not restate exam logistics — link instead.
 4. Move the *Last verified* date in `README.md` and `resources/official-links.md`.
-5. Run both checks. `check-catalog.mjs` is what catches the "renamed folder, stale table"
+5. Run all four checks. `check-catalog.mjs` is what catches the "renamed folder, stale table"
    class of mistake, which is the one that has actually happened here.
 
 ## Where to open issues
@@ -167,3 +169,9 @@ that has worked so far:
 Open an issue in this repository's issue tracker to report broken links,
 propose structural improvements, or discuss new content and conventions before
 writing a pull request.
+
+> **Verification:** executed on **2026-09-19** from the repository root: the four commands in
+> "Checks that must pass" above were run with Node 22.23.2 on Windows 11 and with Node 18.19.1
+> on Ubuntu 24.04 (WSL), each exiting 0, `check-commands.mjs` in the `--require-verification`
+> form CI now uses. `check-links.mjs . --external` was **not** part of that run: it makes
+> network requests and is the weekly sweep, not a pull-request gate.

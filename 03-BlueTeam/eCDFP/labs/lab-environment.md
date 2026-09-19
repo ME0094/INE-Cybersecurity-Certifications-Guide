@@ -357,6 +357,16 @@ losetup -a
 - [ ] I know how to reset the lab, and I have done it at least once without losing anything I needed.
 - [ ] No evidence file has ever been mounted, and `mount`/`losetup` show nothing stale.
 
+> **Verification:** executed against **The Sleuth Kit 4.12.1**, **GNU coreutils 9.4**,
+> **foremost 1.5.7** and **ewfacquire/ewfverify 20140814** on **2026-09-19** (Ubuntu 24.04 WSL),
+> against an ext4 partition inside a partition table built in `/tmp`: `mmls` listed the
+> 2048-sector start, `fsstat -o 2048` reported Ext4 and the volume ID, `sha256sum` agreed on the
+> source and the working copy, `sha256sum -c` printed `OK`, `ewfacquire -u -C … -D … -t …/disk`
+> produced `disk.E01` that `ewfverify` passed, and `fls`/`ils`/`mactime` produced the bodyfile CSV
+> with the `/lab` prefix. **Not executed:** `bulk_extractor` (absent from this install), `dc3dd`,
+> and every step that needs a hypervisor, a real block device or a Windows victim — no VM was
+> built, so sections 3–5 and 9 are a build plan here.
+
 ## Further Resources
 
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final

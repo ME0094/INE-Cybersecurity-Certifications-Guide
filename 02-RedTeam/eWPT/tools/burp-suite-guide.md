@@ -212,6 +212,11 @@ permissions and can send traffic.
 
 ---
 
+> **Verification:** unverified syntax reference — not run. Burp Suite is not installed in the
+> verification environment (Windows + WSL Ubuntu 24.04, 2026-09-19), so the UI paths, edition
+> differences, attack types and extension names here are a documentation reference; the
+> PortSwigger pages linked below were fetched and answer 200.
+
 ## Further Resources
 
 - PortSwigger Burp Suite documentation — <https://portswigger.net/burp/documentation>

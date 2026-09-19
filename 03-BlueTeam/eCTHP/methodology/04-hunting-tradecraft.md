@@ -324,6 +324,18 @@ A hunt is not a forensic examination, but its output may become evidence in an i
 - [ ] Can I hash, store, and hand over a collected artifact with a custody record?
 - [ ] Do I know the exact point at which I stop hunting and escalate to incident response?
 
+> **Verification:** executed on **2026-09-19** against **Volatility 3 Framework 2.28.2** and
+> **Velociraptor 0.77.2** (Ubuntu 24.04 WSL) and **PowerShell 7.6.6** (Windows 11). All nine
+> plugins named in "Hunting in memory and on disk" exist in the Volatility build —
+> `windows.info`, `windows.pslist`, `windows.psscan`, `windows.pstree`, `windows.cmdline`,
+> `windows.netscan`, `windows.malfind`, `windows.dlllist`, `windows.handles` — though no memory
+> image was available to run them against. The `glob()` query of the VQL block returned rows for
+> `OSPath`, and a query selecting `FullPath` returned the same values, so on this build the rename
+> is a version cut rather than a live defect; `velociraptor vql list` exists as the note says.
+> `Get-FileHash -Algorithm SHA256` printed algorithm, hash and path as the custody section
+> describes. **Not executed:** the KQL, SPL, osquery and `wevtutil` examples — no SIEM, no osquery
+> and no event-log export exists here — and the memory image itself.
+
 ## Further Resources
 
 - **MITRE ATT&CK** (technique details, procedure examples, and detection notes) — https://attack.mitre.org/

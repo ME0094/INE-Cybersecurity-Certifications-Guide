@@ -273,6 +273,8 @@ Also worth writing once, while it is fresh: **what you would do differently**, p
 - [ ] I know which evidence actions are read-only and which ones destroy evidence.
 - [ ] I have written what I would do differently as a process change, not as self-criticism.
 
+> **Verification:** executed against PowerShell 7.6.6 on Windows 11 on 2026-09-19: the read-only evidence actions in "What Tier 1 Collects" were run — `Get-NetTCPConnection` and `netstat -ano` both returned the live connection table with owning PIDs, and `Get-FileHash -Algorithm SHA256` returned a hash for the file it was pointed at. `Disable-ADAccount`, `Set-ADAccountPassword`, `wevtutil epl` and `reg export` were **not** executed: the first two change production state and need a domain, and the last two write files this pass was asked not to create.
+
 ## Further Resources
 
 - NIST SP 800-61 Rev. 3 — *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile*: https://csrc.nist.gov/pubs/sp/800/61/r3/final

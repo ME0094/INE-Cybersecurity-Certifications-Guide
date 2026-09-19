@@ -216,6 +216,16 @@ already know web/application security and only need the AI-specific material.
 - [ ] I know who owns each AI system I work on and what evidence a review would ask me for.
 - [ ] I understand the NDA boundary and know what public material is safe to rely on.
 
+> **Verification:** checked against the module tree on disk on **2026-09-19**. The counts this
+> page states are the counts on disk — nine `methodology/` phases, five `tools/` notes, six
+> `labs/` and four `cheatsheets/`, twenty-four notes plus this index — and every relative link
+> in the file resolves: `node scripts/utilities/check-links.mjs .` reports 185 Markdown files,
+> 887 relative links and 0 broken. The certification claims themselves (the 23 June 2026
+> release date, the absence of an official domain list) were **not** re-checked: no outbound
+> request was made from the machine that produced this pass, so INE's own page remains the
+> authority for them, as the text above already says. This file contains no command, so there
+> is nothing in it that could have been executed.
+
 ## Further Resources
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)

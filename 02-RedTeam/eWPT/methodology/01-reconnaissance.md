@@ -113,8 +113,10 @@ Crawling finds what is linked; content discovery finds what is **not** linked: a
 ### Pick a good wordlist
 
 - `/usr/share/seclists/Discovery/Web-Content/` from SecLists is the standard source.
-- Use `raft-large-directories.txt` or `directory-list-2.3-medium.txt` for general paths.
-- For technology-specific discovery, use `CommonBackdoors-Ports.fuzz.txt` or CMS lists such as `wp-themes.txt`, `cms/drupal.txt`.
+- Use `raft-large-directories.txt` or `raft-medium-directories.txt` for general paths.
+- For technology-specific discovery, use `CommonBackdoors-PHP.fuzz.txt` (the other
+  languages ship their own file in the same folder) or CMS lists such as
+  `CMS/wp-themes.fuzz.txt` and `CMS/Drupal.txt`.
 
 ### Fuzzing with ffuf or gobuster
 
@@ -198,6 +200,12 @@ Reconnaissance produces hundreds of small facts; the difference between a good a
 - [ ] I searched JavaScript bundles and common documentation paths for API endpoints.
 - [ ] I recorded every finding in notes with the raw request/response or screenshot attached.
 - [ ] My note file lists candidate areas for authentication, authorization, and input validation testing.
+
+> **Verification:** executed against ffuf 2.1.0-dev, Gobuster 3.6 and WhatWeb 0.5.5 on 2026-09-19
+> against a local listener: ffuf returned the test wordlist's three entries, WhatWeb fingerprinted
+> `HTTPServer[BaseHTTP/0.6 Python/3.12.3]` and `gobuster dir` refused to run because the lab
+> answered 200 for a non-existent path. The SecLists paths were re-checked upstream: `CMS/wp-themes.fuzz.txt`,
+> `CMS/Drupal.txt` and `CommonBackdoors-PHP.fuzz.txt` exist, `directory-list-2.3-medium.txt` 404s.
 
 ## Further Resources
 

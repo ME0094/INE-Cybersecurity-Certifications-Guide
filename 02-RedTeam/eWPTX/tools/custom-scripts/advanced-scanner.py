@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import ssl
 import sys
@@ -80,20 +81,20 @@ class Scanner:
             handlers.append(urllib.request.HTTPSHandler(context=ctx))
         self.opener = urllib.request.build_opener(NoRedirect, *handlers)
 
-    def request(self, url: str, extra_headers: dict | None = None) -> tuple[int, dict, bytes]:
+    def request(self, url: str, extra_headers: dict | None = None) -> tuple[int, "http.client.HTTPMessage", bytes]:
         headers = {"User-Agent": "advanced-scanner/0.1"}
         headers.update(extra_headers or {})
         req = urllib.request.Request(url, headers=headers)
         try:
             with self.opener.open(req, timeout=self.timeout) as resp:
-                return resp.status, dict(resp.headers), resp.read()
+                return resp.status, resp.headers, resp.read()
         except urllib.error.HTTPError as exc:
-            return exc.code, dict(exc.headers), exc.read()
+            return exc.code, exc.headers, exc.read()
         except urllib.error.URLError as exc:
             raise RuntimeError(f"Network error reaching {url}: {exc}") from exc
 
     # ── Checks ──────────────────────────────────────────────────────
-    def check_headers(self, status: int, headers: dict) -> None:
+    def check_headers(self, status: int, headers: "http.client.HTTPMessage") -> None:
         hdr = {k.lower(): v for k, v in headers.items()}
         for name in SECURITY_HEADERS:
             if name.lower() not in hdr:
@@ -103,10 +104,18 @@ class Scanner:
         if server:
             self.findings.append(Finding("info", "banner", f"Exposed banner: {server}"))
 
-    def check_cookies(self, headers: dict) -> None:
-        for set_cookie in headers.get("Set-Cookie", "").splitlines():
+    def check_cookies(self, headers: "http.client.HTTPMessage") -> None:
+        # get_all() keeps every Set-Cookie header; dict(Message) would collapse
+        # repeated names to the first value and silently drop cookies 2..n.
+        if hasattr(headers, "get_all"):
+            raw = headers.get_all("Set-Cookie") or []
+        else:
+            raw = headers.get("Set-Cookie", "").splitlines()
+        for set_cookie in raw:
             parts = [p.strip().lower() for p in set_cookie.split(";")]
-            name = parts[0].split("=")[0] if parts else "?"
+            # The name sits before the first '=', so the rest of the attributes
+            # cannot be mistaken for part of it.
+            name = parts[0].split("=")[0] or "?"
             missing = [f for f in WEAK_COOKIE_FLAGS if f not in parts]
             if missing:
                 self.findings.append(Finding("low", "cookies",

@@ -341,6 +341,18 @@ This phase supplies the concepts and decisions; the commands, procedures, and co
 - [ ] I have planted a canary, run the positive control, run cross-user and cross-tenant probes, and recorded a rate with its budget.
 - [ ] I can state the limits of my own measurement: which paths were not tested, on which version, within which budget.
 
+> **Verification:** the inversion probe was extracted **verbatim from the markdown** and executed
+> on **2026-09-19** against **numpy 2.4.6** in the `/opt/pytools/bin` virtualenv (numpy is not on
+> the system interpreter, whose 3.12.3 handled every other check here). Against six synthetic
+> vectors spanning two tenants, a probe built from a near-paraphrase of chunk `a-3` ranked `a-3`
+> first (`cosine 0.999971`), then an unrelated chunk — the ranking behaviour the block illustrates,
+> returning ids and scores and no text. The probe manifest parses as YAML under PyYAML 6.0.1
+> (`run_id: leak-07-a`; budget 60 requests × 5 repetitions; seven probes, the owner-positive control
+> first) and the three canary rows parse as JSON. Both filter snippets are pseudo-code over an
+> undefined `index` and `acl`; run with a stand-in store, the buggy one leaves `len(hits) = 6` for
+> `k = 10` — the shortfall the file calls an existence oracle. No vector store, model endpoint or
+> log platform exists here, so no leakage rate was measured and no canary was planted.
+
 ## Further Resources
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — sensitive-information disclosure and the surrounding risk categories.

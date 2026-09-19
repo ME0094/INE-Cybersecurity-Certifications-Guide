@@ -383,6 +383,17 @@ Full rebuild (when the range is beyond reverting, or you want a clean-room check
 - [ ] My range log records addresses, versions, changed configuration files, snapshot names, and any internet exposure.
 - [ ] Every VM in the range is mine or covered by written authorization.
 
+> **Verification:** the telemetry-verification step of section 8 was executed on **2026-09-19**
+> against **PowerShell 7.6.6** on Windows 11 (10.0.26200), elevated. `auditpol /get /category:*`
+> printed the subcategory policy table the `auditpol /set` lines address — its labels are localised
+> on this host, so the English subcategory names above come from the documentation rather than from
+> this run — and a marker written by a new PowerShell session produced **no** `4104` record even
+> though `Microsoft-Windows-PowerShell/Operational` does hold `4104` records from other sessions,
+> which is exactly the "the policy did not apply to the session you used" case section 8 describes.
+> The Linux half was **not** executed: `auditctl`, `ausearch` and `augenrules` are absent from this
+> WSL install and nothing was installed for the check. The four VMs of section 5 and the four-node
+> table agree; the range itself was not built — no hypervisor, collector or Zeek exists here.
+
 ## Further Resources
 
 - Sysmon and baseline configurations — learn.microsoft.com/sysinternals/downloads/sysmon; github.com/SwiftOnSecurity/sysmon-config; github.com/olafhartong/sysmon-modular.

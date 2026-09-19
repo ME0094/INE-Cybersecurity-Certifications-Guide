@@ -63,7 +63,7 @@ The behaviour, written as a hypothesis rather than as a sample: **"A Microsoft O
 A rule is a hypothesis about your data. Prove the data first.
 
 1. **Search for one raw process-creation event from the alert window.** Expand it and read the actual field names your pipeline produces — `process.parent.name`, `process.parent.executable`, `process.name`, `process.command_line` in ECS-style pipelines; `ParentImage`, `Image`, `CommandLine` in the Sigma `windows/process_creation` vocabulary this rule uses.
-2. **Check the fields the rule depends on are populated**, not merely present in the schema. In this case the rule is worthless without the parent image and the command line, so "is `ParentImage` empty on my collector?" is the question that decides whether the rule can work as written.
+2. **Check the fields the rule depends on are populated**, not merely present in the schema. In this case the rule is worthless without the parent image and the command line, so "is `ParentImage` empty on my collector?" is the question that decides whether the rule can work as written. Both fields come from the *same* record: `ParentImage` and `Image` are attributes of one process-creation event, so this is a single-event Sigma rule, and the false-positive rate you measure later is the rate of that rule's matches — not the rate of the whole Word → script host → `certutil` chain.
 3. **Generate nothing yet.** If a field is empty across all hosts, the fix is upstream in the pipeline, and a rule that compensates with regex is a rule that hides the defect.
 
 ```text
@@ -72,8 +72,11 @@ A rule is a hypothesis about your data. Prove the data first.
 process.parent.name : "winword.exe" and process.name : *
 
 # Splunk SPL - the same question against the Windows add-on's field names.
+# The add-on's own 4688 fields on the classic WinEventLog sourcetype are
+# New_Process_Name (child) and Creator_Process_Name (parent); the XML route
+# (XmlWinEventLog:Security) exposes NewProcessName / ParentProcessName instead.
 index=windows EventCode=4688
-| stats count by Parent_Process_Name, New_Process_Name
+| stats count by Creator_Process_Name, New_Process_Name
 | sort - count
 ```
 
@@ -334,7 +337,7 @@ Be precise about the boundary, because the temptation is to claim more than a la
 - [ ] I scanned an artifact with a YARA rule and can explain why a match in a text file is a weaker finding than a match in a PE with network activity.
 - [ ] I recorded the numbers, the diff and the reason where the next analyst will find them.
 
-> **Verification:** the two Sigma rules in Parts 3 and 5 were extracted to `/tmp` and checked with **sigma-cli 3.1.0** on **2026-09-19**: both returned `Found 0 errors, 0 condition errors and 0 issues`, and their YAML also parsed under PyYAML 6.0.1. `sigma convert` was not exercised — sigma-cli 3.1.0 reports *"No backends installed"*, so the conversion lines above remain a shape to run where a backend plugin exists. The YARA rules used in Part 6 were run with **yara 4.5.0** on the same date against files created under `/tmp`, never inside the repository: a `.txt` with three of the strings matches `Suspicious_CredDump_Strings_AnyFile` only, the same strings appended to a real PE match `Suspicious_CredDump_Strings_PE` too, and a clean text file matches neither.
+> **Verification:** the two Sigma rules in Parts 3 and 5 were extracted to `/tmp` and checked with **sigma-cli 3.1.0** on **2026-09-19**: both returned `Found 0 errors, 0 condition errors and 0 issues`, and their YAML also parsed under PyYAML 6.0.1. `sigma convert` was not exercised — sigma-cli 3.1.0 reports *"No backends installed"*, so the conversion lines above remain a shape to run where a backend plugin exists. The YARA rules used in Part 6 were run with **yara 4.5.0** on the same date against files created under `/tmp`, never inside the repository: a `.txt` with three of the strings matches `Suspicious_CredDump_Strings_AnyFile` only, the same strings appended to a real PE match `Suspicious_CredDump_Strings_PE` too, and a clean text file matches neither. The SPL field names in Part 2 were corrected against the add-on's own configuration files: `New_Process_Name` and `Creator_Process_Name` are its 4688 fields (`default/props.conf` and `default/transforms.conf`, `SOURCE_KEY = Creator_Process_Name`), while `Parent_Process_Name` appears nowhere in the add-on.
 
 ## Further Resources
 

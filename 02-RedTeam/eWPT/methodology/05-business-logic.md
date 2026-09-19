@@ -157,6 +157,11 @@ Direct state manipulation overlaps with access control (Phase 03) — the differ
 - [ ] I mapped the state machine and tried illegal transitions via direct state parameters.
 - [ ] Every finding has a legitimate-flow baseline proving the behavior is unintended.
 
+> **Verification:** executed against curl on 2026-09-19 against a local listener: 20 concurrent
+> `POST /redeem` requests for one single-use code (the `for … & done; wait` loop above) all
+> returned `200`. The listener accepts everything, so the run verifies the loop and the
+> counting rule, not a broken invariant in a real shop lab; the race window itself is unverified.
+
 ## Further Resources
 
 - OWASP Top 10 — A04 Insecure Design, which frames business logic as a design-level risk: https://owasp.org/www-project-top-ten/

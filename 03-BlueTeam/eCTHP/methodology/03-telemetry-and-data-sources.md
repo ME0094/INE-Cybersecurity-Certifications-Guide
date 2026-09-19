@@ -318,6 +318,18 @@ Closing gaps is slow, unglamorous, and the single most durable thing a hunting p
 - [ ] Can I run a telemetry health check that proves a source is working before I trust an empty result?
 - [ ] Can I write a precise, quantified telemetry gap statement and the smallest collection change that closes it?
 
+> **Verification:** the Windows half was executed on **2026-09-19** against **PowerShell 7.6.6** on
+> Windows 11 (10.0.26200), elevated: `auditpol /get /category:*` printed the per-subcategory policy
+> table (its labels are localised on this host, so the English subcategory names above come from
+> the documentation, not from this run), the health check created the file it names, and the event
+> IDs in the table are declared by their providers' own manifests — Security 4624, 4625, 4634,
+> 4648, 4672, 4688, 4689, 4697, 4698–4702, 4720–4726, 4728, 4732, 4768, 4769, 4771, 4776, 4657,
+> 4663, 5140, 5145, 5156, 5157, 6416, plus 7045 in System and 1102/104 from
+> `Microsoft-Windows-Eventlog`. Live records were retrieved for 4688, 4648, 4672 and 7045.
+> **Not verified:** Sysmon — not installed here, so its IDs and fields come from the documentation;
+> the `auditd` block — `auditctl`, `ausearch` and `augenrules` are absent from this WSL install and
+> nothing was installed for this check; and every KQL/SPL example, since no SIEM exists here.
+
 ## Further Resources
 
 - **Sysmon** (documentation, configuration schema, and event IDs) — https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon

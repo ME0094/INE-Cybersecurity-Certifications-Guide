@@ -254,6 +254,17 @@ The most common outcome of a first injection test is nothing. Before concluding 
 - [ ] I fixed the outcome labels and the ASR definition before running, and I report per-channel rates instead of one aggregate.
 - [ ] I kept a held-out variant set, ran each case more than once, and can distinguish "no success observed in n attempts" from "not vulnerable".
 
+> **Verification:** unverified syntax reference — not run, and no target was contacted. The five
+> `text` fences are educational payloads; the `python` fence is the fragile f-string, and
+> executing it with a system policy and a hostile user turn renders exactly the shape the text
+> warns about — the injected line lands *below* the `--- USER DATA BELOW ---` delimiter that is
+> meant to bound it. The measurement arithmetic behind the sample-size paragraph was recomputed
+> on **2026-09-19** under Python 3.12.3: 3/10 = 0.300, and the exact one-sided 95 % upper bound
+> for zero successes in ten attempts is **0.2589**, which is the "near 26 %" the text states (the
+> Wilson bound for the same input is 0.2775). The OWASP `LLM01:2025` and ATLAS `AML.T0051`
+> identifiers were **not** re-fetched — no outbound request was made from this machine — so treat
+> them as citations to confirm against the frameworks' own pages.
+
 ## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications (2025 edition; LLM01:2025 Prompt Injection) — https://owasp.org/www-project-top-10-for-large-language-model-applications/

@@ -113,9 +113,10 @@ downloads the rest — it needs a handler to complete the handshake. `meterprete
 (underscore before `reverse`) is *stageless*: the whole payload travels in one piece and
 is more robust when size is not a problem. `shell_reverse_tcp` above is stageless.
 
-**Encoders.** Older courses teach `-e x86/shikata_ga_nai` to "evade AV". Modern
-Metasploit releases have deprecated and removed most legacy encoders because current AV
-engines fingerprint them anyway. Check what your version ships:
+**Encoders.** Older courses teach `-e x86/shikata_ga_nai` to "evade AV". Most legacy encoders
+are in **disuse** rather than removed: the framework still ships them and `x86/shikata_ga_nai`
+carries no deprecation mark, but current AV engines fingerprint the well-known ones anyway.
+Check what your version ships:
 
 ```bash
 msfvenom -l encoders      # usually a small set these days
@@ -245,6 +246,11 @@ msf6 > resource handler.rc
 - [ ] I can capture a meterpreter session and run `sysinfo`, `getuid`, `shell`,
       `upload`, and `download`.
 - [ ] I can write and load a resource `.rc` script.
+
+> **Verification:** `msfconsole` and `msfvenom` are not installed here, so every invocation in this
+> note is an unverified syntax reference. The encoder claim was checked against the upstream
+> repository on 2026-09-19: `modules/encoders/` holds **57** encoder modules on `master` (24 under
+> `x86`) and `x86/shikata_ga_nai.rb` is ranked *excellent* with no deprecation mark — in disuse, not removed.
 
 ## Further Resources
 

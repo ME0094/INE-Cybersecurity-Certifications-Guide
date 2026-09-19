@@ -6,7 +6,7 @@
 
 ## What eCTHP covers
 
-eCTHP (**Certified Threat Hunting Professional**) is INE Security's Blue Team credential for **threat hunting**: the proactive, hypothesis-driven search for adversary activity that your existing detections did not catch. INE Security published an updated version of the certification on 24 July 2025 ([launch announcement](https://ine.com/newsroom/ine-security-launches-updated-certified-threat-hunting-professional-ecthp-cybersecurity-certification), [background on the update](https://ine.com/newsroom/ine-updates-threat-hunting-certification-as-adversaries-evolve-beyond-malware)).
+eCTHP (**Certified Threat Hunting Professional**) is INE Security's Blue Team credential for **threat hunting**: the proactive, hypothesis-driven search for adversary activity that your existing detections did not catch. INE Security published an updated version of the certification in July 2025 — the newsroom announcement and the blog post are dated **28 July 2025**, the syndicated press release **24 July 2025** — and a further update on 20 November 2025 ([launch announcement](https://ine.com/newsroom/ine-security-launches-updated-certified-threat-hunting-professional-ecthp-cybersecurity-certification), [the November update](https://ine.com/newsroom/ine-updates-threat-hunting-certification-as-adversaries-evolve-beyond-malware)).
 
 The discipline in this module rests on five pillars:
 

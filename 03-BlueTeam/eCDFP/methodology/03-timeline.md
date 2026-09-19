@@ -47,7 +47,7 @@ The MACB letters look symmetrical and are not. Rank them before you build an arg
 | **A** (accessed) | Reads, when access-time updates are enabled | **Low.** Often disabled entirely, updated lazily, or disturbed by backups, indexing and antivirus | Almost nothing on its own; use for "was read" only with corroboration |
 | **C** (changed / MFT record modified) | Metadata changes, including permission and attribute changes | Moderate; the entry most often *not* touched by timestamp editors | Detecting tampering by disagreement with M or B |
 
-For NTFS, remember that each of these exists **twice** (`$STANDARD_INFORMATION` and `$FILE_NAME`), updated by different events; on ext4, sub-second fields give you precision beyond whole seconds. Both points are treated in `05-windows-artifact-forensics.md` §3 and `08-anti-forensics-and-evidence-integrity.md` §3.
+For NTFS, remember that each of these exists **twice** (`$STANDARD_INFORMATION` and `$FILE_NAME`), updated by different events; on ext4, sub-second fields give you precision beyond whole seconds. The NTFS point is treated in `08-anti-forensics-and-evidence-integrity.md` §3, and the ext4 point in `02-analysis.md` §3 (`ext2 / ext3 / ext4`).
 
 ## Choosing how to build the timeline
 

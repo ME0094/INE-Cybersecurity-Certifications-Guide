@@ -219,7 +219,7 @@ This is the path a detection follows after a real triage, and it is the exact pa
 
 **Step 1 — Write the behaviour, not the sample.** The malware hash will change; the parent–child relationship is the durable part. *"An Office application spawning a scripting or download utility as a child process"* — that is the hypothesis, and it covers the whole family rather than one sample.
 
-**Step 2 — Confirm the data.** Process creation with command lines is required. Check one raw event for the fields the rule will use: the child image path, the parent image path, the command line, the user. If `ParentImage` is empty on your collector, the rule cannot work as written and the real fix is upstream.
+**Step 2 — Confirm the data.** Process creation with command lines is required. Check one raw event for the fields the rule will use: the child image path, the parent image path, the command line, the user. Both image fields come from the *same* record — `ParentImage` and `Image` are attributes of one process-creation event — so the parent–child relationship is read from a single event, the rule stays a single-event Sigma rule, and the false-positive rate measured at step 5 is the rate of that rule's matches, not of the whole Word → script host → `certutil` chain. If `ParentImage` is empty on your collector, the rule cannot work as written and the real fix is upstream.
 
 **Step 3 — Write the rule.** Narrow on the parent (Office products), narrow on the child (script hosts and download utilities), and keep the exclusions explicit:
 

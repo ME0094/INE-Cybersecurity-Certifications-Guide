@@ -300,6 +300,8 @@ Escalating is not handing over the problem; it is handing over *a documented sta
 - [ ] I know my time box for each severity and what I do when it expires.
 - [ ] My notes name the owner and the boundary of my part of the investigation, and state open questions explicitly.
 
+> **Verification:** the 4697/7045 split in the pivot table was checked on Windows 11 with PowerShell 7.6.6 and `auditpol` on 2026-09-19: `auditpol /get /category:*` reports *Security System Extension* as `Sin auditoría` (No Auditing), the Security channel (≈23,000 events) contained **zero** 4697 records, and the System channel carried 7045 written by `Service Control Manager` — which is why the query separates `TaskName` (4698) from `ServiceName` (7045). The Kibana, Lucene, ES|QL and SPL query shapes in this file were not executed: there is no SIEM on the machine that produced this pass.
+
 ## Further Resources
 
 - MITRE ATT&CK — kill-chain framing and technique context for analysis: https://attack.mitre.org

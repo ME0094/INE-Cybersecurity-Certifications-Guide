@@ -329,6 +329,16 @@ Admissibility requirements differ between jurisdictions and forums — some weig
 - [ ] Could another examiner reproduce my analysis from the report alone?
 - [ ] Do I know that post-issue corrections go in a dated addendum, and that I would not edit a delivered report?
 
+> **Verification:** executed against **The Sleuth Kit 4.12.1** and **GNU coreutils 9.4** on
+> **2026-09-19** (Ubuntu 24.04 WSL): on an image built in `/tmp`, `mmls` printed the partition
+> table with the start sector and `fsstat -o 2048` the file-system type and volume serial — the
+> shape the methodology-note example uses, and the two values it tells you to record. `mmls -V`
+> prints `The Sleuth Kit ver 4.12.1` and `sha256sum --version` prints
+> `sha256sum (GNU coreutils) 9.4`, so the `<tool> <version>` notation asked for is the one these
+> tools report; the versions in the templates are illustrative and belong to no particular host.
+> **Not executed:** the report itself — there is no case, no exhibit and no opposing expert here —
+> so every template above remains structure, not a captured document.
+
 ## Further Resources
 
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* (see its reporting guidance) — https://csrc.nist.gov/publications/detail/sp/800-86/final

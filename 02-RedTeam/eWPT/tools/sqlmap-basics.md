@@ -92,9 +92,11 @@ Two flags widen what sqlmap tests; increase them deliberately, not by habit.
 - `--level` (1–5): how many **payloads and injection contexts** are tried.
   Levels 2–3 add cookies and headers as injection points; levels 4–5 add many
   more payload variants. Each step multiplies request count.
-- `--risk` (1–3): how **destructive** the payloads are. Risk 2 adds
-  `OR 1=1`-style payloads that can modify data; risk 3 adds time-based and
-  `OR` payloads with heavier side effects.
+- `--risk` (1–3): how **dangerous the payloads are**. Risk 2 adds the tests for
+  **heavy-query time-based** injections; risk 3 adds `OR`-based injection tests
+  (the sqlmap manual's own wording). The `OR` payloads are the ones to respect:
+  in a statement such as `UPDATE`, an `OR`-based injection can rewrite every row
+  of the table, which is why they sit at 3 and not at 2.
 
 Start at the defaults (`--level=1 --risk=1`). If a parameter is confirmed
 injectable but extraction fails, escalate one notch at a time:
@@ -237,6 +239,12 @@ Tips:
 - [ ] I listed at least two safety controls I apply before every run.
 
 ---
+
+> **Verification:** executed against sqlmap 1.8.4#stable on 2026-09-19 against a deliberately
+> injectable SQLite lab on `127.0.0.1`: `--help`, `-hh` and the manual page print only
+> `Level of tests to perform (1-5, default 1)` / `Risk of tests to perform (1-3, default 1)`,
+> and the manual's *Risk* section gives the risk 2 = heavy-query time-based, risk 3 = also
+> `OR`-based mapping written above. Step 4 returns no rows without `--dump` and all five with it.
 
 ## Further Resources
 

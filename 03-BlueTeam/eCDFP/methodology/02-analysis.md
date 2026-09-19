@@ -470,12 +470,17 @@ A typical Autopsy workflow: start a new case → add the image → let ingest mo
 > fails — with `-o 0` as the offset it exits 1 with
 > `Invalid magic value (raw_open: image "/" - is a directory)` and writes nothing to stdout —
 > whereas `ils -o 0 -m image.dd` exits 0. **Not executed:** the browser-database and registry
-> examples — no case image or hive is available here. The carving example was attempted and is
-> recorded honestly as inconclusive: `foremost` 1.5.7 and `scalpel` 1.60 are installed and both run,
-> but `foremost -t jpg` (and `-t jpeg`, `-t all`) extracted **0 files** from every input tried on
+> examples — no case image or hive is available here. The carving example was attempted and its
+> cause is now **established**: `foremost` 1.5.7 and `scalpel` 1.60 are installed and both run, but
+> `foremost -t jpg` (and `-t jpeg`, `-t all`) extracted **0 files** from every input tried on
 > 2026-09-19 — a raw payload with the `ffd8ffe0`/`ffd9` markers, the same payload padded, and a real
-> 542 091-byte JPEG from `C:\Windows\Web`, as a plain file and inside an ext4 image — and `scalpel`
-> carved nothing with its default config. On this build `strings /usr/bin/foremost` contains no
-> `jpg`/`jpeg`/`png`/`pdf`/`zip`, and `/etc/foremost.conf` ships with every type line commented out,
-> so the `-t jpg,pdf,zip` form above may need those lines enabled before it carves anything. Confirm
-> on your build rather than assuming either way.
+> 542 091-byte JPEG from `C:\Windows\Web`, as a plain file and inside an ext4 image. The reason is
+> that this build carries **no** compiled-in signature table for those types (`strings
+> /usr/bin/foremost` contains no `jpg`/`jpeg`/`png`/`pdf`/`zip`) **and** `/etc/foremost.conf` ships
+> with **every** one of its 239 type lines commented out, so `-t jpg` names a type that exists
+> nowhere: the run completes, `audit.txt` reads `0 FILES EXTRACTED` and the exit status is 0, with
+> nothing on stderr to warn you. The same run with a single line of that same config re-enabled
+> (`-c` pointing at it, with `jpg y 20000000 \xff\xd8\xff\xe0\x00\x10 \xff\xd9`) carved one file,
+> byte-identical to the planted payload — so the `-t jpg,pdf,zip` form above carves nothing until
+> those lines are enabled, and it then matches the old JFIF header only. Confirm on your build rather
+> than assuming either way.

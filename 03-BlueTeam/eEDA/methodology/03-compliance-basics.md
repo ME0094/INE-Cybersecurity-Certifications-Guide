@@ -260,6 +260,8 @@ Two practical traps: an attestation report that covers a service you are not usi
 - [ ] I can run the audit readiness timeline from T-30 to T+30 and say what happens at each stage.
 - [ ] I can split cloud compliance evidence between the provider's layer and mine, and name the artifact for each.
 
+> **Verification:** checked against primary sources on 2026-09-19: GDPR Art. 33 (https://gdpr-info.eu/art-33-gdpr/) states the 72-hour notification duty claimed above, and the PCI Security Standards Council page (https://www.pcisecuritystandards.org/standards/pci-dss/) points at PCI DSS v4.x. The 4.0.1 patch level and the "v3.2.1 retired on 31 March 2024" date could **not** be re-checked here — that page renders its content client-side and the linked standard PDF answers 403 to this client — so confirm them on the document library before quoting them. The ISO/IEC 27001 and HIPAA clauses were not re-fetched either.
+
 ## Further Resources
 
 - European Commission — GDPR text and guidance: https://commission.europa.eu/law/law-topic/data-protection_en

@@ -120,6 +120,8 @@ Repeat the drill week whenever you feel rusty — this is a skill certification,
 - [ ] Filled in the alert triage template from the cheatsheet for every alert I generated in the lab.
 - [ ] Re-read the methodology files after the lab drills, then reviewed the official INE material and practice environment before attempting the exam.
 
+> **Verification:** checked against the module tree on disk on 2026-09-19: the eight `methodology/` files, the six `tools/` guides, the two rule files under `tools/detection-rules/`, the three `labs/` and the single `cheatsheets/` file listed above all exist, and every relative link in this README resolves — the repository-wide `node scripts/utilities/check-links.mjs .` run is clean (887 relative links, 0 broken).
+
 ## Further Resources
 
 - INE Security eSOC official course page (enrollment and authoritative syllabus): <https://ine.com/security/certifications/esoc-certification>

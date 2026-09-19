@@ -246,6 +246,15 @@ A repeatable procedure that keeps the work defensible:
 - [ ] Have I ever verified that a log source was actually collecting before treating an empty result as an answer?
 - [ ] Can I state, for my most recent finding, exactly which source proves it and which part is inference?
 
+> **Verification:** the packet-capture block of section 6.1 was executed against **tshark 4.2.2**
+> (Wireshark) on **2026-09-19** (Ubuntu 24.04 WSL), against a synthetic capture built under
+> `/tmp`: the DNS projection returned one row per query with the client that asked, the
+> `-q -z conv,tcp` summary printed the conversation table the text describes, and the 60-second
+> bucketing pipeline produced the per-minute counts. `tshark -G fields` confirms `dns.qry.name`,
+> `dns.qry.name.len` and `dns.flags.rcode` as field names of this build. **Not executed:** the log
+> and identity half — no log store, collector, SIEM or resolver exists on this machine — and the
+> Zeek field set, since Zeek is not installed here.
+
 ## Further Resources
 
 - **RFC 3227**, *Guidelines for Evidence Collection and Archiving* (order of volatility) — https://www.rfc-editor.org/rfc/rfc3227

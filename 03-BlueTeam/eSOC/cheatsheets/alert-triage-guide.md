@@ -150,6 +150,8 @@ TRIAGE NOTE — <rule/alert title>          Ticket/ID: <id>
 - [ ] I check the time zone on every timestamp before drawing conclusions.
 - [ ] I practise the loop on every drill alert from the SOC lab scenarios.
 
+> **Verification:** checked against the Elastic Common Schema sources on 2026-09-19 (https://github.com/elastic/ecs — `schemas/user.yml`, `schemas/host.yml`, `schemas/source.yml`, `schemas/destination.yml`): `user.name`, `host.name`, `source.ip` and `destination.ip`, the fields named in the 5-Ws table, are all real ECS definitions. The triage flow, the escalation criteria and the template are process artefacts — nothing in this sheet was executed, and no alert was triaged to produce it.
+
 ## Further Resources
 
 - MITRE ATT&CK — https://attack.mitre.org/ (technique IDs for escalation notes)

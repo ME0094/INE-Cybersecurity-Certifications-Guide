@@ -298,6 +298,17 @@ The last row is the one people skip. Hardening without re-measurement produces a
 - [ ] I can name the fields a run trace needs so that an investigator can answer "what did the system see, what did it decide, and who asked for it" from the trace alone.
 - [ ] For every control in this phase, I can name the drill that produces its evidence — and I have run at least one of them and recorded the result.
 
+> **Verification:** the `dispatch()` block was extracted **verbatim from this file** and executed
+> on **2026-09-19** under Ubuntu 24.04 / Python 3.12.3, with a stub tool registry standing in for
+> the `TOOLS` the block refers to. All three branches behave as documented: an argument with **no**
+> recorded source raises `PermissionError: send_email.cc: value has no known source`; a value whose
+> source is `tool_result` raises `PermissionError: … value came from tool_result`; a complete set of
+> user-turn sources reaches the tool; and a tool absent from `SINK_ARGUMENTS` is called with no
+> provenance check at all. The argument named in the error varies with set iteration order — it
+> reported `cc` when only `to` was unsourced — so do not build a log format on that string. No
+> agent runtime, model or tool server exists here, so the run trace, the four sandbox claims and
+> every drill in the agent-abuse lab remain unmeasured on this machine.
+
 ## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications (2025 edition) — https://owasp.org/www-project-top-10-for-large-language-model-applications/

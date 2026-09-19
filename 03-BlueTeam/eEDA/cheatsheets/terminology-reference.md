@@ -160,6 +160,8 @@ VPN    Virtual Private Network
 - [ ] I can expand every acronym in the list above and say which domain it belongs to.
 - [ ] I can write one sentence using GRC terminology correctly to describe a real security task.
 
+> **Verification:** checked against the NIST CSRC glossary (https://csrc.nist.gov/glossary) on 2026-09-19: *residual risk*, *plan of action and milestones*, *authorization to operate* and *accreditation* are all defined there in the sense the tables above use — an ATO as the RMF authorization decision, a POA&M as the documented plan to close findings. The policy/standard/procedure/guideline layering is internal practice vocabulary and comes from no single external source.
+
 ## Further Resources
 
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework) — glossary of cybersecurity terms in NIST context.

@@ -121,7 +121,7 @@ In practice, zero trust is realized by making **identity the new perimeter** and
 
 Microsegmentation splits the network/data center into fine-grained segments so a compromised workload cannot roam. Where legacy segmentation was "subnet per tier," microsegmentation is **policy per workload or application** — enforced by software-defined overlays, host agents, or cloud security groups.
 
-```json
+```jsonc
 // Workload-to-workload segmentation policy (conceptual)
 {
   "from": { "workload": "web-tier",   "env": "prod" },
@@ -166,6 +166,20 @@ Architecture implications: comprehensive **activity logging** (authn, authz, dat
 - [ ] I can describe continuous verification as a loop with revocation triggers.
 - [ ] I can argue why identity-centric architecture implements zero trust in practice.
 - [ ] I can map eIAMA Phases 01–03 (lifecycle, AuthN, AuthZ) into a zero-trust design.
+
+> **Verification:** the seven tenets above were checked on **2026-09-19** against the published
+> **NIST SP 800-207** (HTTP 200,
+> `nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf`, 59 pages). Section
+> **2.1, "Tenets of Zero Trust"**, reads *"A zero trust architecture is designed and deployed
+> with adherence to the following zero trust basic tenets:"* and is followed by the seven
+> numbered items reproduced here. The two sentences quoted in tenet 3 — *"access should also
+> be granted with the least privileges needed to complete the task"* and *"authentication and
+> authorization to one resource will not automatically grant access to a different
+> resource"* — are verbatim, as is tenet 5's *"No asset is inherently trusted."* The "what is
+> *not* on that list" note also holds: neither `never trust, always verify` nor `assume
+> breach` occurs anywhere in the document, in either capitalisation. Nothing here was
+> executed — the fences in this file are ASCII diagrams plus one JSON sketch, so the PE/PA/PEP
+> components are described from the standard, not observed in a running deployment.
 
 ## Further Resources
 

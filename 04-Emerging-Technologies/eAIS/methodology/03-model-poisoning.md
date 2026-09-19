@@ -260,6 +260,20 @@ Suspicion is a legitimate state — you will usually not be able to prove a back
 - [ ] I can name my rollback target for the model and for the index, and I have restored one of them in a drill.
 - [ ] I can state in one sentence what my poisoning evidence does *not* prove.
 
+> **Verification:** the two runnable fragments were executed on **2026-09-19** under Ubuntu 24.04
+> / Python 3.12.3. The `hashlib` block was extracted verbatim and run against a real file:
+> `verify_artifact()` returned the digest of the untouched artifact, and after one byte was
+> appended it raised `AssertionError: artifact hash mismatch: <path>` — the documented behaviour.
+> The `bash` snapshot pipeline was run against a synthetic corpus of two `.md` files and one
+> `.txt`: `find corpus/ -type f -name '*.md' -print0 | sort -z | xargs -0 sha256sum` wrote a
+> two-line manifest, correctly excluding the non-Markdown file; `sha256sum -c` printed `OK` for
+> both files and exited 0, then `corpus/a.md: FAILED` plus `WARNING: 1 computed checksum did NOT
+> match` and exit 1 after one file changed, and the documented `grep -v ': OK$'` filter leaves
+> that failure visible. Both `jsonl` provenance rows parse. Nothing here touched a model, a
+> dataset or an index: this machine has no GPU and no torch (`ModuleNotFoundError: No module
+> named 'torch'`), so the fine-tuning, backdoor and weight-inspection material above stays a
+> design to execute rather than a result.
+
 ## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications (2025 edition: LLM03:2025 Supply Chain, LLM04:2025 Data and Model Poisoning, LLM08:2025 Vector and Embedding Weaknesses) — https://owasp.org/www-project-top-10-for-large-language-model-applications/

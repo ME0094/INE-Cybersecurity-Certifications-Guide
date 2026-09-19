@@ -29,7 +29,7 @@
 | Context leakage and cross-tenant | Session or tenant boundary → context | Per-user, per-tenant retrieval filters and scoped tokens applied **in the query** | Post-retrieval check that every returned ID belongs to the caller; fail closed | Two test tenants with marked documents; ask tenant A for tenant B's marker directly, indirectly and through a summary; observe which document IDs reach the context | Isolation written in the prompt ("only use this user's documents") instead of enforced in the query |
 | Retrieval corpus poisoning | Ingestion path → vector store | Provenance, vetting and content screening at ingest; curated or signed sources | Re-rank toward trusted sources; answer with citations so a bad source is visible | Ingest one test document that contradicts a known-good answer; observe which source wins and whether the answer cites it | "The corpus is internal" — an internal wiki takes external edits and pastes too |
 | Index dominance by duplicates | Ingestion → top-k selection | Deduplicate; cap documents per source at query time | Cross-check the answer against a trusted store before acting on it | Ingest N near-identical copies of one test document and re-run the same question; observe whether the correct source is crowded out of top-k | Top-k returns something relevant — relevance is not authority |
-| Backdoor in a model artifact | Model load → behaviour | Pin version and hash; prefer safe load formats; record the artifact in an AIBOM | Re-run the behavioural suite on the **final** artifact, plus runtime guardrails | Compare refusal and policy results before and after the artifact swap; probe with candidate trigger strings; observe behaviour deltas, not benchmark scores | Benchmarks are unchanged — surviving benchmarks is what a backdoor is designed to do |
+| Backdoor in a model artifact | Model load → behaviour | Re-run the behavioural suite on the **final** artifact, with candidate trigger strings in the case set (Phase 08) | Pin the version and hash, prefer safe load formats, and record the artifact in an AIBOM — that fixes *which* artifact you loaded, not that it is benign — plus runtime guardrails | Compare refusal and policy results before and after the artifact swap; probe with candidate trigger strings; observe behaviour deltas, not benchmark scores | Benchmarks are unchanged — surviving benchmarks is what a backdoor is designed to do. And a passing suite is only as good as its trigger strings: a backdoor whose trigger you never guessed is invisible to it |
 | Tool abuse / confused deputy | Injected instruction → privileged tool | Per-tool least privilege plus human approval for external or destructive actions | Action logging with blast-radius alerts on the first external send or export | "Read everything, then send" sequence as a case; assert the send is *gated*, not merely recorded; observe the approval payload | An approval prompt exists but shows only the model's own summary, never the resolved arguments |
 | Tool confusion | Overlapping tool descriptions → wrong call | Minimal, distinct, non-overlapping tool names and descriptions; schema-validated tool enum | Dispatcher-side validation that the chosen tool matches the intent class | Near-duplicate tool set (read vs search vs export) with paraphrased requests; observe which tool each variant selects and whether args match the paraphrase | Every tool "works" — correctness of *choice* was never tested |
 | Injection of tool arguments | Model output → tool arguments | Validate and normalise arguments server-side; allow-list values (recipients, paths, queries) | Confirmation step that renders the resolved arguments before execution | Cases that smuggle an extra field, a quoted override or a path traversal through a string argument; inspect what the tool actually received | Schema types pass — a string field can still carry an override |
@@ -62,6 +62,7 @@ the right whenever a row's *mechanism* is what you need:
 | Retrieval corpus poisoning | Data poisoning (the RAG path); Retrieval manipulation (winning the top-k) |
 | Backdoor in a model artifact | Data poisoning; Supply-chain attacks |
 | Model or dependency supply chain | Supply-chain attacks |
+| Leakage via traces and logs | Privacy leakage — its log, cache and retention channel, plus the delivery-channel table |
 
 Two catalogue sections, **Memory and state poisoning** and **Embedding inversion**, have no row
 here on purpose: the first is covered by the context-assembly and history controls in the
@@ -181,9 +182,9 @@ Marks: **●** covers this group well · **◐** partial, catches common cases o
 | Human approval for high-impact actions | ◐ | ○ | ○ | ○ | ● | ◐ | ○ | ○ | Approval fatigue; a reviewer who reads the summary, not the arguments |
 | Sandboxing, egress allow-list, timeouts and quotas | ○ | ○ | ◐ | ○ | ● | ● | ◐ | ○ | Side channels inside an allowed destination |
 | Per-user, per-session scoped credentials and tenancy | ○ | ○ | ● | ◐ | ● | ○ | ○ | ◐ | Shared caches, indexes and embeddings that ignore the scope |
-| Artifact pinning, hashing and AIBOM | ○ | ○ | ○ | ● | ○ | ○ | ● | ○ | A backdoor whose behaviour is invisible on ordinary inputs |
+| Artifact pinning, hashing and AIBOM | ○ | ○ | ○ | ◐ | ○ | ○ | ● | ○ | A backdoor whose behaviour is invisible on ordinary inputs. Pinning and hashing establish *which* artifact you loaded and prove it did not change afterwards; they say nothing about whether that artifact was benign when it was built. The control that looks for a backdoor is the behavioural suite on the final artifact, and it is only as good as the trigger strings in its case set |
 | Logging with redaction and abuse-pattern detection | ◐ | ◐ | ◐ | ◐ | ◐ | ◐ | ○ | ● | Detection is after the fact; logs are themselves a data store |
-| Versioned regression suite and release gate | ◐ | ◐ | ◐ | ◐ | ◐ | ◐ | ◐ | ○ | It *proves* coverage, it does not *provide* it — and only for the cases it contains |
+| Versioned regression suite and release gate | ◐ | ◐ | ◐ | ◐ | ◐ | ◐ | ◐ | ○ | It *proves* coverage, it does not *provide* it — and only for the cases it contains (a behaviour no case triggers stays invisible) |
 
 **Group legend**
 
@@ -199,6 +200,8 @@ Marks: **●** covers this group well · **◐** partial, catches common cases o
 | H Obs | Leakage via traces and logs |
 
 **How to use the gaps.** A **○** or a lone **◐** in a row that protects something valuable is an accepted risk until a *compensating* control exists in a **different layer** — an output filter is not a compensating control for an input filter. The two most common real gaps in agentic applications are the E column (tool authority) and the C column (later: tenancy enforced in a query rather than in a prompt).
+
+**The single ● in the D column covers its retrieval sub-vectors, not the rest of the column, and that gap is the finding rather than an oversight.** *Retrieval-time authorization and corpus vetting* addresses retrieval corpus poisoning and index dominance by duplicates — two of the four vectors in D. The other two are not *covered* by any one row: training-data/membership extraction, and a backdoor planted in a model artifact, for which pinning and hashing only tell you which artifact you loaded and that it has not changed since. The closest thing to a detector there is the behavioural re-run on the final artifact — bounded by the trigger strings you thought to write. Treat the artifact half of D as an accepted risk whose compensating pair is *pinned provenance plus a behavioural re-run on the final artifact*, and state in the report which triggers you probed and which you did not.
 
 ---
 
@@ -288,6 +291,19 @@ Cost here means effort inside your own lab — a local model on `localhost:11434
 - [ ] I can state which artifact hashes are verified at deploy time, and by what.
 - [ ] I can find my own test markers in the trace store and confirm what is redacted there.
 - [ ] Every claim of coverage in my last review is backed by a case result with a date and a version.
+
+> **Verification:** unverified syntax reference — not run. Every entry here is a method to run in
+> your own lab, and no case was executed against any system on this pass. Two checks of the
+> sheet's own accounting were made on **2026-09-19**: its nineteen master-table rows are all
+> present, and the two catalogue sections it says have no row here (`Memory and state poisoning`,
+> `Embedding inversion`) indeed have none. Two gaps are reported rather than repaired, because
+> this pass adds a record and nothing else: the claim that the D column has no ● row is
+> contradicted by the sheet's own coverage matrix, where `Retrieval-time authorization and corpus
+> vetting` carries **●** under `D Int`; and `Leakage via traces and logs` is covered neither by
+> the eight names the prose lists as identical in both sheets nor by the correspondence table,
+> which accounts for ten of the nineteen rows. The CWE-1426, ATLAS and OWASP-edition citations
+> were **not** re-fetched — no outbound request was made from this machine — so read the
+> "verified against the source" line above them as a claim from the pass that wrote it.
 
 ## Further Resources
 

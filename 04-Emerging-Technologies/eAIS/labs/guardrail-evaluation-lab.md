@@ -712,8 +712,8 @@ If the control costs more than the loss it prevents, what is the honest recommen
 ## Regression gate
 
 A measurement nobody re-runs is a measurement that decays. The gate turns the baseline into
-a tripwire: it fails when the block rate drops or the FP rate rises relative to a
-**versioned** baseline.
+a tripwire: it fails when the block rate drops, the FP rate rises, or the **bypass rate on
+the held-out variants** rises relative to a **versioned** baseline.
 
 ```python
 """check_regression.py — fail when the control gets worse, or noisier.
@@ -721,8 +721,13 @@ a tripwire: it fails when the block rate drops or the FP rate rises relative to 
   python check_regression.py --baseline baseline.json --current metrics.json
 
 Exit 0 = within tolerance, 1 = regression, 2 = NOT COMPARABLE (different model, set hashes,
-or enabled checks). Exit code 2 matters: comparing numbers from different sets — or from a
-run that measured a different set of checks — is how gates start lying.
+enabled checks, guardrail version, failure mode, or repetition count). Exit code 2 matters:
+comparing numbers from different sets — or from a run that measured a different set of
+checks, a different control version, a different fail mode, or a different N — is how gates
+start lying. `fail_mode` and `runs_per_case` are in that list because a switch from
+fail-closed to fail-open, or from N = 5 to N = 2, moves the rates without changing a line of
+the control: the gate would report "no regression" for a control that lost its failure
+policy or its sample size.
 
 The two files must be different files. Passing the same path twice compares a run with
 itself, cannot fail, and makes the gate decorative.
@@ -733,6 +738,10 @@ import sys
 
 BLOCK_TOLERANCE = 0.05      # YOUR numbers: block rate may fall by at most this much
 FP_TOLERANCE = 0.05         # YOUR numbers: FP rate may rise by at most this much
+BYPASS_TOLERANCE = 0.05     # YOUR numbers: bypass rate on held-out variants may rise by at
+                            # most this much. This is the one rate the suite cannot tune
+                            # against, so leaving it out of the gate is how a control that
+                            # stops passing its own cases still reports "no regression".
 
 
 def main():
@@ -750,12 +759,17 @@ def main():
         now = json.load(handle)
 
     # The two runs must be about the same thing: same model, same set contents, same
-    # checks applied. A run that only enabled `input` is not comparable with one that
-    # also enforced the output contract.
-    if (base["model"], base["sets"], base.get("checks")) != \
-       (now["model"], now["sets"], now.get("checks")):
-        print("NOT COMPARABLE: model, set contents, or enabled checks changed since the "
-              "baseline")
+    # checks applied, same control version, same failure mode, same repetition count. A run
+    # that only enabled `input` is not comparable with one that also enforced the output
+    # contract; neither is a fail-open run against a fail-closed baseline, a rate from N = 2
+    # against one from N = 5, or a new guardrail version measured against an old baseline.
+    # These are the axes whose change voids the comparison; the rest of the baseline table —
+    # latency, the security/format split, the recording date — is provenance for the reader,
+    # not a comparability gate.
+    axes = ("model", "sets", "checks", "guardrail_version", "fail_mode", "runs_per_case")
+    if tuple(base.get(axis) for axis in axes) != tuple(now.get(axis) for axis in axes):
+        changed = ", ".join(axis for axis in axes if base.get(axis) != now.get(axis))
+        print("NOT COMPARABLE: " + changed + " changed since the baseline")
         sys.exit(2)
 
     problems = []
@@ -766,6 +780,12 @@ def main():
     if is_now["fp_rate"] > was["fp_rate"] + FP_TOLERANCE:
         problems.append("fp_rate rose {:.3f} -> {:.3f}".format(
             was["fp_rate"], is_now["fp_rate"]))
+    # `rate()` returns None when a run carried no rows for that split, so compare only when
+    # both sides have a number rather than raising on `None > float`.
+    if was.get("bypass_rate") is not None and is_now.get("bypass_rate") is not None:
+        if is_now["bypass_rate"] > was["bypass_rate"] + BYPASS_TOLERANCE:
+            problems.append("bypass_rate rose {:.3f} -> {:.3f}".format(
+                was["bypass_rate"], is_now["bypass_rate"]))
     for problem in problems:
         print("REGRESSION: " + problem)
     sys.exit(1 if problems else 0)
@@ -907,7 +927,9 @@ the easiest way to mislead yourself and your reader at once.
 - [ ] I measured added latency and cost per query, and picked a threshold with a reason I can
       defend.
 - [ ] My regression gate compares against a versioned baseline, refuses to compare across
-      different set hashes or models, and exits non-zero on a regression.
+      different set hashes, models, checks, guardrail versions, failure modes or N, gates the
+      held-out bypass rate as well as the block and FP rates, and exits non-zero on a
+      regression.
 - [ ] My finding names the control version, the model version, the run ids, and what was not
       tested — and I used only fictional data throughout.
 

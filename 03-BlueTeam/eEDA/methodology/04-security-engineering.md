@@ -347,6 +347,8 @@ Question 10 is the one designs usually omit, and it is where a surprising amount
 - [ ] I can make and document retention decisions for five log classes, including one deliberate blind spot.
 - [ ] I can ask the ten design-review questions of a proposed system and name the one designs usually omit.
 
+> **Verification:** executed against PowerShell 7.6.6 on 2026-09-19: the baseline service check in this note, `Get-Service | Where-Object {$_.StartType -eq 'Automatic' -and $_.Status -eq 'Running'}`, returned **69** services to review against an approved manifest. The OpenSCAP half was checked separately in WSL Ubuntu 24.04.4 on the same date: `oscap` 1.3.9 `xccdf generate` lists only `report`/`guide`/`fix`/`custom`, and `autotailor` 1.3.9 confirms the unselect form that emits a derived `<profile>_customized`. No SCAP Security Guide data stream is installed here, so no `oscap xccdf eval` was run end to end.
+
 ## Further Resources
 
 - CIS Benchmarks: https://www.cisecurity.org/cis-benchmarks

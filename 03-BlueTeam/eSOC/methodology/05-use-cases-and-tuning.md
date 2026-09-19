@@ -201,6 +201,8 @@ The measurable output of this story is not "we reduced noise". It is: a document
 - [ ] I can run a thirty-minute rule review and produce decisions rather than discussion.
 - [ ] I know which rules in my environment should be retired, and I can say why.
 
+> **Verification:** executed against PowerShell 7.6.6 and **sigma-cli 3.1.0** on 2026-09-19: the worked readings in section 4 were recomputed (45 ÷ 900 = 5.0 %, 10 ÷ 12 = 83.3 %, both as printed), and `sigma check` re-validated this module's study rules — the Office-spawns rule and the example rule — returning `Found 0 errors, 0 condition errors and 0 issues`. The queue metrics in sections 4 and 8 need a SIEM to compute; none is available here, so they remain definitions rather than measurements.
+
 ## Further Resources
 
 - SigmaHQ — rule repository and specification for writing portable detection content: https://github.com/SigmaHQ/sigma

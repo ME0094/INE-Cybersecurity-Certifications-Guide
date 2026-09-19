@@ -155,6 +155,10 @@ Also re-check: world-writable scripts executed by cron/root, writable `PATH` dir
 - [ ] I can enumerate and abuse sudo rules, SUID binaries, and file capabilities on Linux.
 - [ ] I verify every automated finding manually and record commands/output as evidence.
 
+> **Verification:** executed on 2026-09-19 — Windows 10.0.26200: `whoami /priv` (this host lists `SeImpersonatePrivilege` and `SeDebugPrivilege`) and `reg query HKCU\Software\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated` (exit 1, key not found);
+> WSL Ubuntu 24.04: `sudo -l`, `find / -xdev -perm -4000 -type f`, `getcap -r /usr/bin`.
+> `accesschk`, `sc config`, the potato tooling and the LSASS dump need a domain lab and were **not** run.
+
 ## Further Resources
 
 - Microsoft Learn — Service accounts and Windows privileges (SeImpersonate/SeDebug): https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-service-accounts

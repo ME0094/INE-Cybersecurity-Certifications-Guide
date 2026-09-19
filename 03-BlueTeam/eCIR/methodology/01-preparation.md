@@ -240,6 +240,16 @@ offline for forensics while BC wants them restored — the decision framework
       interact with containment decisions.
 - [ ] I know where the offline copy of the IR plan and the out-of-band
       contact list are stored at my organization.
+> **Verification:** checked against **NIST SP 800-61 Rev. 3**
+> (`https://csrc.nist.gov/pubs/sp/800/61/r3/final`, HTTP 200 on **2026-09-19**) and the **GDPR**
+> (`https://eur-lex.europa.eu/eli/reg/2016/679/oj`, HTTP 200, same date): the publication page
+> carries the title this file cites, and Article 33(1) reads *"not later than 72 hours"*, which is
+> the number in the escalation matrix. The two hashing commands in the tooling checklist were run
+> on this host — `sha256sum` (GNU coreutils 9.4, Ubuntu 24.04 WSL) and
+> `Get-FileHash -Algorithm SHA256` (PowerShell 7.6.6, Windows 11), both printing a digest for a
+> file of known content. **Not executed:** the plans, playbooks and exercises above are documents,
+> not runs — no team, no tabletop and no incident exists on this machine.
+
 ## Further Resources
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* —
   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final

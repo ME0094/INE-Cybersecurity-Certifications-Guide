@@ -128,6 +128,8 @@ A repeatable division of labour, so neither console is opened blindly:
 - [ ] I have checked whether my EDR telemetry reaches the SIEM, for the asset groups that matter.
 - [ ] I can describe the order in which I use the SIEM and the EDR during triage, and why.
 
+> **Verification:** checked against the Sysmon documentation on Microsoft Learn on 2026-09-19 (https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon): every event ID in the pivot table exists — 1 ProcessCreate, 3, 7 ImageLoad, 8 CreateRemoteThread, 10, 11, 12/13/14, 16, 22 DnsQuery, 23 and 26 FileDeleteDetected — and the ECS names beside them (`process.name`, `registry.path`, `dns.question.name`) match the Elastic Common Schema sources. No EDR console and no Sysmon installation were queried, so the console behaviours in section 4 remain a description to confirm against your own product.
+
 ## Further Resources
 
 - Microsoft Learn — Sysmon (event IDs, configuration, and what each event contains): https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon

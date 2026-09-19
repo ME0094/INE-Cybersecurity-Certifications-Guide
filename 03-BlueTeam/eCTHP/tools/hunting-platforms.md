@@ -48,7 +48,7 @@ Two consequences follow, and they cause most failed hunts:
 event.category : "process" and process.name : "svchost.exe" and not process.executable : "C:\\Windows\\System32\\*"
 ```
 
-```json
+```http
 // Dev Tools: the same hypothesis with an aggregation KQL cannot express
 GET /logs-*/_search
 {
@@ -253,7 +253,7 @@ SELECT System.TimeCreated.SystemTime AS Time,
        EventData.TargetUserName AS User,
        EventData.IpAddress AS Source
 FROM parse_evtx(filename="C:/Windows/System32/winevt/Logs/Security.evtx")
-WHERE System.EventID.Value == 4625
+WHERE System.EventID.Value = 4625
 ```
 
 > VQL is powerful enough to be dangerous: a `glob()` over `C:/**` on a production fleet is a denial-of-service you authorized yourself. Scope every query, test it on one client, then widen.
@@ -304,6 +304,16 @@ WHERE System.EventID.Value == 4625
 - [ ] I know the retention and scope limits of each platform in my own environment.
 - [ ] I can explain why a low-jitter connection interval is a beacon *lead* and not a finding.
 - [ ] Every platform I query belongs to me or to an environment I am authorized to monitor.
+
+> **Verification:** executed on **2026-09-19** against **Velociraptor 0.77.2** (Ubuntu 24.04 WSL)
+> and **pandas 3.0.6**. `velociraptor query` ran the `glob()` and `pslist()` shapes shown here, and
+> the notebook snippet ran unchanged over a synthetic `conn.csv`, printing the rare-value count and
+> the `count`/`mean`/`std` table — which is why the module reads the ratio rather than the raw
+> deviation: on that data a 600-second beacon measured 5.3 s of absolute spread and a fast noisy
+> pair 3.1 s. **One correction:** this VQL build rejects `==`, so the `parse_evtx` example now
+> reads `WHERE System.EventID.Value = 4625` and returns rows against a real `Security.evtx`.
+> **Not executed:** the Splunk, Sentinel, Kibana, EQL, RITA and osquery examples — no SIEM, no
+> Elastic, no RITA and no osquery exist here — so those remain syntax references.
 
 ## Further Resources
 

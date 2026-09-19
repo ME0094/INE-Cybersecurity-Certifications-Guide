@@ -186,7 +186,7 @@ snmpwalk -v2c -c public 10.10.10.5 system
 # Brute-force common community strings
 onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt 10.10.10.5
 
-# Dump the running-processes tree (software + usernames)
+# Dump the running-software table: hrSWRunName is a process/software name, not a user
 snmpwalk -v2c -c public 10.10.10.5 .1.3.6.1.2.1.25.4.2.1.2
 ```
 
@@ -239,6 +239,12 @@ Next steps: test Apache 2.4.49 exploit, dig into /backup/, brute force login
 - [ ] I keep one up-to-date notes block per host with ports, versions, and
       next steps.
 - [ ] I record exact service versions — not just names — for every open port.
+
+> **Verification:** executed against Nmap 7.94SVN on 2026-09-19: `nmap -sV -sC -p <port>` against a
+> local listener returned the `PORT/STATE/SERVICE/VERSION` output quoted above; the SNMP OID was
+> checked against RFC 2790 (<https://www.rfc-editor.org/rfc/rfc2790.txt>) — `1.3.6.1.2.1.25.4.2.1.2`
+> is `hrSWRunName`, running software and not a user list. `snmpwalk`, `enum4linux`, `smbclient`
+> and `/usr/share/wordlists/` are absent here, so those blocks are unverified syntax references.
 
 ## Further Resources
 

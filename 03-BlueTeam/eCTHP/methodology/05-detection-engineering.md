@@ -77,7 +77,7 @@ level: medium
 tags:
   - attack.execution
   - attack.t1059.001
-  - attack.defense_evasion
+  - attack.stealth             # ATT&CK v19 renamed the old "Defense Evasion" tactic to Stealth
   - attack.t1027
 ```
 
@@ -186,7 +186,7 @@ A false positive is a cost, and the cost is paid by whoever is on shift at 03:00
 5. **Keep exceptions documented and owned.** Each filter gets a reason, an owner, and a date. An undocumented filter is tomorrow's blind spot.
 6. **Re-test after every change.** Retune with the emulation that produced the finding, so you know the rule still catches the malicious case.
 
-**Measure it.** Track alerts per rule per week, the share marked false positive, and the time analysts spend per alert. A rule with a 95% false-positive rate is not a detection; it is a queue tax. Report it and either fix it or retire it.
+**Measure it.** Track alerts per rule per week, the share marked false positive, and the time analysts spend per alert. A rule whose false-positive share reaches the high nineties is not a detection; it is a queue tax. Report it and either fix it or retire it — and set that floor from your own baseline rather than from this sentence, which is illustrative.
 
 ## Validation with emulation
 
@@ -310,6 +310,17 @@ Two habits keep this honest:
 - [ ] Can I produce a rule handoff package a tier-1 analyst could act on during their first shift?
 - [ ] Can I write a hunt report with facts separated from interpretation, quantified gaps, and ordered recommendations?
 - [ ] Can I measure coverage as validated techniques rather than as a count of rules?
+
+> **Verification:** the Sigma rule above was extracted to `/tmp` and checked with **sigma-cli
+> 3.1.0** on **2026-09-19**: it now returns `Found 0 errors, 0 condition errors and 0 issues`. The
+> single issue the check did report was the tag `attack.defense_evasion` (severity medium) — the
+> validator's ATT&CK data set is v19, where that tactic is *Stealth* — so the tag was corrected to
+> `attack.stealth`; `attack.t1059.001` (*PowerShell*) and `attack.t1027` (*Obfuscated Files or
+> Information*) resolve as written. `sigma convert -t splunk` **could not run**: sigma-cli 3.1.0
+> reports *"No backends installed"*, so the conversion lines remain a shape to run where a backend
+> exists. **Not executed:** the KQL and SPL translations and the atomic tests — no SIEM and no
+> Atomic Red Team installation here — so the three expressions were compared by reading, not by
+> running, and the 95 % figure is a rhetorical marker, not a measured boundary.
 
 ## Further Resources
 

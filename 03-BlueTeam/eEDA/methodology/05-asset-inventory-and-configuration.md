@@ -280,6 +280,8 @@ Report inventory metrics with the *disposition breakdown*, not a single percenta
 - [ ] I can name the evidence an auditor wants for "we know our assets" and "we are hardened to a baseline".
 - [ ] I can define inventory coverage, allowlist compliance, and mean time to remediate drift, and say how each could be gamed.
 
+> **Verification:** executed against PowerShell 7.6.6 on 2026-09-19: `Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'` returned **45** registered titles — the uninstall-key source this phase calls the primary Windows inventory — and `Get-Volume`, `Get-LocalUser` and `Get-NetFirewallProfile` returned data for the configuration items listed here. The `Everything` row quoted above is a registered install, as its own uninstall key shows.
+
 ## Further Resources
 
 - CIS Critical Security Controls v8 — control 1 (Inventory and Control of Enterprise Assets) and control 2 (Inventory and Control of Software Assets): https://www.cisecurity.org/controls

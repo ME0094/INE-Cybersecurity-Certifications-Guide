@@ -173,6 +173,8 @@ Swap memos with a peer, or review your own after a day away. Attack the document
 - [ ] I filed the memo, the finding, and at least one piece of control evidence in one place.
 - [ ] I found at least one weakness in my own memo during adversarial review and fixed it.
 
+> **Verification:** unverified syntax reference — not run; `auditctl`, `ausearch` and `aureport` are not installed on the machine used for this pass (WSL Ubuntu 24.04.4 has `journalctl`, systemd 255, and nothing else from the audit toolchain), so the two commands in Exercise 5 remain a shape to confirm on a build that has `auditd`. The rest of the lab is a document-writing exercise and needs no execution.
+
 ## Further Resources
 
 - [NIST SP 800-30 Rev. 1](https://csrc.nist.gov/pubs/sp/800/30/r1/final) — risk assessment, including risk response and acceptance.

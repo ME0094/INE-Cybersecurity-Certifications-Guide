@@ -72,7 +72,7 @@ tables below links to that module's `README.md`, which acts as its index.
 
 | Certification | Full official name | Official page | Latest public update |
 |---|---|---|---|
-| [eJPT](01-Fundamentals/eJPT/README.md) | Junior Penetration Tester | [dedicated page](https://ine.com/security/certifications/ejpt-certification) | Updated certification announced 31 Mar 2026 (web app testing, recon, offensive AI) |
+| [eJPT](01-Fundamentals/eJPT/README.md) | Junior Penetration Tester | [dedicated page](https://ine.com/security/certifications/ejpt-certification) | Updated certification announced 1 Apr 2026 (newsroom; press release 31 Mar 2026): web app testing, recon, offensive AI |
 
 ### Red Team — [`02-RedTeam/`](02-RedTeam)
 
@@ -91,7 +91,7 @@ tables below links to that module's `README.md`, which acts as its index.
 | [eSOC](03-BlueTeam/eSOC/README.md) | SOC Analyst | [dedicated page](https://ine.com/security/certifications/esoc-certification) | Certification launch announced 3 Mar 2026 |
 | [eCIR](03-BlueTeam/eCIR/README.md) | Certified Incident Responder | [dedicated page](https://ine.com/security/certifications/ecir-certification) | Next-generation certification announced 3 Sep 2025 |
 | [eCDFP](03-BlueTeam/eCDFP/README.md) | Certified Digital Forensics Professional | [dedicated page](https://ine.com/security/certifications/ecdfp-certification) | — |
-| [eCTHP](03-BlueTeam/eCTHP/README.md) | Certified Threat Hunting Professional | [dedicated page](https://ine.com/security/certifications/ecthp-certification) | Updated certification announced 24 Jul 2025; further update announced 20 Nov 2025 |
+| [eCTHP](03-BlueTeam/eCTHP/README.md) | Certified Threat Hunting Professional | [dedicated page](https://ine.com/security/certifications/ecthp-certification) | Updated certification announced 28 Jul 2025 (press release 24 Jul 2025); further update announced 20 Nov 2025 |
 
 ### Emerging Technologies — [`04-Emerging-Technologies/`](04-Emerging-Technologies)
 
@@ -231,7 +231,7 @@ to open at home, plus the ones the repository cites because they are dead:
 
 - [x] Catalog matches the repository — no module on disk that `README.md` does not link, no table row pointing at a folder that moved, no note that is orphaned from its module index
 - [x] Every relative link, in-repo anchor and promised path resolves
-- [x] Every flag, subcommand and plugin name in the guides exists in a catalogue extracted from the tool's own documentation, including tables of flags (what that check cannot see is stated in its header and in `AUDIT-2026-09-19.md`)
+- [x] Every flag, subcommand and plugin name in the guides exists in a catalogue extracted from the tool's own documentation, including tables of flags, and every file that contains commands declares how it was checked in a `> **Verification:**` record (what that check cannot see is stated in its header and in `AUDIT-2026-09-19.md`)
 - [x] Every fenced code block is closed, and every `python`/`js` block and `.py`/`.mjs` file parses (`check-code.mjs`, which never executes them)
 - [x] Catalog, names, areas and version notes verified against INE's own pages (19 Sep 2026)
 

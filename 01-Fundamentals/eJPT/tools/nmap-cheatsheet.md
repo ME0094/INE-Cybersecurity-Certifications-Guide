@@ -18,8 +18,9 @@ service/version detection, OS detection, and the Nmap Scripting Engine (NSE).
 ## Host discovery
 
 Find which hosts are alive before deeper scanning. Nmap's default host discovery sends
-ICMP echo + TCP SYN to port 443 + TCP ACK to port 80 (+ ARP on the local subnet when
-running as root).
+ICMP echo + TCP SYN to port 443 + TCP ACK to port 80 + an ICMP timestamp request
+(+ ARP on the local subnet when running as root). Watch it with
+`nmap -sn -n --packet-trace <target>`: that is how the `-sn` row above was checked.
 
 ```bash
 # Ping sweep a /24 (no port scan). Root not strictly required for -sn.

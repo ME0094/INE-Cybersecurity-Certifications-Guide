@@ -266,6 +266,8 @@ For a fleet, the honest architectural answers are **Windows Event Forwarding** (
 - [ ] I can describe the control that turns "the attacker deleted the logs" from a dead end into a survivable event.
 - [ ] I have completed at least one end-to-end proof: created a known event, found it locally, and found it in the forwarded copy.
 
+> **Verification:** executed against PowerShell 7.6.6 on Windows 11 on 2026-09-19: `wevtutil gl Security` reproduced the block in section 5 field for field (same `maxSize: 20971520`, `retention: false`, `autoBackup: false` and `channelAccess` ACL); `Get-WinEvent -LogName System -MaxEvents 2` returned events, and the 24-hour count over the last 500 `System` events returned 204. One correction to section 6: `Get-WinEvent -LogName Security -MaxEvents 1` **did** return an event here (a 4688) from an elevated session, so the documented *Attempted to perform an unauthorized operation* is a property of a non-elevated session, not of the channel. The `auditd` and `journald` material is an unverified syntax reference: `auditctl`, `ausearch` and `aureport` are not installed on this machine (`journalctl` is, systemd 255).
+
 ## Further Resources
 
 - [Linux auditd man page](https://man7.org/linux/man-pages/man8/auditd.8.html) — daemon reference; see also `auditctl(8)`, `auditd.conf(5)`, `ausearch(8)`, `aureport(8)`.

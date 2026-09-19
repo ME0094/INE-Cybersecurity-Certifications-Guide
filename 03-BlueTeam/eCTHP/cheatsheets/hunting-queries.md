@@ -473,7 +473,7 @@ velociraptor query "SELECT Name, Pid, Ppid, CommandLine FROM pslist()"
 SELECT System.TimeCreated.SystemTime AS Time, System.Computer AS Host,
        EventData.TargetUserName AS User, EventData.IpAddress AS Source
 FROM parse_evtx(filename="C:/Windows/System32/winevt/Logs/Security.evtx")
-WHERE System.EventID.Value == 4625
+WHERE System.EventID.Value = 4625
 ```
 
 ---
@@ -529,8 +529,6 @@ WHERE System.EventID.Value == 4625
 > list was reproduced with `awk` on the tab-separated log body. The SPL, KQL, EQL, VQL and Kibana
 > examples are **unverified syntax references — not run**: no Splunk, Sentinel or Kibana was
 > available.
-
-## Further Resources
 
 ## Further Resources
 

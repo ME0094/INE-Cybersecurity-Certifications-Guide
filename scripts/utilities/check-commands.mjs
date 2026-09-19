@@ -32,7 +32,10 @@
 //   - It does not read pseudocode or non-shell fences (`yaml`, `json`, `sql`, `python`),
 //     standalone `.py`/`.js` files, or plugin options (`--pid`, `--dump`), which belong to
 //     the plugin rather than to the tool and are not in any catalogue. `check-code.mjs` covers
-//     the unclosed-fence and does-not-parse classes; AUDIT-2026-09-19.md lists what remains.
+//     the unclosed-fence and-does-not-parse classes; AUDIT-2026-09-19.md lists what remains.
+//   - It does not read an ASCII directory tree as commands, even though the index pages draw
+//     the repository that way in an unlabelled block: a diagram has no flags and no tool, so
+//     counting its lines told the reader that `README.md` needed a verification record.
 //   - `--help`, `-h`, `--version` and friends are accepted for every tool: catalogues are
 //     extracted from documentation pages that mention them only in prose, so their absence
 //     there is not evidence that the flag is missing.
@@ -49,6 +52,7 @@
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, resolve, relative, sep, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { stripFences } from './markdown.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SPEC_DIR = join(HERE, 'tool-specs');
@@ -147,6 +151,15 @@ function commandsIn(file) {
     if (!SHELL_LANGS.has(info)) continue;
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
+    // A fence is not always a command. `README.md` and `README.es.md` draw the repository
+    // tree in an unlabelled block, and a diagram is not a shell transcript: reading it as one
+    // made both index pages count as "files with commands" and demand a verification record
+    // for a directory listing. Two shapes are a diagram and nothing else — a line that opens
+    // with a box-drawing glyph, and a line that is a single directory name ending in `/`.
+    // Anything with a second token is left alone, so `cd payloads/` is still a command.
+    if (/^[│├└┌┐┘┤┬┴─]/.test(trimmed)) continue;
+    if (/^[|`+]-{1,2}\s/.test(trimmed)) continue;
+    if (/^[^\s/][^\s]*\/$/.test(trimmed)) continue;
     // A line ending in a shell continuation is joined with the next one.
     if (buffer !== null) {
       buffer.text += ` ${trimmed}`;
@@ -367,7 +380,10 @@ const RECORD = /^\s*>\s*\*\*Verification:\*\*/im;
 for (const file of walk(ROOT).sort()) {
   const rel = relative(ROOT, file).split(sep).join('/');
   const source = readFileSync(file, 'utf8');
-  const hasRecord = RECORD.test(source);
+  // Fences are stripped first: this repository documents the convention inside a fenced
+  // example, and a fenced example is not a record. Counting it would report a file as
+  // verified because it explains how to verify one.
+  const hasRecord = RECORD.test(stripFences(source));
   // Tables of flags: same catalogue, different shape. See flagsInTables().
   for (const cell of flagsInTables(file)) {
     tableCells++;

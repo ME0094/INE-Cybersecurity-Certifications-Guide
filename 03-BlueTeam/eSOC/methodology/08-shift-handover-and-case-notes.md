@@ -183,6 +183,8 @@ The pattern in every strong version: **what happened, how it is known, who owns 
 - [ ] I confirm open actions aloud with the incoming analyst, by name.
 - [ ] I can explain why an empty dashboard is not the same as a calm night.
 
+> **Verification:** checked against the NIST publication pages on 2026-09-19: https://csrc.nist.gov/pubs/sp/800/61/r3/final is titled *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile* and SP 800-92 is *Guide to Computer Security Log Management*, as cited above. The handover note, the case-note standards and the open-action register are paper artefacts: nothing in this file was executed, and no case-management tool was available to this pass.
+
 ## Further Resources
 
 - NIST SP 800-61r3 — incident response lifecycle, documentation, and communication expectations: https://csrc.nist.gov/pubs/sp/800/61/r3/final

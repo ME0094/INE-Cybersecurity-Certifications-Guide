@@ -191,6 +191,11 @@ Before moving to `practice-scenarios.md`, verify your environment works end to e
 - [ ] I can SSH from Kali into Metasploitable 2 with its documented credentials.
 - [ ] I have a clean "base" snapshot of every VM to restore after each drill.
 
+> **Verification:** executed against Nmap 7.94SVN on 2026-09-19: `nmap -sV -sC -p <port>` against
+> a local listener returned the open-port/version shape these drills rely on, and `nmap -sn` behaves
+> as the readiness checklist says. The hypervisor steps were **not** run — no VirtualBox, VMware,
+> Kali image, Metasploitable or DVWA container exists in this environment.
+
 ## Further Resources
 
 - Kali Linux documentation and downloads: <https://www.kali.org/docs/> · <https://www.kali.org/get-kali/>

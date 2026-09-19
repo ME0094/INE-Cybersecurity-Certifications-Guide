@@ -43,7 +43,7 @@ SecurityEvent
 # Splunk SPL - the same question against the Windows add-on's CIM-normalised view
 index=windows EventCode=4688
 | search Process_Name="powershell.exe"
-| table _time, host, Account_Name, Process_Name, Process_Command_Line, Parent_Process_Name
+| table _time, host, Account_Name, Process_Name, Process_Command_Line, Creator_Process_Name
 | sort - _time
 ```
 
@@ -207,6 +207,8 @@ The third line is the part analysts skip and the part that makes the note usable
 - [ ] I can measure beacon regularity with inter-arrival deltas rather than a raw connection count.
 - [ ] I know why `timeframe` and `count()` do not belong in a Sigma rule, and where that logic lives instead.
 - [ ] I record every triage query verbatim with its time range and result summary.
+
+> **Verification:** unverified syntax reference — **not run**: there is no SIEM, EQL engine or ES|QL endpoint on the machine that produced this pass, so all four languages above remain shapes to adapt, as the note at the top of this file states. The one field-level check that could be made was made, and it corrected a name: the Windows add-on's SPL field for the parent of a 4688 is `Creator_Process_Name`, not `Parent_Process_Name` — the add-on's own `transforms.conf` extracts it with `SOURCE_KEY = Creator_Process_Name` (`New_Process_Name` is real; `Parent_Process_Name` appears nowhere in the add-on).
 
 ## Further Resources
 

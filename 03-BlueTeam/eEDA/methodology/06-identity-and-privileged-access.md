@@ -244,6 +244,8 @@ Minimum viable service-account discipline:
 - [ ] I can name the evidence for "leavers lose access" and "elevation is temporary".
 - [ ] I can define three identity metrics and one way each could be gamed.
 
+> **Verification:** executed against PowerShell 7.6.6 on 2026-09-19, and both queries in "Verifying who is actually privileged" reproduced the documented behaviour: `Get-LocalGroupMember -Group 'Administrators'` answered *No se encontró el grupo Administrators*, and resolving the group by its well-known SID returned `Administradores  S-1-5-32-544` with the two local member rows the table shows (`Usuario`, `Local` and `MicrosoftAccount`). The Linux and cloud equivalents (`getent group sudo`, IAM role listings) were not run — no such target exists on this machine.
+
 ## Further Resources
 
 - CIS Critical Security Controls v8 — control 5 (Account Management) and control 6 (Access Control Management): https://www.cisecurity.org/controls

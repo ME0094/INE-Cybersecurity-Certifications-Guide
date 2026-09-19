@@ -88,7 +88,7 @@ android root disable              # simulate "not rooted" for detection code
 android hooking list activities   # enumerate launchable activities
 android hooking list services
 android hooking watch class com.example.app.CryptoHelper   # watch method calls
-android heap search strings "secret"                       # search process memory
+memory search "secret" --string                            # search process memory (objection)
 ```
 
 objection is ideal for quick wins: disable protections, list components, and
@@ -158,7 +158,11 @@ adb shell run-as com.example.app ls -R files shared_prefs databases
 # Screenshot evidence as you go
 adb exec-out screencap -p > screen.png
 
-# Capture process memory for later review
+# Capture process memory for later review. `am dumpheap` only works when the app is
+# debuggable (a debug build, or `android:debuggable="true"` in the manifest); on a release
+# build it fails with a permission error — use the debug build you already installed for
+# Frida, or take a full-system heap with `adb shell am dumpheap -n <pid> <file>` from a
+# rooted device.
 adb shell am dumpheap $(adb shell pidof -s com.example.app) /data/local/tmp/heap.hprof
 ```
 

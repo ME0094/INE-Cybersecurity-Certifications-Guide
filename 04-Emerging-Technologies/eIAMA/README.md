@@ -138,6 +138,16 @@ Use this to track your overall preparation:
 - [ ] I can recall the OAuth 2.0 grant types and OIDC flows from the cheatsheet without looking.
 - [ ] I can compare cloud IdP, open-source IdP, and cloud-provider-native IAM use cases.
 
+> **Verification:** unverified — nothing in this file could be run: its only fenced block is
+> the module's own directory tree, not a command line. That tree was checked against the
+> working copy on **2026-09-19** and matches it exactly (nine files in four folders). The two
+> vendor claims above were **not** confirmed in this pass: INE's certification page
+> (`https://ine.com/security/certifications/eiama-certification`) answers **HTTP 200**, but it
+> is client-rendered — its HTML carries neither the phrase "Identity & Access Management
+> Technologist" nor any August 2026 date. The credential name in the nomenclature note and the
+> launch date in "What the eIAMA Certification Covers" therefore rest on a browser-rendered
+> page that this pass did not render.
+
 ## Further Resources
 
 - **Official eIAMA product page** (syllabus and exam information) — <https://ine.com/security/certifications/eiama-certification>

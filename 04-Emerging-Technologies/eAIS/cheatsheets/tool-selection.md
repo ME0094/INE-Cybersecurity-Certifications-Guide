@@ -170,12 +170,8 @@ A chosen tool is an assumption about coverage; write it down where the next pers
 does *not* cover. One line per decision is enough:
 
 ```jsonl
-{"decision":"scanner for endpoint health check","date":"<date>","target":"<staging-endpoint>","why":"fast first pass",
- "cost_ceiling":"<cap>","authorization":"<who approved the test>","not_covering":"tools, retrieval, tenancy",
- "next":"campaign on the injection family that failed"}
-{"decision":"tracing as the evidence source","date":"<date>","scope":"<app>","fields":"<schema ref>",
- "redaction":"<field list>","retention":"<metadata/payload windows>","not_covering":"provider internals, uninstrumented paths",
- "next":"one trace-derived detection, then convert two traces into cases"}
+{"decision":"scanner for endpoint health check","date":"<date>","target":"<staging-endpoint>","why":"fast first pass","cost_ceiling":"<cap>","authorization":"<who approved the test>","not_covering":"tools, retrieval, tenancy","next":"campaign on the injection family that failed"}
+{"decision":"tracing as the evidence source","date":"<date>","scope":"<app>","fields":"<schema ref>","redaction":"<field list>","retention":"<metadata/payload windows>","not_covering":"provider internals, uninstrumented paths","next":"one trace-derived detection, then convert two traces into cases"}
 ```
 
 ## Module map — where this file sits
@@ -220,6 +216,17 @@ Reading order for the eAIS module, relative to this directory. Every path in the
 - [ ] I have confirmed one tool's current syntax on my own build instead of trusting a remembered command.
 - [ ] I can explain why a clean scan is not evidence of a secure system.
 - [ ] Every test I run targets a system I own or am explicitly authorized to test.
+
+> **Verification:** unverified syntax reference — not run. Every command line in this sheet is a
+> placeholder shape (`<scanner> --help`, `<scanner> <target> <probe-set>`) and the sheet asserts
+> no version, so nothing in it could be executed as written. What the pass of **2026-09-19** did
+> check is the environment it sends you into: `garak --version` answers **v0.17.0** here, and
+> Promptfoo **is** installed but cannot start — it exits 1 with *"promptfoo requires Node.js
+> 22.22.0 or newer (found v18.19.1)"* under this WSL's Node 18.19.1 — which is exactly the
+> "confirm the tool on your own build" step the sheet asks for. The two `jsonl` decision lines
+> parse as JSON, and they were reflowed to one record per line in this pass so that the fence
+> label is true: they had been wrapped across six lines, which no line-per-record reader
+> accepts.
 
 ## Further Resources
 

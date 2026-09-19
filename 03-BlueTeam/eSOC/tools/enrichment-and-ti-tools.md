@@ -215,6 +215,8 @@ Look for: registration date, registrar, registrant country and privacy service, 
 - [ ] I record negative results, dates, and source names in the case note.
 - [ ] I know my free-tier rate limits, and I batch lookups instead of exhausting them mid-triage.
 
+> **Verification:** executed in WSL Ubuntu 24.04.4 with `curl` and `jq` on 2026-09-19: the RDAP lookup in section 5 works exactly as written — `curl -sSL "https://rdap.org/domain/example.com"` returns structured JSON (`ldhName EXAMPLE.COM`, registrar `RESERVED-Internet Assigned Numbers Authority`, events `registration 1995-08-14T04:00:00Z` and `expiration 2027-08-13T04:00:00Z`), which is the domain-age signal this file tells you to read. The MISP, VirusTotal, Shodan and AbuseIPDB calls were **not** run: they need API keys and accounts this pass does not have.
+
 ## Further Resources
 
 - MISP Project — documentation, data model, and REST API reference: https://www.misp-project.org/documentation/

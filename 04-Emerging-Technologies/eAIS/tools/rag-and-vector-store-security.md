@@ -379,6 +379,18 @@ execution of this plan.
 - [ ] I can explain what a canary document detects, and why I want one even in a single-tenant corpus.
 - [ ] I can state the two properties that actually make retrieval safe, and what I would tell a team that wants to fix a leak with a better prompt.
 
+> **Verification:** the eight inspection queries were extracted **verbatim from the `sql` blocks
+> above** and executed on **2026-09-19** against a synthetic relational schema in **SQLite 3.45.1**
+> — five metadata rows across two tenants plus one with no tenant at all, one stale row, one
+> fingerprint duplicate, one ACL that moved and one document deleted at source. Every query ran and
+> returned the shape the prose predicts: the null-ACL count came back **1**, the near-duplicate
+> group **1**, the staleness check **1** row, the left join the deleted-at-source chunk, the
+> retrieval-frequency ranking most-retrieved first, and `IS DISTINCT FROM` the moved ACL. That is a
+> check of the *query shapes* in a relational stand-in, not of a vector store: the file itself says
+> the names are schema-specific and the dialect is not a vector-store syntax, and no index,
+> embedding model or model endpoint exists on this machine, so the §9 test plan, the ingestion
+> paths and every recall and permission claim above remain unmeasured.
+
 ## Further Resources
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — includes the vector-and-embedding and sensitive-information-disclosure entries.

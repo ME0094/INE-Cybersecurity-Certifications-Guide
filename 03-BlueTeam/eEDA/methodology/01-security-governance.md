@@ -258,6 +258,8 @@ The metric to watch is not the number of exceptions but their **age distribution
 - [ ] I can describe the six steps of the exception process and explain why the engineer must not accept their own risk.
 - [ ] I can explain what the age distribution of open exceptions tells you that their count does not.
 
+> **Verification:** checked against the CIS Controls v8 page for control 6 on 2026-09-19 (https://www.cisecurity.org/controls/access-control-management, titled "CIS Critical Security Control 6: Access Control Management"): the MFA-for-administrative-access citation in the policy template therefore points at Access Control Management — safeguard 6.5 — and not at Account Management, which is control 5.
+
 ## Further Resources
 
 - NIST — Cybersecurity Framework (CSF 2.0): https://www.nist.gov/cyberframework

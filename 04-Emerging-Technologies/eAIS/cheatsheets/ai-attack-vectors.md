@@ -538,6 +538,16 @@ not verdicts — every row below needs the trace or the log to become a finding.
       would remove to shrink it.
 - [ ] For every vector I report, I name the channel it arrived on and what it reached.
 
+> **Verification:** unverified syntax reference — not run, and no target was contacted. This
+> sheet is a mapping rather than a command set, so what could be checked on **2026-09-19** is
+> its internal accounting: the twenty-one vector sections are matched by exactly twenty-one
+> rows in the `Vector → defense quick map`, and the two vectors the prose says carry no OWASP
+> LLM category are the two whose ID cell says so (`Model extraction`, `Adversarial evasion`).
+> The ATLAS and OWASP IDs were **not** re-fetched on this pass — no outbound request was made
+> from this machine — and the ATLAS list this file names as its source (`mitre-atlas/atlas-data`,
+> `dist/ATLAS.yaml`) is not in this checkout, so confirm each ID against ATLAS's and OWASP's own
+> pages before quoting it, as the note under the table already instructs.
+
 ## Further Resources
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)

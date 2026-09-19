@@ -80,7 +80,9 @@ msf6 > sessions -l
 ## Scenario 3 — Web command injection to a reverse shell (DVWA)
 
 - **Goal:** go from a web page to a reverse shell on your DVWA host.
-- **Environment:** Kali listener + DVWA (login `admin`/`password`, security level *low*).
+- **Environment:** Kali listener + DVWA (login `admin`/`password`, security level *low*). Set the
+  level on the instance you are using — `Security` in the left menu, or POST to `security.php` —
+  because the injection below only runs unfiltered at *low*.
 - **Steps:**
 
 ```bash

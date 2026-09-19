@@ -330,6 +330,8 @@ Two risk classes that behave differently from internal ones, and that administra
 - [ ] I can assess a change request against the five exposure questions and decide whether it needs a security review.
 - [ ] I can explain how third-party and cloud risk differ from internal risk, and which contract and Annex A clauses make them accountable.
 
+> **Verification:** executed against PowerShell 7.6.6 on 2026-09-19: the arithmetic in this note was recomputed and holds — the 5×5 matrix products, and the worked example ($1,000,000 × 0.4 = $400,000 SLE; × 0.1 ARO = $40,000 ALE; a control that cuts ARO to 0.02 leaves $8,000, an annual saving of $32,000). The SLE/ARO/ALE definitions themselves are the standard ones and were not re-sourced for this pass.
+
 ## Further Resources
 
 - NIST Risk Management Framework overview: https://csrc.nist.gov/projects/risk-management

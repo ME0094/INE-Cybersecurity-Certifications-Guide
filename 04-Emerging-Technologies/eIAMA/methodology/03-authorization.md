@@ -170,6 +170,18 @@ Access reviews are the same engine as the lifecycle reviews in Phase 01 — cert
 - [ ] I can design least-privilege/JIT controls and a break-glass exception path.
 - [ ] I can design an access certification campaign with remediation hooks.
 
+> **Verification:** nothing was run — the fenced blocks in this file are a ReBAC tuple sketch,
+> a PDP/PEP diagram and one OAuth authorize URL, all conceptual (the URL has no real host and
+> no authorization server was contacted). Its parameters were checked on **2026-09-19**
+> against the primary RFCs (both HTTP 200): **RFC 6749 §4.1.1** makes `response_type`
+> REQUIRED with the value `code`, `client_id` REQUIRED, `redirect_uri` and `scope` OPTIONAL,
+> and `state` *"RECOMMENDED. An opaque value used by the client to maintain state between the
+> request and callback"* — the parameter §10.12 calls out for CSRF prevention; **RFC 7636
+> §4.3** adds `code_challenge` as REQUIRED and `code_challenge_method` as *"OPTIONAL,
+> defaults to"* `plain` with the values `S256` or `plain`. The
+> PAP/PDP/PEP/PIP vocabulary was checked against **NIST SP 800-162** (HTTP 200), which defines
+> all four points and cites XACML as the vocabulary's origin.
+
 ## Further Resources
 
 - NIST SP 800-162, *Guide to Attribute Based Access Control (ABAC)*: https://doi.org/10.6028/NIST.SP.800-162

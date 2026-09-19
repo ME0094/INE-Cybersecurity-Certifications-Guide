@@ -335,6 +335,15 @@ A repeatable decision procedure, so your artefact work is driven by the question
 - [ ] For every finding in my notes, can I name the primary artefact and the independent corroborating one?
 - [ ] Am I keeping action claims and intent claims in separate sentences, with the intent claims labelled as inference?
 
+> **Verification:** the image-side half of section 2 was executed against **The Sleuth Kit 4.12.1**
+> on **2026-09-19** (Ubuntu 24.04 WSL): on a partitioned ext4 image built in `/tmp`, `mmls` gave
+> the partition offset, `fsstat -o 2048` the file system, `fls -o 2048 -r -p` the paths with their
+> meta addresses, and `icat -o 2048 <meta>` returned a planted file byte-for-byte — nothing was
+> mounted. **Not executed:** the Windows-side parsers of sections 3–7 (`PECmd`,
+> `AmcacheParser`, `AppCompatCacheParser`, `MFTECmd`, `RECmd`) — no Windows image, hive or
+> Zimmerman binary is available here — so those invocations remain syntax references whose flags
+> were not checked against a build.
+
 ## Further Resources
 
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final

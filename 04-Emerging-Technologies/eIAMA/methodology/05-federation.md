@@ -75,7 +75,7 @@ The ACS URL is the SP's *trusted mailbox*: if the SP accepts responses at any UR
 
 OIDC layers identity on OAuth 2.0: the client obtains an **ID token** (a JWT asserting who the user is) plus an access token for APIs, and can fetch more attributes from the **UserInfo** endpoint. Critical endpoints are discovered via the **discovery document** at `/.well-known/openid-configuration`, and public keys via **JWKS** (JSON Web Key Set).
 
-```json
+```jsonc
 // Conceptual ID token (JWT payload)
 {
   "iss": "https://idp.example.com",       // must match configured issuer
@@ -177,6 +177,23 @@ Strategic considerations: protocol support (SAML for legacy/B2B, OIDC for modern
 - [ ] I can map SAML↔OIDC concepts (NameID↔sub, attributes↔claims, logout differences).
 - [ ] I can explain at least five federation failure modes and their fixes.
 - [ ] I can recommend an IdP topology (single, broker, B2B, CIAM) for a given scenario.
+
+> **Verification:** the protocol facts above were checked on **2026-09-19** against the primary
+> specifications, all HTTP 200 unless noted. **OpenID Connect Core 1.0**: `sub` is *"A locally
+> unique and never reassigned identifier within the Issuer for the End-User"*, `nonce` is a
+> *"String value used to associate a Client session with an ID Token, and to mitigate replay
+> attacks"*, and `aud` *"MUST contain the OAuth 2.0 client_id of the Relying Party as an
+> audience value"*. **OpenID Connect Discovery 1.0**: the metadata document is served at the
+> path formed by concatenating `/.well-known/openid-configuration` to the Issuer, and
+> `jwks_uri` is *"REQUIRED"*. **SAML V2.0 core**
+> (`docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf`) contains `AuthnRequest`,
+> `InResponseTo`, `AudienceRestriction`, `NotOnOrAfter` and `NameID`; the HTML rendering under
+> that same path answers **HTTP 404**, as the note in Further Resources says. The XML and JSON
+> blocks are abridged illustrations rather than captured traffic: no IdP, realm or federation
+> partner was available in this pass, so no assertion or token shown above was produced or
+> validated live. `groups`, used in the ID token example, is not one of the standard claims
+> registered by OIDC Core — the spec permits additional claims and its own example of one is
+> `http://example.info/claims/groups`.
 
 ## Further Resources
 

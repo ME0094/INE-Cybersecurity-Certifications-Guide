@@ -376,6 +376,19 @@ Related reading: [../methodology/05-defensive-controls.md](../methodology/05-def
 - [ ] I labelled ambiguous replies by the written rule rather than by mood, and I said which
       cases I genuinely could not classify.
 
+> **Verification:** `app.py`, `runner.py` and `prompts.jsonl` were extracted **verbatim from the
+> blocks above** and executed on **2026-09-19** under Ubuntu 24.04 / Python 3.12.3 in the
+> `/opt/pytools/bin` virtualenv (Flask 3.1.3, requests 2.34.2). `python runner.py` against the
+> running app wrote the three documented rows to `results.jsonl` (`id`, `drill`, `prompt`,
+> `reply`) and exited 0, and `python -m py_compile` passed on both blocks. The model endpoint was
+> a **stub** of the documented `{"message": {"content": …}}` contract, not Ollama: WSL has no
+> Ollama, and the Windows install (0.32.15) reads `OLLAMA_MODELS=C:\ai\models`, which holds no
+> manifests, so the documented `curl … /api/chat` answered `{"error":"model 'llama3.2:1b' not
+> found"}` for the tag on disk and `'llama3.2:3b' not found` for the tag this lab names. Its body
+> **was** accepted without a `Content-Type` header, which is all that could be established
+> without a model. No model was pulled or downloaded, so every refusal, rate and drill outcome
+> above remains unmeasured: this pass records only that the harness runs.
+
 ## Further Resources
 
 - [OWASP Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)

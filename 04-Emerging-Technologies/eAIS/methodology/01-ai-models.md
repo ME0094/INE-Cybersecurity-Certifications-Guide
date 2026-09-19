@@ -278,6 +278,17 @@ retrieve(query, k, acl_filter = <predicate derived from the authenticated caller
 - [ ] I filled the component inventory for one application and named the owning phase for every row.
 - [ ] I checked retrieval-time authorization: the retriever is no more privileged than the caller, and the ACL filter runs before ranking rather than after.
 
+> **Verification:** unverified syntax reference — not run, and the style note above says so. The
+> `run_assistant()` sketch is illustrative and does not execute: called with any arguments it
+> raises `NameError: name 'load_system_policy' is not defined`, because it names four helpers the
+> block never defines. All four fragments compile under `python3 -m py_compile` (3.12.3) without
+> resolving anything they call. The arithmetic the worked example asks the reader to trust was
+> recomputed on **2026-09-19** and holds: 420 + 1,150 = **1,570** developer tokens; 1,300 + 3,600
+> + 900 = **5,800** runtime tokens; input subtotal **7,430**; total demand **9,478**; and the
+> overrun is **1,286** tokens past the 8,192 ceiling. The cosine column orders C (0.91) → B (0.84)
+> → A (0.62), so a `k = 3` cut reaches the attacker's chunk. No model, tokenizer or vector store
+> exists on this machine, so none of those figures is a measurement — the file says as much.
+
 ## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/

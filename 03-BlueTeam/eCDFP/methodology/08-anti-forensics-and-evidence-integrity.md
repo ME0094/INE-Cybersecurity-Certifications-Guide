@@ -229,6 +229,14 @@ Three sentences that do the job, and the reasoning behind each:
 - [ ] If I broke a procedure, would I know how to document it, quantify its effect, and where to state it in the report?
 - [ ] Can I word an anti-forensic finding that states what the artefacts support, names the alternative explanations, and keeps intent claims in a separate, labelled sentence?
 
+> **Verification:** executed against **GNU coreutils 9.4** and **The Sleuth Kit 4.12.1** on
+> **2026-09-19** (Ubuntu 24.04 WSL): an evidence file with its manifest under `/tmp` verified with
+> `sha256sum -c` as `OK`, exit 0, and after a single byte of that file was overwritten the same
+> command printed `FAILED` and exited 1 — the habit of section 6, which is what makes an
+> accidental write visible. **Not executed:**
+> `istat` against an NTFS record and the `MFTECmd` invocation — no NTFS image and no Windows-side
+> parser exists here — so the timestamp-set examples remain syntax references.
+
 ## Further Resources
 
 - **NIST SP 800-86**, *Guide to Integrating Forensic Techniques into Incident Response* — https://csrc.nist.gov/publications/detail/sp/800-86/final

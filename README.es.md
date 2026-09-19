@@ -162,11 +162,12 @@ Cuatro comprobaciones automáticas se ejecutan en cada push a `main` y en cada p
 que el repositorio no se descomponga: que el catálogo del README coincida con las carpetas que
 existen de verdad, que no se rompa ningún enlace relativo, ancla interna ni ruta prometida, que
 cada flag, subcomando y plugin que usan las guías exista en un catálogo extraído de la
-documentación de la propia herramienta (**incluidas las tablas de flags**), y que todo bloque de
-código esté cerrado y todo bloque `python`/`js` y todo script `.py`/`.mjs` se pueda parsear (sin
-ejecutarlo). Un quinto trabajo semanal revisa que las URLs externas sigan respondiendo (y se
-salta a propósito las URLs de laboratorio que la guía te dice que abras en tu propia máquina, y
-las que el repositorio cita precisamente porque están muertas).
+documentación de la propia herramienta (**incluidas las tablas de flags**, y exigiendo que todo
+archivo con comandos declare en una línea `> **Verification:**` cómo se comprobó), y que todo
+bloque de código esté cerrado y todo bloque `python`/`js` y todo script `.py`/`.mjs` se pueda
+parsear (sin ejecutarlo). Un quinto trabajo semanal revisa que las URLs externas sigan
+respondiendo (y se salta a propósito las URLs de laboratorio que la guía te dice que abras en tu
+propia máquina, y las que el repositorio cita precisamente porque están muertas).
 
 Quien corrija un comando deja constancia de cómo lo comprobó, con una línea
 `> **Verification:**` que nombra la herramienta, la versión y la fecha. Los dos registros de

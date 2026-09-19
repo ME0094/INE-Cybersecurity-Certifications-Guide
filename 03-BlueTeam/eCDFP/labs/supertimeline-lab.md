@@ -65,7 +65,7 @@ python3 -m http.server 8080 --bind 0.0.0.0
 
 > **Serve it from a node that is not `linux-lab`** — the optional `linux-victim`, or a throwaway HTTP container on the hypervisor host attached to the lab network. The analysis host must never be a participant in the incident it examines ([lab-environment.md:68-74](lab-environment.md)). If you have no third node, write the deviation and its reason into the case log, as [lab-environment.md:299-309](lab-environment.md) shows.
 
-**Record the time base before you touch the victim.** Everything later is expressed in UTC ([03-timeline:79](../methodology/03-timeline.md)), and the offset is a fact about the timeline, not a footnote ([lab-environment.md:343](lab-environment.md)).
+**Record the time base before you touch the victim.** Everything later is expressed in UTC ([03-timeline:135](../methodology/03-timeline.md)), and the offset is a fact about the timeline, not a footnote ([lab-environment.md:341](lab-environment.md)).
 
 ```bash
 # On win-lab (PowerShell): zone, reading, sync state — then on linux-lab, at the same moment
@@ -176,7 +176,7 @@ In this incident, look for **the two names of one file** (the download's birth a
 
 ### 6.2 Route B — the plaso super-timeline over the image and the extracted artefacts
 
-One parse, one storage file, then as many filters as you have questions ([03-timeline:48-79](../methodology/03-timeline.md)). Confirm the current CLI shape first: plaso's command forms have changed across releases.
+One parse, one storage file, then as many filters as you have questions ([03-timeline:94-135](../methodology/03-timeline.md)). Confirm the current CLI shape first: plaso's command forms have changed across releases.
 
 ```bash
 log2timeline.py --help
@@ -216,7 +216,7 @@ What this route teaches: **which staged steps have an event at all** (task creat
 
 The method, in order. Its central discipline: **pivot on entities, not on time**. Widening a window adds noise from every unrelated component on the machine; pivoting on a name, a path, an account or a hash adds only events plausibly belonging to the same actor.
 
-**1. Fix the time base.** Write the victim's zone, your measured offset and the display zone you will export in into the case log. Every filter below is in UTC. Store UTC, display local if you must ([03-timeline:79](../methodology/03-timeline.md)) — but never mix the two inside one subset, because a mixed subset produces a sequence that exists only in your spreadsheet.
+**1. Fix the time base.** Write the victim's zone, your measured offset and the display zone you will export in into the case log. Every filter below is in UTC. Store UTC, display local if you must ([03-timeline:135](../methodology/03-timeline.md)) — but never mix the two inside one subset, because a mixed subset produces a sequence that exists only in your spreadsheet.
 
 **2. Anchor on an event you already know.** Pick one step from the answer key with the richest artefact potential in the routes you built and write its time down. From now on the answer key stays closed: you are allowed to know the anchor, and nothing else.
 

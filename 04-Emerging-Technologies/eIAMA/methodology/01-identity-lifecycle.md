@@ -86,7 +86,7 @@ HR (SoR) ──► Identity Governance / Provisioning hub ──► Authoritativ
 
 Modern SaaS systems are provisioned over **SCIM 2.0** (System for Cross-domain Identity Management), a standard REST/JSON API. A conceptual user creation, then a deprovisioning update:
 
-```json
+```http
 // SCIM 2.0 create user (conceptual)
 POST /scim/v2/Users
 {
@@ -97,11 +97,13 @@ POST /scim/v2/Users
   "active": true
 }
 
-// Deprovisioning: PATCH "active": false. Per RFC 7643 §4.1.1, `active` is a *boolean*
-// attribute of the account, not a session control: "specifying false ... indicates that
-// the user should be prevented from accessing any resource". It does not by itself end
-// sessions that are already established, nor expire tokens already issued — those are
-// separate steps (see the pitfalls below).
+// Deprovisioning: PATCH "active": false. RFC 7643 §4.1.1 defines `active` as a boolean
+// attribute of the account — "A Boolean value indicating the user's administrative status.
+// The definitive meaning of this attribute is determined by the service provider" — and
+// gives as its example that true means the user can log in while false means the account
+// has been suspended. Note what that is not: it is not a session control. Setting it does
+// not by itself end sessions that are already established, nor expire tokens already
+// issued — those are separate steps (see the pitfalls below).
 ```
 
 | Provisioning pattern | Strengths | Weaknesses |
@@ -190,6 +192,20 @@ Good hygiene is what makes a zero-trust architecture (Phase 04) believable: you 
 - [ ] I can design an access review campaign: scope, reviewer, frequency, SoD checks, and remediation path.
 - [ ] I can list at least five identity-hygiene problems and a mitigation for each.
 - [ ] I can explain why session revocation matters for offboarding, not just account disabling.
+
+> **Verification:** no command was executed — this file holds no runnable command line (its
+> fences are two ASCII diagrams and two `json` sketches), and this pass had no IdP tenant or
+> domain to provision against. The SCIM `active` semantics were checked on **2026-09-19**
+> against **RFC 7643 §4.1.1** (HTTP 200, `rfc-editor.org/rfc/rfc7643.txt`), which defines the
+> attribute as *"A Boolean value indicating the user's administrative status. The definitive
+> meaning of this attribute is determined by the service provider. As a typical example, a
+> value of true implies that the user is able to log in, while a value of false implies that
+> the user's account has been suspended."* The sentence quoted in the JSON comment above is
+> **not** in that section — the string `prevented` does not occur anywhere in RFC 7643 or
+> RFC 7644 — so the argument that `active` is not a session control stands on weaker ground
+> than the quotation suggests, though the RFC does support the conclusion. The RBAC/ABAC
+> vocabulary used here was checked against **NIST SP 800-162** (HTTP 200), which defines the
+> PDP, PEP, PIP and PAP roles and the XACML lineage the note cites.
 
 ## Further Resources
 

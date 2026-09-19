@@ -218,6 +218,8 @@ The point of the exercise: three numbers from one dataset tell three different s
 - [ ] I can explain why per-analyst leaderboards damage triage quality.
 - [ ] I can present the same month's numbers to the team, to management, and to leadership without misleading any of them.
 
+> **Verification:** executed against PowerShell 7.6.6 on 2026-09-19: the arithmetic in sections 3 and 8 was recomputed and matches this note line for line — 420 × 11 min = 4,620 min = **77** analyst-hours against 24 available; fidelity 310 ÷ 8,350 = **3.7 %**; escalation precision 180 ÷ 290 = **62.1 %**; reopening 24 ÷ 8,350 = **0.29 %**; missed detections (7−2) ÷ 7 = **71.4 %**. The SPL, KQL and ES|QL that would supply those inputs were **not** executed: there is no SIEM on the machine that produced this pass.
+
 ## Further Resources
 
 - NIST SP 800-61r3 — *Incident Response Recommendations and Considerations for Cybersecurity Risk Management* (response lifecycle framing, April 2025): https://csrc.nist.gov/pubs/sp/800/61/r3/final

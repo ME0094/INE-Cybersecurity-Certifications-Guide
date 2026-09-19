@@ -94,7 +94,7 @@ Other passwordless options: one-time codes by email ("magic links" — convenien
 
 **Step-up authentication** demands a *higher* assurance level for sensitive actions *after* the session is established (viewing a payment card, changing MFA settings, admin console, bulk export). A conceptual policy:
 
-```json
+```jsonc
 // Conditional-access-style rule (conceptual)
 {
   "name": "Step-up for admin actions",

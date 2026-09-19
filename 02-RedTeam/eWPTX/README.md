@@ -28,7 +28,7 @@ In public, domain-level terms, the module develops expertise in:
 - **Protection bypasses** — evading WAFs, rate limits, input filters, and client-side controls, and understanding *why* each bypass works.
 - **Complex authentication and authorization** — modern token formats (JWT), delegated authorization flows (OAuth), session-management edge cases, and flawed access-control logic.
 - **HTTP protocol-level attacks** — request smuggling/desync, parameter pollution, cache-poisoning primitives, and how front-end/back-end disagreement gets abused.
-- **Server-side exploitation in context** — SSRF reaching internal networks, unsafe deserialization, template injection, and similar classes used as links in a chain rather than as isolated tricks.
+- **Server-side exploitation in context** — SSRF reached through a vulnerable parameter and used as a link in a chain rather than as an isolated trick. Families this module does not develop are named where they belong: the phases cover what is written here, and the cheatsheet lists the rest as chain steps.
 - **Professional assessment craft** — scoping, enumeration discipline, evidence-based verification, and clear reporting.
 
 The exact syllabus, prerequisites, and exam brief are published by INE; check the official site (`https://ine.com`) before planning your preparation. This repository is a study aid, not a copy of the syllabus.
@@ -140,6 +140,11 @@ Tip: keep a personal notes file with **one worked chain per technique family**. 
 - [ ] I can reproduce the core entries of `cheatsheets/advanced-techniques.md` with the file closed.
 - [ ] I have written at least one end-to-end pentest-style report using the reporting methodology.
 - [ ] Everything I added to this module is English, public, and free of NDA content.
+
+> **Verification:** checked against INE's relaunch announcement on 2026-09-19
+> (<https://www.globenewswire.com/news-release/2024/12/04/2991356/0/en/INE-Security-Launches-Updated-Web-Application-Pentesting-Certification.html>):
+> the release is dated 4 December 2024, matching the window stated above, and the eWPTX
+> product page returns HTTP 200. Exam logistics were not looked up; no laboratory was run.
 
 ## Further Resources
 

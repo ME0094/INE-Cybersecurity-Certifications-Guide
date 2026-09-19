@@ -241,6 +241,8 @@ The limits are part of the finding, and stating them is what makes an escalation
 - [ ] If I closed it, the reason is written and the baseline gap that caused the alert was recorded as tuning input.
 - [ ] I wrote down what I could **not** conclude, with the queries I ran and the sources I checked.
 
+> **Verification:** checked against Microsoft Learn on 2026-09-19: the field lists in "The Four Events You Will Correlate" match the published event pages — 4648 documents `SubjectUserName`, `TargetUserName`, `TargetServerName` and `TargetInfo` (https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4648), and 4672 documents `SubjectUserName`, `SubjectLogonId` and the privilege list (https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4672). Nothing in this lab was executed: no SIEM, directory or lab VM was available for this pass, exactly as the note at the top of the file says.
+
 ## Further Resources
 
 - Microsoft Learn — audit logon events and the `4624`/`4625` field reference: https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/audit-logon

@@ -221,7 +221,7 @@ Detection coverage is a property of *data* before it is a property of rules. The
 |---|---|---|---|
 | Initial Access | A logon made with explicit credentials; the delivery channel | Security 4648; proxy and mail-gateway logs | Delivery is invisible, so the first visible event becomes *execution* and you lose the "how did they get in" answer |
 | Execution | Which process started, with which command line | 4688 **with command-line auditing enabled**, Sysmon 1 | You learn that something ran but never how it was invoked |
-| Persistence | Service installs, scheduled-task creation, autostart registry writes | 4697 / System 7045, 4698, Sysmon 13 | Persistence becomes visible only when it acts, usually much later |
+| Persistence | Service installs, scheduled-task creation, autostart registry writes | 4697 (**needs *Audit Security System Extension*, which is "No Auditing" until you enable it**) / System 7045 (**written by the Service Control Manager whether or not any audit policy is on**), 4698, Sysmon 13 | Persistence becomes visible only when it acts, usually much later |
 | Privilege Escalation | Special privileges assigned, token and process access | 4672, Sysmon 10 | Escalation is inferred from later behaviour instead of observed |
 | Defense Evasion | Log clearing, AV/AMSI/ETW tampering, config changes | Security 1102, System 104, Defender 5001/5007, Sysmon 12/13 | You cannot distinguish *the attacker removed the data* from *we never had it* |
 | Credential Access | Access to LSASS, Kerberos ticket requests | Sysmon 10, Security 4768/4769/4771 | Theft stays invisible until the stolen account is used somewhere else |
@@ -364,6 +364,8 @@ Prioritization discipline for a full queue: work **severity × blast radius × t
 - [ ] I can walk the silent-detection chain (endpoint → ingest → parse → rule → engine) and name the check for each step.
 - [ ] I can explain the difference between event time, ingest time, and display time, and which one belongs in my notes.
 - [ ] I can name the channels I deliberately do not collect, and why.
+
+> **Verification:** executed against PowerShell 7.6.6 on Windows 11 and `auditpol` on 2026-09-19: the step-1 coverage command returned `Security` and `System` enabled (23,237 and 16,085 records at the time of the run) and then exited 1 on the third name, because `Microsoft-Windows-Sysmon/Operational` does not exist on this host — Sysmon is not installed, which is itself the gap the step is designed to find. Step 2 needs a caveat: `auditpol /get /subcategory:"Process Creation"` fails on a non-English Windows because subcategory names are localized, while `/get /category:*` works and prints `Sin auditoría` for *No Auditing*. The SIEM half of that procedure (KQL, ES|QL) stays an unverified syntax reference: no SIEM exists here.
 
 ## Further Resources
 

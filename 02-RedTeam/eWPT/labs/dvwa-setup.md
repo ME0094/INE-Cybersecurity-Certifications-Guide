@@ -129,16 +129,22 @@ use it as a control case to observe secure behavior.
 You need more than `admin` for realistic drills (stored XSS between users,
 horizontal privilege checks, login brute force with a real victim account).
 
-- **Via the app:** with the security level at **low**, the login page offers a
-  **Register** link. Create accounts such as `alice` / `Password123` and
-  `bob` / `Password123`. If registration is disabled in your version, enable
-  it via the config or use the SQL method below.
-- **Via SQL (always works):** insert a user with the same password hashing DVWA
-  uses (MD5). Reset the database afterwards if you corrupt anything:
+- **Via the app:** not available. DVWA ships no registration page — `login.php` in
+  current master has no **Register** link and the repository contains no
+  `register.php`. Some older forks or course bundles may add one; if yours does,
+  create `alice` / `Password123` and `bob` / `Password123` from it.
+- **Via SQL (the route that always works):** insert a user with the same password
+  hashing DVWA uses (MD5). `user_id` is a PRIMARY KEY with no AUTO_INCREMENT and
+  DVWA's own setup seeds ids 1–5 (`admin`, `gordonb`, `1337`, `pablo`, `smithy`),
+  so pick an id outside that range. Reset the database afterwards if you corrupt
+  anything:
 
 ```sql
 INSERT INTO dvwa.users (user_id, user, avatar, password, last_login, failed_login)
-VALUES ('3', 'alice', 'alice.jpg', MD5('Password123'), NOW(), 0);
+VALUES ('6', 'alice', 'alice.jpg', MD5('Password123'), NOW(), 0);
+
+INSERT INTO dvwa.users (user_id, user, avatar, password, last_login, failed_login)
+VALUES ('7', 'bob', 'bob.jpg', MD5('Password123'), NOW(), 0);
 ```
 
 - Log out and log back in as the new account to confirm it works before a
@@ -194,6 +200,12 @@ VALUES ('3', 'alice', 'alice.jpg', MD5('Password123'), NOW(), 0);
 - [ ] I completed one full exercise at Low, then repeated it at Medium.
 
 ---
+
+> **Verification:** checked against DVWA's own source on 2026-09-19 (current `master`,
+> `dvwa/includes/DBMS/MySQL.php`): `users` has `PRIMARY KEY (user_id)` with no `AUTO_INCREMENT`
+> and the seed inserts ids 1–5, which is why the accounts above use ids 6 and 7;
+> `register.php` returns 404 and `login.php` has no registration link. No MySQL was started
+> here, so the INSERT statements were checked against the schema and not executed.
 
 ## Further Resources
 

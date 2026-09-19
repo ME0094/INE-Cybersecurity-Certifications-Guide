@@ -146,6 +146,8 @@ Spacing matters more than cramming: this material is vocabulary-and-frameworks h
 - [ ] I can look up any GRC term in the terminology cheatsheet without opening a browser.
 - [ ] I have completed the Checklist / Self-Test section of every file in this module.
 
+> **Verification:** checked against the module tree on disk on 2026-09-19: the nine `methodology/` phases, the five `tools/` guides, the three `labs/` and the single `cheatsheets/` file listed above all exist, and every relative link in this README resolves — the repository-wide `node scripts/utilities/check-links.mjs .` run is clean (887 relative links, 0 broken).
+
 ## Further Resources
 
 - [NIST Cybersecurity Framework (CSF 2.0)](https://www.nist.gov/cyberframework) — the CSF itself, quick start guides, and mapping resources.

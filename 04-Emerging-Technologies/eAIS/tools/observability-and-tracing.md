@@ -231,7 +231,7 @@ Version cases like code: immutable once frozen, reviewed when changed, reference
 edited in place silently loses its history, and the next person comparing pass rates is comparing two different
 tests. Keep production payloads out of the corpus unless the environment is expressly cleared for them.
 
-```jsonl
+```json
 {"case_id":"inj-indirect-001","source_trace":"<trace-id>","class":"indirect-injection","input":"<fictional question>",
  "context_docs":["<synthetic-doc-id>"],"tool_stubs":["<read-tool>","<egress-tool>"],"expected":"safe",
  "pins":{"template_hash":"sha256:<h>","model_revision":"<pinned>","guardrail_version":"<id>"},
@@ -315,6 +315,18 @@ test-case library, the verdict data behind any guardrail claim, and the observat
 - [ ] I can convert a trace into a versioned evaluation case without copying production data, and say which pins make a pass meaningful.
 - [ ] I can list five things tracing will not tell me, including two needing a different evidence source.
 - [ ] I have run one synthetic incident through my own stack and confirmed the chain joins by ids alone.
+
+> **Verification:** this file states at the top that nothing in it was executed, and that stands
+> for the traces, queries and detections. What a pass can still check was checked on
+> **2026-09-19** under Python 3.12.3: the span-shape block parses as JSON and the three span rows
+> parse as JSONL, one object per line; the `redact_span()` sketch compiles and, run with a
+> stand-in digest, masks the field named `email` at both depths, digests `user_id` and
+> `account_number`, and leaves `tool.arguments` untouched — which is the gap the surrounding text
+> asks you to close deliberately. One formatting defect found here was repaired in the same
+> pass: the case-schema fence below the trace section was labelled `jsonl` while holding a
+> single pretty-printed object across four lines, so a line-per-record reader could not parse
+> it; it is now labelled `json`, which is what it is. No tracing backend, exporter or
+> application exists on this machine, so no span was ever emitted and no detection rule was run.
 
 ## Further Resources
 

@@ -114,13 +114,17 @@ adb shell run-as com.example.app cat databases/*.db
 
 # Rooted device — check everywhere:
 adb shell "find /data/data/com.example.app -type f"
-adb shell sqlite3 /data/data/com.example.app/databases/app.db ".dump"
+# `sqlite3` is not part of a stock Android user build: pull the database out first, or use a
+# device image that ships it (some custom ROMs do). The workstation query is the reliable one.
+adb exec-out run-as com.example.app cat databases/app.db > app.db
+sqlite3 app.db ".dump"
 
 # Log leakage:
 adb logcat -d | grep -iE "password|token|secret"
 
-# Android Keystore usage (does the app use it?):
-adb shell dumpsys package com.example.app | grep -i keystore
+# Android Keystore usage: `dumpsys package` does not report it — look for the APIs in the
+# decompiled code, or hook them at runtime.
+grep -rn "AndroidKeyStore\|KeyGenParameterSpec\|KeyStore.getInstance" jadx-out/sources | head
 ```
 
 **Expected outcome:** a concrete inventory: which files exist, which contain

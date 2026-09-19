@@ -10,8 +10,11 @@ name: docs-check
 #      or a code block or script that does not parse.
 # The third compares every command line against a catalogue downloaded from each tool's own
 # documentation (scripts/utilities/tool-specs); it also checks tables of flags whose context
-# names one tool. The fourth parses every `python` and `js` block and every `.py`/`.mjs` file
-# without executing any of them, using `ast.parse` and `vm.Script`.
+# names one tool, and it refuses a file that contains commands and declares no
+# `> **Verification:**` record — the record is what tells a reader whether an example was
+# executed, compared with documentation, or never run at all. The fourth parses every `python`
+# and `js` block and every `.py`/`.mjs` file without executing any of them, using `ast.parse`
+# and `vm.Script`.
 # All four are plain Node scripts with no dependencies, so they run anywhere; the code check
 # uses Python 3 when it is on the PATH and says so when it is not.
 on:
@@ -41,8 +44,8 @@ jobs:
       - name: Relative links and in-repo anchors resolve
         run: node scripts/utilities/check-links.mjs .
 
-      - name: Flags and subcommands exist in the tool's own documentation
-        run: node scripts/utilities/check-commands.mjs .
+      - name: Flags and subcommands exist, and every file with commands says how it was checked
+        run: node scripts/utilities/check-commands.mjs . --require-verification
 
       - name: Code blocks are closed and code parses
         run: node scripts/utilities/check-code.mjs .

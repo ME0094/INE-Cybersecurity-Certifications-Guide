@@ -206,6 +206,8 @@ Steps 2, 3, 4, and 5 are the ones that get skipped in plans written by people wh
 - [ ] I can define the metrics that distinguish backup existence from recovery capability.
 - [ ] I can name the evidence for "restores work" and "backups are protected from tampering".
 
+> **Verification:** checked against the NIST publication pages on 2026-09-19: SP 800-34 Rev. 1 is titled *Contingency Planning Guide for Federal Information Systems*, as cited above (https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final), and the SP 800-53 Rev. 5 page resolves. No backup system, repository or restore target is available in this environment, so every restore test, RTO and RPO figure in this phase is a design to be executed by the reader, not a record of an execution.
+
 ## Further Resources
 
 - CIS Critical Security Controls v8 — control 11 (Data Recovery): https://www.cisecurity.org/controls

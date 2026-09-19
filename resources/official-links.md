@@ -145,11 +145,21 @@
 
 - Official page: **https://ine.com/security/certifications/ecthp-certification**
   Dedicated product page (verified).
-- Version note: INE announced an **updated eCTHP certification on 24 July 2025**, and later
+- Version note: INE announced an **updated eCTHP certification in July 2025**, and later
   published *"INE Updates Threat Hunting Certification as Adversaries Evolve Beyond
-  Malware"*:
+  Malware"* on **20 November 2025**. The July date depends on which artefact you read: the
+  newsroom announcement page and the blog post *"New eCTHP Certification: Master Real-World
+  Threat Hunting"* both carry **28 July 2025**, while the GlobeNewswire press release is
+  dated **24 July 2025**:
   <https://ine.com/newsroom/ine-security-launches-updated-certified-threat-hunting-professional-ecthp-cybersecurity-certification>
+  · <https://ine.com/blog/new-ecthp-certification-master-real-world-threat-hunting>
   · <https://ine.com/newsroom/ine-updates-threat-hunting-certification-as-adversaries-evolve-beyond-malware>
+  · press release: <https://www.financialcontent.com/article/gnwcq-2025-7-24-ine-security-launches-updated-certified-threat-hunting-professional-ecthp-cybersecurity-certification>
+  Re-checked 19 September 2026 against the pages themselves: `2025-07-28` on the newsroom page
+  and in the blog post's `datePublished`, `2025-11-20` on the update page, and `2025-07-24` in
+  the press release's `datePublished` and its visible dateline. The two July dates are not a
+  contradiction to resolve but two artefacts published four days apart; the earlier note here
+  gave "24 July 2025" alone, which sent a reader to a page carrying the 28th.
 - Why it helps: the module in this repository covers the *discipline* (hypothesis-driven
   hunting, telemetry, tradecraft, detection engineering); the official page is where the
   current exam scope lives.
@@ -174,13 +184,17 @@
   Dedicated product page (verified).
 - Version note: **launched 26 August 2026** as a vendor-neutral IAM certification.
 - Naming note: the **product page** and issued badges say *"Certified Identity & Access
-  Management Technologist (eIAMA)"*, and that is the wording this repository uses.
-  An earlier revision of this entry also claimed that INE's launch announcement called it
-  *"Certified Identity & Access Management **Associate**"*. **That claim has been removed: no
-  source in this repository's own checks supported it**, and it should not be reinstated
-  without a quotation and a link to the page it came from. Where a credential's title is at
-  issue, the product page and the issued badge are what this repository treats as governing —
-  read them rather than a summary, including this one.
+  Management Technologist (eIAMA)"*, and that is the wording this repository uses. INE's own
+  launch announcement says something else — it announces "the launch of the Certified Identity
+  & Access Management **Associate** (eIAMA) certification" and links a learning path slugged
+  `identity-access-management-associate`:
+  <https://ine.com/newsroom/ine-launches-eiama-certification-to-help-organizations-build-practical-identity-and-access-management-skills>
+  Both wordings are INE's, so neither is an error to correct here; where a credential's title
+  is at issue, the **product page and the issued badge govern**, and this repository follows
+  them. Read those two rather than a summary, including this one.
+  (Re-checked 19 September 2026: the announcement URL answers HTTP 200 and carries the
+  *Associate* wording in its body; an earlier revision of this entry recorded the *Associate*
+  claim as unsupported, which was itself wrong.)
 - Why it helps: direct access to the IAM syllabus (identity lifecycle, authentication,
   authorization, zero trust, federation).
 - Note: if the page ever 404s, fall back to the catalogue **https://ine.com/certifications**.

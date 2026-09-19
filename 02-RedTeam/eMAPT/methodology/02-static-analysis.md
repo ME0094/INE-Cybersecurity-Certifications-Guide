@@ -130,9 +130,12 @@ grep -rniE "openOrCreateDatabase|getSharedPreferences|\.db" jadx-out/ | head -20
 ## Step 5 — Hardcoded Secrets
 
 ```bash
-# Common secret shapes across the decompiled tree
-grep -rnoE "(AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|sk-[A-Za-z0-9]{20,})" jadx-out/ | head
-grep -rniE "password|passwd|secret|token|api[_-]?key|private[_-]?key" jadx-out/assets jadx-out/res | head -20
+# Common secret shapes across the decompiled tree. jadx writes two trees: `sources/` for the
+# decompiled classes and `resources/` for everything else, so the res/ and assets/ directories
+# live *under* resources/ — `jadx-out/res` and `jadx-out/assets` do not exist (checked with
+# jadx 1.5.1 on a real APK: only `resources` and `sources` appear at the top level).
+grep -rnoE "(AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|sk-[A-Za-z0-9]{20,})" jadx-out/sources | head
+grep -rniE "password|passwd|secret|token|api[_-]?key|private[_-]?key" jadx-out/resources | head -20
 ```
 
 Watch for: embedded API keys, signing/private keys, OAuth client secrets,

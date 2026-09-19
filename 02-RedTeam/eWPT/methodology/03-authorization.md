@@ -162,6 +162,11 @@ A finding is only as good as its demonstrated impact. For every access-control i
 - [ ] I checked client-side role claims (cookies, headers, JWT payload) for server-side enforcement.
 - [ ] Every finding is backed by a two-identity reproduction showing real impact.
 
+> **Verification:** executed against curl on 2026-09-19 against a local listener: the IDOR loop
+> printed `990 -> 200`, `1001 -> 200`, `1002 -> 200` and the verb loop `GET -> 200`, `POST -> 200`,
+> `PUT -> 501`, `DELETE -> 501`, `PATCH -> 501`, `OPTIONS -> 501`. The listener answers every
+> path, so the codes verify the request shape and the loop, not a real access-control flaw.
+
 ## Further Resources
 
 - OWASP Top 10 — A01 Broken Access Control: https://owasp.org/www-project-top-ten/

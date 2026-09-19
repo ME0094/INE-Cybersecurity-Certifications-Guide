@@ -227,6 +227,15 @@ Telemetry (EDR/XDR agents, logs)  ──►  SIEM (collect + correlate + alert)
 - [ ] I can name the trade-off I accepted when I chose my lab platform, and what it will not teach me.
 - [ ] I have run one query in at least two languages and can explain how aggregation differs between them.
 
+> **Verification:** unverified syntax reference — **not run**: the pass of **2026-09-19** ran on
+> Windows 11 and Ubuntu 24.04 (WSL) with no SIEM on either, so the Docker start, the Wazuh
+> install, the KQL/DQL/ES|QL and SPL queries and the Query DSL body above are shapes to adapt,
+> not captured output. Three things beside the query text were checked that day: the Wazuh
+> installer URL answers HTTP 200; the Docker CLI is present but its daemon is not running, so
+> no image was pulled and no container started; and `sigma convert` really does take
+> `-t/--target` in sigma-cli 3.1.0 — while `sigma list targets` answers *No backends installed*,
+> so the conversions above were not executed either.
+
 ## Further Resources
 
 - Elastic SIEM / Security documentation — https://www.elastic.co/guide/en/security/current/index.html

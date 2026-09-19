@@ -159,7 +159,7 @@ certificate queries into one report — fast but noisy, so verify every result.
 
 | Flag | What it sends | Typical use |
 |---|---|---|
-| `-sn` | No port scan: ICMP echo + TCP SYN to 443/80 | Pure ping sweep |
+| `-sn` | No port scan: ICMP echo + TCP SYN to 443 + TCP ACK to 80 + ICMP timestamp request | Pure ping sweep |
 | `-PS22,80,443` | TCP SYN to given ports | Discover hosts behind ICMP-blocking firewalls |
 | `-PA80` | TCP ACK packet (expects RST) | Stateless-firewall live-host check |
 | `-PU53` | UDP probe to given ports | Hosts that drop ICMP but answer UDP |
@@ -237,6 +237,11 @@ Next step: full TCP port scan + version detection (enumeration phase)
       verify the names resolve.
 - [ ] I can explain when to use `-sn`, `-PS`, `-PA`, `-PU`, `-PR`, and `-Pn`.
 - [ ] I produce a written scope and a host list (`-oG`) before any scan.
+
+> **Verification:** executed against Nmap 7.94SVN on 2026-09-19: `nmap -sn -n --packet-trace`
+> against a single address traces exactly the default discovery set — ICMP echo request, TCP
+> SYN to 443, TCP ACK to 80 and an ICMP timestamp request — which is what the `-sn` row above
+> now states. The OSINT and `dig` examples are documented syntax and were not run here.
 
 ## Further Resources
 

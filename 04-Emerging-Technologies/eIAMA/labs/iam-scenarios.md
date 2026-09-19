@@ -276,7 +276,7 @@ Remove the container when finished so no throwaway credentials linger.
 - RFC 7636 (PKCE): https://www.rfc-editor.org/rfc/rfc7636
 - NIST SP 800-207 (Zero Trust Architecture): https://csrc.nist.gov/pubs/sp/800/207/final
 
-> **Verification.** Both corrections in this file were executed, on **2026-09-19**, under
+> **Verification:** Both corrections in this file were executed, on **2026-09-19**, under
 > Ubuntu 24.04 with **Java 21.0.12** and **Keycloak 26.1.0** (the release zip, extracted in
 > `/tmp`, `kc.sh start-dev --http-port=8180`).
 >

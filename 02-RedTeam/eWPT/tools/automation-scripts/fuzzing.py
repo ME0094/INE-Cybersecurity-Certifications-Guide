@@ -3,7 +3,10 @@
 fuzzing.py — Single-parameter HTTP fuzzer (eWPT / eWPTX).
 
 Replaces the FUZZ marker in the URL (or in --data) with each wordlist line
-and prints status + length. Uses only the standard library.
+and prints status + length. Uses only the standard library. In the URL the
+entry is percent-encoded for a path — `/` and any existing `%XX` triplet are
+left as they are — while in --data it is substituted verbatim. Redirects are
+not followed: the status printed is the one the server answered.
 
 Usage:
     python3 fuzzing.py -u "http://target/dir/FUZZ" -w payloads.txt
@@ -13,6 +16,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import re
 import ssl
 import sys
 import time
@@ -22,9 +26,42 @@ import urllib.request
 
 MARKER = "FUZZ"
 
+# An already percent-encoded triplet, as shipped by payload lists that carry
+# encoded traversal (`..%2f..%2f`) or pre-encoded characters.
+_PCT_ESCAPE = re.compile(r"%[0-9A-Fa-f]{2}")
+
+
+def encode_for_path(word: str) -> str:
+    """Encode a wordlist entry for use inside a URL path.
+
+    Path separators stay literal, so a multi-segment entry such as `api/v1` or
+    `.git/config` reaches the server as written. Characters that are already
+    percent-encoded are left alone, so `..%2f..%2f` is sent as the traversal
+    the wordlist intends rather than double-encoded to `..%252f`.
+    """
+    parts = _PCT_ESCAPE.split(word)
+    escapes = _PCT_ESCAPE.findall(word)
+    out = [urllib.parse.quote(parts[0], safe="/")]
+    for escape, part in zip(escapes, parts[1:]):
+        out.append(escape)
+        out.append(urllib.parse.quote(part, safe="/"))
+    return "".join(out)
+
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Report the status the server sent instead of the one it leads to.
+
+    build_opener() installs HTTPRedirectHandler by default, so a 301/302 would
+    be followed and printed as the final 200 — which is exactly the status the
+    result table is read for.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
 
 def build_opener(insecure: bool) -> urllib.request.OpenerDirector:
-    handlers: list = []
+    handlers: list = [NoRedirect]
     if insecure:
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
@@ -89,7 +126,7 @@ def main() -> int:
     opener = build_opener(args.insecure)
     print(f"{'STATUS':>6} {'LEN':>7}  LINE")
     for word in words:
-        url = args.url.replace(MARKER, urllib.parse.quote(word, safe=""))
+        url = args.url.replace(MARKER, encode_for_path(word))
         data = None
         if args.data:
             data = args.data.replace(MARKER, word)

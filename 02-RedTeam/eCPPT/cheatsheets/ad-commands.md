@@ -141,9 +141,14 @@ nxc smb 10.0.0.11 -u bob -H '<NTLM>'          # valid hash? (Pwn3d! = admin)
   the domain. Mixing them up produces confusing "no such group" errors.
 - RSAT missing — AD cmdlets fail with "module not found"; install
   `RSAT-AD-PowerShell` or run from the DC.
-- **Filters are not always case-insensitive** — LDAP filters are
-  case-sensitive for attribute names; PowerShell `-Filter` strings use
-  PowerShell syntax (`"Name -like '*x*'"`), not LDAP.
+- **Attribute names are case-insensitive; matching rules are where case matters.** LDAP
+  attribute *descriptions* are case-insensitive (RFC 4512 §2.5), so `sAMAccountName` and
+  `samaccountname` name the same attribute, and RFC 4515 filters match attribute names the
+  same way. What differs is the *value* comparison: `caseIgnoreMatch` (most name and
+  description attributes) folds case, while `caseExactMatch` and the DN syntaxes do not — so
+  `(cn=JDOE)` is not a reliable way to find `jdoe`. Separately, PowerShell's `-Filter`
+  parameter is **not** LDAP: it takes PowerShell syntax (`"Name -like '*x*'"`), and
+  `-LDAPFilter` is the one that takes an RFC 4515 filter.
 - BloodHound queries need the *imported* data — a fresh collector zip only
   helps after ingestion.
 - Mimikatz/PtH needs admin on the *target*, not just valid credentials.

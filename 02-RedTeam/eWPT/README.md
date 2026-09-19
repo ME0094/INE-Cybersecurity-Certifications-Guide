@@ -28,13 +28,19 @@ Working through this module should give you the following capabilities:
 - Test authorization boundaries: horizontal and vertical access control,
   object-level references (IDOR), and forced browsing.
 - Find and exploit classic input-validation flaws: SQL injection, XSS,
-  command injection, path traversal / LFI, SSRF, and unsafe file upload.
+  command injection, path traversal / LFI, and unsafe file upload.
 - Reason about business logic: abusing workflows, pricing or quota fields,
   race conditions, and trust boundaries.
 - Drive professional tooling: Burp Suite as the central proxy and sqlmap for
   automated SQL injection testing.
 - Write up findings the way a consultant would: evidence, impact, and
   remediation — no exam specifics, just good professional practice.
+
+What the module deliberately does not develop: **SSRF** has payload probes in
+`cheatsheets/web-payloads.md` (§5) but no phase of its own, and **CSRF** is named
+where it matters and never given a family — the five phases are the
+input-validation families listed above. Treat both as reading material, not as
+drills this module walks you through.
 
 ## Prerequisites
 
@@ -137,6 +143,13 @@ alone will not make it stick.
 - [ ] I reviewed each file's common-mistakes list and re-tested my weak spots.
 
 ---
+
+> **Verification:** executed against the repository's own checks on 2026-09-19:
+> `check-catalog.mjs .` reports every module note keeping the H1 + Checklist + Further
+> Resources convention and `check-links.mjs .` resolves every relative link and anchor; the
+> five phase files, both tool guides, the lab and the cheatsheet named above exist on disk,
+> and `tools/automation-scripts/fuzzing.py` was run against a local listener (it now reports
+> the status the server sent, 302 included, instead of the redirect target's 200).
 
 ## Further Resources
 

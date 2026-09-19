@@ -287,6 +287,22 @@ wevtutil epl Security C:\lab\exports\Security.evtx
 - [ ] For every negative finding, I stated whether the artefact or the audit policy was actually present.
 - [ ] Every artefact I collected came from a host I own or am authorized to examine.
 
+> **Verification:** executed against **PowerShell 7.6.6 / `Get-WinEvent`** on Windows 11
+> (10.0.26200) on **2026-09-19**, elevated. Every non-Sysmon channel named in the tables exists on
+> this host with its `.evtx` file under `C:\Windows\System32\winevt\Logs` — `Security`, `System`,
+> `Windows PowerShell`, `Microsoft-Windows-PowerShell/Operational`,
+> `TaskScheduler/Operational`, `WMI-Activity/Operational`, both TerminalServices channels,
+> `Windows Defender/Operational` and `DNS-Client/Operational` — and the cited IDs are declared by
+> their providers' own manifests: TaskScheduler 106/140/141/142/200/201, WMI-Activity
+> 5857/5858/5860/5861, Defender 1116/1117/5001/5007, PowerShell 4103/4104, DNS-Client
+> 3006/3008, TerminalServices 21–25 and 1149, and the Security IDs including 4688, 4624, 4648,
+> 4672, 4698 and 6416. Two rows deserve the precision: **1102** and **104** are declared by
+> `Microsoft-Windows-Eventlog`, not by the auditing provider, and the legacy `400`/`403`/`600`/`800`
+> IDs come from the `Windows PowerShell` channel, which no installed manifest describes.
+> **Not verified:** the Sysmon rows — Sysmon is not installed on this host, and `Get-WinEvent
+> -LogName 'Microsoft-Windows-Sysmon/Operational'` fails accordingly — and the logon-type table,
+> which is documentation rather than a manifest entry.
+
 ## Further Resources
 
 - Windows Security auditing and event reference — learn.microsoft.com/windows/security/threat-protection/auditing.

@@ -363,6 +363,17 @@ The division of labour in one line each: **methodology** explains and decides, *
 - [ ] I can state what my reviewer sees before approving an irreversible action, what happens on timeout, and why an approval is per action rather than per session.
 - [ ] I can list the fields my decision log must contain, name what must never be stored in clear, and state the release-gate thresholds before running the suite.
 
+> **Verification:** `parse_model_decision()` was extracted **verbatim from the block above** and
+> executed on **2026-09-19** under Ubuntu 24.04 / Python 3.12.3. It behaves as the comments claim:
+> a well-formed call for an allow-listed tool comes back unchanged; `send_email` raises
+> `ValueError: disallowed tool requested: send_email`; empty arguments raise `ValueError: empty
+> arguments`; and text that is not JSON raises `JSONDecodeError`. One detail the comments do not
+> state: a payload with **no** `args` key raises `KeyError: 'args'` instead of a `ValueError`, so
+> a caller catching one exception type will miss that rejection. Everything else in this phase is
+> a control catalogue, a permission table and a checklist — no guardrail, approval queue, trace
+> store or agent runtime exists on this machine, so no control was proved here, only the one
+> parser that could be run.
+
 ## Further Resources
 
 - OWASP Top 10 for Large Language Model Applications — https://owasp.org/www-project-top-10-for-large-language-model-applications/

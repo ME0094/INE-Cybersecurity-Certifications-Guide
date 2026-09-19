@@ -427,7 +427,14 @@ Carving pitfalls that change conclusions:
 > build, `strings /usr/bin/foremost` contains **no** `jpg`, `jpeg`, `png`, `pdf` or `zip` (the short
 > lowercase strings that look like type names are `docx ftyp gzip impress mdat moov mpeg office pnot
 > pptx regf trak vjpeg xlsx`), and `/etc/foremost.conf` ships with **every** type line commented
-> out — which its own header explains is for formats that are *not* built in. Cause not fully
-> established, and `scalpel -o <dir> <img>` ran with the default (all-commented) config and carved
-> nothing either. **Not executed:** `dd`/`dc3dd` against a real block device, and `bulk_extractor`
+> out — which its own header explains is for formats that are *not* built in. **Cause established on
+> 19 September 2026:** the shipped config enables **zero** type lines (0 of its 239) and this binary
+> carries no compiled-in table for them, so `-t jpg` names a type defined nowhere — `foremost`
+> finishes normally, writes an `audit.txt` reading `0 FILES EXTRACTED`, exits 0 and prints nothing on
+> stderr. The proof is the same run with one line of that same config re-enabled
+> (`jpg y 20000000 \xff\xd8\xff\xe0\x00\x10 \xff\xd9`, passed with `-c`): it carved
+> `jpg/00000000.jpg`, byte-identical to the planted `ffd8ffe0` payload. That line matches the JFIF
+> header only, so EXIF (`ffd8ffe1`) and bare `ffd8` JPEGs are still not carved even then.
+> `scalpel -o <dir> <img>` ran with the default (all-commented) config and carved nothing either.
+> **Not executed:** `dd`/`dc3dd` against a real block device, and `bulk_extractor`
 > (not installed).

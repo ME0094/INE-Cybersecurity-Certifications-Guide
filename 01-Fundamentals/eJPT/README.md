@@ -63,10 +63,13 @@ Security page, since those details can change.
 
 ## Certification version and recent updates
 
-INE Security announced an **updated eJPT** on **31 March 2026**, with "expanded web
+INE Security announced an **updated eJPT** in **spring 2026**, with "expanded web
 app testing, recon training, and offensive AI": more web application testing,
-reconnaissance, and offensive AI. In the announcement's own words: "Enhanced training
-and updated exam deliver stronger alignment between learning and real-world skills".
+reconnaissance, and offensive AI. The newsroom post below is datelined **26 March
+2026** and published **1 April 2026** — those are the dates on the announcement page
+itself, which is the artefact to quote. In the announcement's own words: "Enhanced
+training and updated exam deliver stronger alignment between learning and real-world
+skills".
 
 - Official announcement:
   <https://ine.com/newsroom/ine-security-launches-updated-ejpt-certification-with-expanded-web-app-testing-recon-training-and-offensive-ai>
@@ -143,6 +146,11 @@ build the lab with `labs/lab-setup-guide.md` → work through
 - [ ] I can re-run the core drills without opening these notes.
 - [ ] I keep organized engagement notes with evidence (commands + output).
 - [ ] I verified current exam logistics on the official INE Security page.
+
+> **Verification:** checked against INE's eJPT newsroom announcement
+> (<https://ine.com/newsroom/ine-security-launches-updated-ejpt-certification-with-expanded-web-app-testing-recon-training-and-offensive-ai>),
+> the eJPT product page and the certifications directory (both HTTP 200) on 2026-09-19: the post
+> is datelined 26 March 2026 and published 1 April 2026. No exam material is reproduced here.
 
 ## Further Resources
 

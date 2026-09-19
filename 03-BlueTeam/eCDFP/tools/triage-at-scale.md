@@ -305,6 +305,18 @@ The three-line version: **breadth first** (hunt the fleet for one specific artef
 - [ ] I can justify, for a given question, choosing triage over imaging — and one case where imaging is the only defensible answer.
 - [ ] I hold written authorisation for every host I collected from, and I collected only what the question required.
 
+> **Verification:** executed against **Velociraptor 0.77.2** on **2026-09-19** (Ubuntu 24.04 WSL):
+> `velociraptor --help`, `artifacts collect --help` and `config --help` name
+> the command groups and subcommands this file quotes (`artifacts`, `config generate`, `config
+> repack`), and a bare local `artifacts list` (no `--config`, so only the artifacts compiled into
+> the binary) ships `Windows.System.Pslist` — the artifact collected in section 3.4 — but **not**
+> `Windows.KapeFiles.Targets`, which is exactly why section 4 says to copy every name out of your
+> own catalogue on the build you are using. `Get-FileHash -Algorithm SHA256`
+> was run separately in **PowerShell 7.6.6** and printed algorithm, hash and path for a file, as
+> section 6 describes. **Not executed:** `config generate -i`, `gui`, `config repack` and any
+> collection — no server, no enrolled client and no collector package exists here — so sections 3,
+> 5 and 6 remain a plan, not a result.
+
 ## Further Resources
 
 - Velociraptor documentation — https://docs.velociraptor.app/ (architecture, artifact reference, VQL reference, offline collector, notebooks).

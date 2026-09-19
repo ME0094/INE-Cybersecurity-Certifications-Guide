@@ -181,6 +181,16 @@ is a complete detection → containment → eradication → lessons-learned cycl
 - [ ] Every drill's evidence was hashed, logged, and traceable in the case file.
 - [ ] I can run a complete drill start to finish without referring back to this guide.
 
+> **Verification:** the triage step of Drill A was executed on **2026-09-19** against
+> **PowerShell 7.6.6** on Windows 11 (10.0.26200), elevated: `Get-Process` returned the process
+> list with `Id`, `ProcessName`, `Path` and `StartTime`, and
+> `Get-NetTCPConnection -State Established` returned the established connections with their
+> owning PID — the process-side evidence the drill asks you to capture first. The two external
+> references new to this drill resolve (HTTP 200: the KapeFiles repository and the SwiftOnSecurity
+> Sysmon configuration). **Not executed:** the drills themselves — no hypervisor, victim VMs,
+> Sysmon, Velociraptor server or KAPE binary exists on this machine — so the snapshots, injects
+> and forwarding steps remain a plan rather than a rehearsed result.
+
 ## Further Resources
 
 - NIST SP 800-61 Rev. 2, *Computer Security Incident Handling Guide* — https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
